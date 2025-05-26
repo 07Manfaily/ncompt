@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Drawer,
-  AppBar,
   Toolbar,
   Typography,
-  Button,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Avatar,
   AvatarGroup,
   Card,
@@ -21,15 +14,11 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  TextField,
-  InputAdornment,
-  LinearProgress,
   Chip,
   Grid,
   Paper
 } from '@mui/material';
 import {
-  CloudUpload,
   Folder,
   Computer,
   Share,
@@ -37,12 +26,8 @@ import {
   Star,
   Delete,
   Backup,
-  Search,
-  Settings,
-  Help,
   GridView,
   Info,
-  Menu,
   Description,
   PictureAsPdf,
   Image,
@@ -50,20 +35,11 @@ import {
   ChevronRight
 } from '@mui/icons-material';
 
-const drawerWidth = 260;
 
 export default function GoogleDriveUI() {
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const sidebarItems = [
-    { text: 'My drive', icon: <Folder />, active: true },
-    { text: 'Computers', icon: <Computer /> },
-    { text: 'Shared with me', icon: <Share /> },
-    { text: 'Recent', icon: <Schedule /> },
-    { text: 'Starred', icon: <Star /> },
-    { text: 'Trash', icon: <Delete /> },
-    { text: 'Backups', icon: <Backup /> }
-  ];
+
 
   const quickAccessFolders = [
     {
@@ -139,188 +115,12 @@ export default function GoogleDriveUI() {
 
   return (
     <Box sx={{ display: 'flex', bgcolor: 'white', minHeight: '100vh' }}>
-      {/* AppBar */}
-      <AppBar position="fixed" sx={{boxShadow: 'none', bgcolor: 'white', color: '#5f6368', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <Toolbar sx={{ justifyContent: 'space-between', minHeight: 64 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <IconButton aria-label="menu">
-              <Menu />
-            </IconButton>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box 
-                sx={{ 
-                  width: 24, 
-                  height: 24, 
-                  bgcolor: '#4285f4', 
-                  borderRadius: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <Folder sx={{ color: 'white', fontSize: 16 }} />
-              </Box>
-              <Typography variant="h6" sx={{ color: '#5f6368', fontWeight: 400 }}>
-                Google Drive
-              </Typography>
-            </Box>
-          </Box>
-          <TextField
-            placeholder="Search Drive"
-            variant="outlined"
-            size="small"
-            sx={{ 
-              width: { xs: 120, sm: 250, md: 400, lg: 600 },
-              '& .MuiOutlinedInput-root': {
-                bgcolor: '#f1f3f4',
-                borderRadius: '24px',
-                '& fieldset': { border: 'none' }
-              }
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: '#5f6368' }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton aria-label="help">
-              <Help sx={{ color: '#5f6368' }} />
-            </IconButton>
-            <IconButton aria-label="settings">
-              <Settings sx={{ color: '#5f6368' }} />
-            </IconButton>
-            <Avatar sx={{ bgcolor: '#1976d2', width: 32, height: 32 }}>J</Avatar>
-            <IconButton aria-label="menu options">
-              <Menu sx={{ color: '#5f6368' }} />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      {/* Drawer (Sidebar) */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundColor: '#020235',
-            borderRight: '1px solid #e0e0e0',
-            borderTopRightRadius: '60px',
-            mt: 8,
-         
-            // PAS de mt, pt, ou paddingTop ici !
-          },
-        }}
-      >
-        <Toolbar sx={{ minHeight: 64 }} />
-        {/* <Box sx={{ p: 2 }}>
-          <Button
-            variant="contained"
-            startIcon={<CloudUpload />}
-            sx={{
-              width: '100%',
-              borderRadius: '24px',
-              textTransform: 'none',
-              bgcolor: '#1976d2',
-              '&:hover': { bgcolor: '#1565c0' }
-            }}
-          >
-            Upload New File
-          </Button>
-        </Box>*/}
-
-        <List sx={{ px: 1 ,mt:2}}>
-          {sidebarItems.map((item, index) => (
-            <ListItem
-              key={item.text}
-              sx={{
-                borderRadius: '0 24px 24px 0',
-                bgcolor: item.active ? '#e3f2fd' : 'transparent',
-                color: item.active ? '#1976d2' : '#5f6368',
-                mb: 0.5,
-                '&:hover': { bgcolor: item.active ? '#e3f2fd' : '#f5f5f5' }
-              }}
-            >
-              <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText 
-                primary={item.text}
-                primaryTypographyProps={{ fontSize: '14px' }}
-              />
-            </ListItem>
-          ))}
-        </List>
-
-        <Box sx={{ mt: 'auto', p: 2 }}>
-          <Typography variant="caption" sx={{ color: '#5f6368', mb: 1, display: 'block' }}>
-            STORAGE DETAILS
-          </Typography>
-          
-          <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Folder sx={{ color: '#5f6368', fontSize: 20 }} />
-              <Typography variant="body2" sx={{ color: '#202124' }}>Storage</Typography>
-            </Box>
-            <LinearProgress 
-              variant="determinate" 
-              value={60} 
-              sx={{ 
-                height: 4, 
-                borderRadius: 2,
-                bgcolor: '#e8eaed',
-                '& .MuiLinearProgress-bar': { bgcolor: '#1976d2' }
-              }} 
-            />
-            <Typography variant="caption" sx={{ color: '#5f6368', mt: 0.5, display: 'block' }}>
-              60.8 GB of 1 TB used
-            </Typography>
-          </Box>
-
-          <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Image sx={{ color: '#5f6368', fontSize: 20 }} />
-              <Typography variant="body2" sx={{ color: '#202124' }}>Photos</Typography>
-            </Box>
-            <LinearProgress 
-              variant="determinate" 
-              value={15} 
-              sx={{ 
-                height: 4, 
-                borderRadius: 2,
-                bgcolor: '#e8eaed',
-                '& .MuiLinearProgress-bar': { bgcolor: '#34a853' }
-              }} 
-            />
-            <Typography variant="caption" sx={{ color: '#5f6368', mt: 0.5, display: 'block' }}>
-              10.3 GB of 1 TB used
-            </Typography>
-          </Box>
-
-          <Button
-            variant="text"
-            sx={{ 
-              textTransform: 'none',
-              color: '#1976d2',
-              fontSize: '13px',
-              p: 0
-            }}
-          >
-            Upgrade Storage ↗
-          </Button>
-        </Box>
-      </Drawer>
+ 
 
       {/* Main content */}
       <Box component="main" sx={{ flexGrow: 1, p: 3, bgcolor: 'white' }}>
         <Toolbar sx={{ minHeight: 64 }} />
-        
-        {/* Header */}
+      
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="h5" sx={{ color: '#202124', fontWeight: 400 }}>
@@ -461,12 +261,12 @@ export default function GoogleDriveUI() {
                     <TableCell>
                       <Typography variant="body2" sx={{ color: '#5f6368' }}>
                         {file.lastModified}
-                      </Typography>
+      </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ color: '#5f6368' }}>
                         {file.size}
-                      </Typography>
+      </Typography>
                     </TableCell>
                     <TableCell>
                       <IconButton size="small" aria-label="more options">
@@ -480,6 +280,6 @@ export default function GoogleDriveUI() {
           </TableContainer>
         </Box>
       </Box>
-    </Box>
-  );
+  </Box>
+);
 }

@@ -85,6 +85,7 @@ const Login = () => {
                 </Link>
               </Box>
               <Button
+              onClick={window.location.href="/home"}
                 type="submit"
                 variant="contained"
                 sx={{

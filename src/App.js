@@ -1,6 +1,6 @@
 import './App.css';
-import Sidebar from './layouts/sidebar';
-import Header from './layouts/header';
+import Sidebar from './components/layouts/sidebar';
+import Header from './components/layouts/header';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import Home from './pages/Home';
@@ -12,6 +12,9 @@ import Support from './pages/Support';
 import Login from './pages/Login';
 import BusinessCard from './pages/BusinessCard';
 import BusinessCardOrange from './pages/BusinessCardOrange';
+import Plan from './pages/formationPlan'
+import Task from './pages/task'
+
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,8 +26,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Login />} />
         <Route
           path="*"
           element={
@@ -34,7 +36,10 @@ function App() {
                 <Header toggleSidebar={toggleSidebar} />
                 <main className="content-section">
                   <Routes>
-                 
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/formation-plan" element={<Plan />} />
+                    <Route path="/sessions" element={<Task />} />
+                   
                     <Route path="/bookings" element={<Bookings />} />
                     <Route path="/rate-plans" element={<RatePlans />} />
                     <Route path="/apartments" element={<Apartments />} />
