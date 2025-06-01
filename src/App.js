@@ -14,7 +14,7 @@ import BusinessCard from './pages/BusinessCard';
 import BusinessCardOrange from './pages/BusinessCardOrange';
 import Plan from './pages/formationPlan'
 import Task from './pages/task'
-
+import Form from './pages/form'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,7 +39,8 @@ function App() {
                     <Route path="/home" element={<Home />} />
                     <Route path="/formation-plan" element={<Plan />} />
                     <Route path="/sessions" element={<Task />} />
-                   
+                    <Route path="/form" element={<Form />} />
+
                     <Route path="/bookings" element={<Bookings />} />
                     <Route path="/rate-plans" element={<RatePlans />} />
                     <Route path="/apartments" element={<Apartments />} />

@@ -119,22 +119,7 @@ const Task = () => {
       ],
       status: 'In Progress'
     },
-    {
-      id: 8,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Planning',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'YZ', priority: 'Urgent', color: '#795548' },
-        { initials: 'AA', priority: 'Urgent', color: '#e91e63' }
-      ],
-      status: 'Completed'
-    }
+    
   ]);
 
   const columns = [
@@ -171,9 +156,8 @@ const Task = () => {
 
   return (
     <div style={{ 
-      padding: '24px', 
       backgroundColor: '#f5f5f5', 
-      minHeight: '100vh',
+      marginTop:'60px',
       fontFamily: 'Roboto, sans-serif'
     }}>
       {/* Header */}
@@ -181,7 +165,8 @@ const Task = () => {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        marginBottom: '32px' 
+        marginBottom: '32px',
+       
       }}>
         <h1 style={{ 
           fontSize: '32px', 
@@ -230,7 +215,7 @@ const Task = () => {
         display: 'grid', 
         gridTemplateColumns: 'repeat(4, 1fr)', 
         gap: '24px',
-        height: 'calc(100vh - 140px)'
+        height: 'calc(100vh - 180px)' // Ajustement de la hauteur pour compenser l'espacement
       }}>
         {columns.map(column => (
           <div key={column.id} style={{ display: 'flex', flexDirection: 'column' }}>

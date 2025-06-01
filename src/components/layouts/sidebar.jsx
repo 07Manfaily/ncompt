@@ -22,7 +22,7 @@ const menuItems = [
       { text: 'Action de formation', path: '/formation-action' },
     ]
   },
-  { text: 'Rate plans', icon: <BarChartIcon />, path: '/rate-plans' },
+  { text: 'Form', icon: <BarChartIcon />, path: '/form' },
   { text: 'Bookings', icon: <CalendarMonthIcon />, path: '/bookings' },
   { text: 'Apartments', icon: <ApartmentIcon />, path: '/apartments' },
   { text: 'Pricing', icon: <LocalOfferIcon />, path: '/pricing' },
