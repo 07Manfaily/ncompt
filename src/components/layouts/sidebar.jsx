@@ -23,6 +23,7 @@ const menuItems = [
     ]
   },
   { text: 'Form', icon: <BarChartIcon />, path: '/form' },
+  { text: 'Chart', icon: <BarChartIcon />, path: '/chart' },
   { text: 'Bookings', icon: <CalendarMonthIcon />, path: '/bookings' },
   { text: 'Apartments', icon: <ApartmentIcon />, path: '/apartments' },
   { text: 'Pricing', icon: <LocalOfferIcon />, path: '/pricing' },

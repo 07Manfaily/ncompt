@@ -15,6 +15,7 @@ import BusinessCardOrange from './pages/BusinessCardOrange';
 import Plan from './pages/formationPlan'
 import Task from './pages/task'
 import Form from './pages/form'
+import Chart from './pages/chart'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,6 +28,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/chart" element={<Chart />} />
         <Route
           path="*"
           element={
@@ -36,6 +38,7 @@ function App() {
                 <Header toggleSidebar={toggleSidebar} />
                 <main className="content-section">
                   <Routes>
+                  
                     <Route path="/home" element={<Home />} />
                     <Route path="/formation-plan" element={<Plan />} />
                     <Route path="/sessions" element={<Task />} />
