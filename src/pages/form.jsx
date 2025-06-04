@@ -1,42 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Stepper,
-  Step,
-  StepLabel,
-  StepButton,
-  Typography,
-  Box,
-  Paper,
-  Fade,
-  Slide,
-  IconButton,
-  LinearProgress,
-  Card,
-  CardContent,
-  Divider,
-  Grid,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  Alert
+  Dialog,DialogTitle,DialogContent,DialogActions,Button,TextField,Stepper,Step,StepLabel,StepButton,Typography,Box,Paper,Fade,Slide,IconButton,LinearProgress,Card,CardContent,Divider,Grid,MenuItem,FormControl,InputLabel,Select,Alert
 } from '@mui/material';
 import {
-  School,
-  Business,
-  Schedule,
-  Euro,
-  Close,
-  NavigateNext,
-  NavigateBefore,
-  Check,
-  Celebration
+  School, Business, Schedule, Euro, Close, NavigateNext, NavigateBefore, Check, Celebration
 } from '@mui/icons-material';
 
 // Composant pour chaque étape avec layout adaptatif
@@ -710,8 +677,8 @@ const SuccessComponent = ({ formData, onRestart }) => (
   </Fade>
 );
 
-const WizardFormModal = () => {
-  const [open, setOpen] = useState(false);
+const WizardFormModal = ({ open, onClose }) => {
+ // const [open, setOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   const [errors, setErrors] = useState({});
@@ -795,7 +762,23 @@ const WizardFormModal = () => {
       console.log('Données de formation:', formData);
     }
   };
+  useEffect(() => {
+    if (open) {
+      setActiveStep(0);
+      setShowSuccess(false);
+      setErrors({});
+      setFormData({
+        step1: {},
+        step2: {},
+        step3: {},
+        step4: {}
+      });
+    }
+  }, [open]);
 
+  const handleClose = () => {
+    onClose();
+  };
   const handleRestart = () => {
     setShowSuccess(false);
     setActiveStep(0);
@@ -806,7 +789,8 @@ const WizardFormModal = () => {
       step3: {},
       step4: {}
     });
-    setOpen(false);
+    onClose();
+    //setOpen(false);
   };
 
   const renderStep = () => {
@@ -831,40 +815,9 @@ const WizardFormModal = () => {
   const progress = showSuccess ? 100 : ((activeStep + 1) / totalSteps) * 100;
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '20px'
-    }}>
-      <Button
-        variant="contained"
-        size="large"
-        onClick={() => setOpen(true)}
-        sx={{
-          background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-          borderRadius: 3,
-          boxShadow: '0 8px 32px rgba(255, 105, 135, 0.3)',
-          px: 4,
-          py: 2,
-          fontSize: '1.1rem',
-          fontWeight: 'bold',
-          textTransform: 'none',
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 12px 40px rgba(255, 105, 135, 0.4)',
-          },
-          transition: 'all 0.3s ease'
-        }}
-      >
-        Créer une Formation
-      </Button>
-
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleClose}
         maxWidth="lg"
         fullWidth
         PaperProps={{
@@ -890,7 +843,7 @@ const WizardFormModal = () => {
           <Typography variant="h5" fontWeight="bold">
             {showSuccess ? 'Formation Créée !' : `Création de Formation - Étape ${activeStep + 1}/${totalSteps}`}
           </Typography>
-          <IconButton onClick={() => setOpen(false)} sx={{ color: 'white' }}>
+          <IconButton onClick={handleClose} sx={{ color: 'white' }}>
             <Close />
           </IconButton>
         </DialogTitle>
@@ -1020,7 +973,7 @@ const WizardFormModal = () => {
           </DialogActions>
         )}
       </Dialog>
-    </div>
+    
   );
 };
 
