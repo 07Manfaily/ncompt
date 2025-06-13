@@ -5,6 +5,51 @@ import {
 import {
   School, Business, Schedule, Euro, Close, NavigateNext, NavigateBefore, Check, Celebration
 } from '@mui/icons-material';
+import axios from 'axios';
+
+// Fonction pour envoyer le formulaire à l'API avec tous les paramètres attendus
+const envoyerFormation = async (formData) => {
+  try {
+    // Construction de l'objet avec tous les champs attendus par l'API
+    const donnees = {
+      code_formation: formData.step1.code_formation || "",
+      intitule_formation: formData.step1.intitule_formation || "",
+      objectif_formation: formData.step1.objectif_formation || "",
+      ogf: formData.step1.ogf || "",
+      thematique: formData.step1.thematique || "",
+      type_de_programme: formData.step2.type_de_programme || "",
+      origine_de_la_demande: formData.step2.origine_de_la_demande || "",
+      formation_obligatoire: formData.step2.formation_obligatoire || "",
+      formation_diplomante: formData.step2.formation_diplomante || "",
+      priorite: formData.step2.priorite || "",
+      mode_diffusion: formData.step2.mode_diffusion || "",
+      direction: formData.step3.direction || "",
+      profil_cible: formData.step3.profil_cible || "",
+      effectif: formData.step3.effectif || "",
+      type: formData.step4.type || "",
+      formateur: formData.step3.formateur || "",
+      nbr_session: formData.step4.nbr_session || "",
+      duree_jours: formData.step3.duree_jours || "",
+      duree_heures: formData.step3.duree_heures || "",
+      date_de_debut: formData.step3.date_de_debut || "",
+      date_de_fin: formData.step3.date_de_fin || "",
+      periode_couts: formData.step4.periode_courts || "",
+      conception_animation: formData.step4.conception_animation || "",
+      couts_logistique: formData.step4.couts_logistique || "",
+      couts_total: formData.step4.couts_total || "",
+      statut: "", // à remplir si tu as ce champ dans le formulaire
+      avis_drh: formData.step4.statut_avis_drh || "",
+    };
+
+    // Appel POST vers l'API
+    const response = await axios.post('/api/formation', donnees);
+
+    return response.data;
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi du formulaire :', error);
+    throw error;
+  }
+};
 
 // Composant pour chaque étape avec layout adaptatif
 const StepComponent = ({ title, icon, children, description }) => (
@@ -756,10 +801,15 @@ const WizardFormModal = ({ open, onClose }) => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateStep(activeStep)) {
-      setShowSuccess(true);
-      console.log('Données de formation:', formData);
+      try {
+        await envoyerFormation(formData);
+        setShowSuccess(true);
+        console.log('Données de formation envoyées:', formData);
+      } catch (error) {
+        alert("Erreur lors de l'envoi du formulaire. Veuillez réessayer.");
+      }
     }
   };
   useEffect(() => {

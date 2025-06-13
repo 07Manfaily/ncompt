@@ -19,6 +19,7 @@ import {
   IconButton,
   Pagination,
   Toolbar,
+  Modal,
 
 } from '@mui/material';
 import {
@@ -30,6 +31,7 @@ import {
 } from '@mui/icons-material';
 
 import  WizardFormModal  from './form';
+import colors from '../utils/colorChart';
 
 const ProductTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -219,45 +221,63 @@ const ProductTable = () => {
             <Button
               variant="contained"
               size="large"
-                onClick={handleOpenModal}
-                sx={{
-                background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+              onClick={handleOpenModal}
+              sx={{
+                background: `linear-gradient(45deg, ${colors.apricot} 30%, ${colors.azure} 90%)`,
                 borderRadius: 3,
-                boxShadow: '0 8px 32px rgba(255, 105, 135, 0.3)',
+                boxShadow: `0 8px 32px ${colors.spicyMix}33`,
                 px: 4,
                 py: 2,
                 fontSize: '1.1rem',
                 fontWeight: 'bold',
                 textTransform: 'none',
+                color: colors.mako,
                 '&:hover': {
+                  background: `linear-gradient(45deg, ${colors.azure} 30%, ${colors.royalBlue} 90%)`,
                   transform: 'translateY(-2px)',
-                  boxShadow: '0 12px 40px rgba(255, 105, 135, 0.4)',
+                  boxShadow: `0 12px 40px ${colors.azure}44`,
                 },
                 transition: 'all 0.3s ease'
               }}
               startIcon={<AddIcon />}
-           
             >
-              Add New Product
+              Ajouter une formation
             </Button>
           </Box>
         </Toolbar>
-        <WizardFormModal
-        open={modalOpen} 
-        onClose={handleCloseModal} 
-      />
+        <Modal
+          open={modalOpen}
+          onClose={handleCloseModal}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '.MuiPaper-root': {
+              background: `linear-gradient(135deg, ${colors.puertoRico}, ${colors.azure})`,
+              color: colors.mako,
+              borderRadius: 3,
+              boxShadow: `0 8px 32px ${colors.azure}33`,
+              p: 4,
+            }
+          }}
+        >
+          <WizardFormModal
+            open={modalOpen}
+            onClose={handleCloseModal}
+          />
+        </Modal>
         {/* Table */}
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#fafafa' }}>
-                <TableCell sx={{ fontWeight: 600, color: '#666', py: 2 }}>Product Name</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#666', py: 2 }}>Product ID</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#666', py: 2 }}>Price</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#666', py: 2 }}>Stock</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#666', py: 2 }}>Type</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#666', py: 2 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: '#666', py: 2 }}>Action</TableCell>
+              <TableRow sx={{ backgroundColor: colors.mercury }}>
+                <TableCell sx={{ fontWeight: 600, color: colors.azure, py: 2 }}>Product Name</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: colors.azure, py: 2 }}>Product ID</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: colors.azure, py: 2 }}>Price</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: colors.azure, py: 2 }}>Stock</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: colors.azure, py: 2 }}>Type</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: colors.azure, py: 2 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: colors.azure, py: 2 }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -265,7 +285,7 @@ const ProductTable = () => {
                 <TableRow key={product.id} sx={{ '&:hover': { backgroundColor: '#f8f9fa' } }}>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Avatar sx={{ width: 40, height: 40, backgroundColor: '#f5f5f5', fontSize: '1.2rem' }}>
+                      <Avatar sx={{ width: 40, height: 40, backgroundColor: colors.fadedJade, fontSize: '1.2rem', color: colors.mako }}>
                         {product.avatar}
                       </Avatar>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -341,9 +361,10 @@ const ProductTable = () => {
             sx={{
               '& .MuiPaginationItem-root': {
                 borderRadius: 1,
+                color: colors.azure,
                 '&.Mui-selected': {
-                  backgroundColor: '#4285f4',
-                  color: 'white'
+                  backgroundColor: colors.azure,
+                  color: colors.mercury
                 }
               }
             }}
