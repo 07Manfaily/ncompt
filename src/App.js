@@ -14,7 +14,7 @@ import BusinessCard from './pages/BusinessCard';
 import BusinessCardOrange from './pages/BusinessCardOrange';
 import Plan from './pages/formationPlan'
 import Task from './pages/task'
-import Form from './pages/form'
+import Form from './pages/test'
 import Chart from './pages/chart'
 
 function App() {

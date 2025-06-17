@@ -7,6 +7,8 @@ export const testUsers = [
       email: "marie.dupont@entreprise.com",
       poste: "Développeur Frontend",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Développement",
       statut: "actif"
     },
     {
@@ -16,6 +18,8 @@ export const testUsers = [
       email: "pierre.martin@entreprise.com",
       poste: "Chef de Projet",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Projets",
       statut: "actif"
     },
     {
@@ -25,6 +29,8 @@ export const testUsers = [
       email: "sophie.bernard@entreprise.com",
       poste: "Analyste Financier",
       departement: "Finance",
+      direction: "Direction Financière",
+      service: "Service Comptabilité",
       statut: "actif"
     },
     {
@@ -34,6 +40,8 @@ export const testUsers = [
       email: "thomas.durand@entreprise.com",
       poste: "Développeur Backend",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Développement",
       statut: "actif"
     },
     {
@@ -43,6 +51,8 @@ export const testUsers = [
       email: "julie.moreau@entreprise.com",
       poste: "Responsable RH",
       departement: "Ressources Humaines",
+      direction: "Direction des Ressources Humaines",
+      service: "Service RH",
       statut: "actif"
     },
     {
@@ -52,6 +62,8 @@ export const testUsers = [
       email: "alexandre.petit@entreprise.com",
       poste: "Designer UX/UI",
       departement: "Design",
+      direction: "Direction Marketing",
+      service: "Service Design",
       statut: "actif"
     },
     {
@@ -61,6 +73,8 @@ export const testUsers = [
       email: "camille.robert@entreprise.com",
       poste: "Responsable Marketing",
       departement: "Marketing",
+      direction: "Direction Marketing",
+      service: "Service Marketing",
       statut: "actif"
     },
     {
@@ -70,6 +84,8 @@ export const testUsers = [
       email: "nicolas.richard@entreprise.com",
       poste: "DevOps Engineer",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Infrastructure",
       statut: "actif"
     },
     {
@@ -79,6 +95,8 @@ export const testUsers = [
       email: "emma.dubois@entreprise.com",
       poste: "Comptable",
       departement: "Finance",
+      direction: "Direction Financière",
+      service: "Service Comptabilité",
       statut: "actif"
     },
     {
@@ -88,6 +106,8 @@ export const testUsers = [
       email: "maxime.leroy@entreprise.com",
       poste: "Commercial",
       departement: "Ventes",
+      direction: "Direction Commerciale",
+      service: "Service Ventes",
       statut: "actif"
     },
     {
@@ -97,6 +117,8 @@ export const testUsers = [
       email: "lea.moreau@entreprise.com",
       poste: "Assistante RH",
       departement: "Ressources Humaines",
+      direction: "Direction des Ressources Humaines",
+      service: "Service RH",
       statut: "actif"
     },
     {
@@ -106,6 +128,8 @@ export const testUsers = [
       email: "baptiste.simon@entreprise.com",
       poste: "Architecte Logiciel",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Architecture",
       statut: "actif"
     },
     {
@@ -115,6 +139,8 @@ export const testUsers = [
       email: "clara.michel@entreprise.com",
       poste: "Chargée de Communication",
       departement: "Marketing",
+      direction: "Direction Marketing",
+      service: "Service Communication",
       statut: "actif"
     },
     {
@@ -124,6 +150,8 @@ export const testUsers = [
       email: "lucas.garcia@entreprise.com",
       poste: "Analyste de Données",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Data",
       statut: "actif"
     },
     {
@@ -133,6 +161,8 @@ export const testUsers = [
       email: "sarah.martinez@entreprise.com",
       poste: "Directeur Financier",
       departement: "Finance",
+      direction: "Direction Financière",
+      service: "Service Finance",
       statut: "actif"
     },
     {
@@ -142,6 +172,8 @@ export const testUsers = [
       email: "hugo.lopez@entreprise.com",
       poste: "Testeur QA",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Qualité",
       statut: "actif"
     },
     {
@@ -151,6 +183,8 @@ export const testUsers = [
       email: "manon.gonzalez@entreprise.com",
       poste: "Graphiste",
       departement: "Design",
+      direction: "Direction Marketing",
+      service: "Service Design",
       statut: "actif"
     },
     {
@@ -160,6 +194,8 @@ export const testUsers = [
       email: "antoine.wilson@entreprise.com",
       poste: "Responsable Ventes",
       departement: "Ventes",
+      direction: "Direction Commerciale",
+      service: "Service Ventes",
       statut: "actif"
     },
     {
@@ -169,6 +205,8 @@ export const testUsers = [
       email: "chloe.anderson@entreprise.com",
       poste: "Spécialiste SEO",
       departement: "Marketing",
+      direction: "Direction Marketing",
+      service: "Service Digital",
       statut: "actif"
     },
     {
@@ -178,6 +216,8 @@ export const testUsers = [
       email: "julien.taylor@entreprise.com",
       poste: "Administrateur Système",
       departement: "Informatique",
+      direction: "Direction Technique",
+      service: "Service Infrastructure",
       statut: "actif"
     },
     {
@@ -187,6 +227,8 @@ export const testUsers = [
       email: "oceane.brown@entreprise.com",
       poste: "Juriste",
       departement: "Juridique",
+      direction: "Direction Juridique",
+      service: "Service Juridique",
       statut: "actif"
     },
     {
@@ -196,6 +238,8 @@ export const testUsers = [
       email: "romain.davis@entreprise.com",
       poste: "Chef de Produit",
       departement: "Produit",
+      direction: "Direction Produit",
+      service: "Service Produit",
       statut: "actif"
     },
     {
@@ -205,6 +249,8 @@ export const testUsers = [
       email: "ines.miller@entreprise.com",
       poste: "Responsable Qualité",
       departement: "Qualité",
+      direction: "Direction Qualité",
+      service: "Service Qualité",
       statut: "actif"
     },
     {
@@ -214,6 +260,8 @@ export const testUsers = [
       email: "theo.moore@entreprise.com",
       poste: "Consultant",
       departement: "Conseil",
+      direction: "Direction Conseil",
+      service: "Service Conseil",
       statut: "actif"
     },
     {
@@ -223,6 +271,8 @@ export const testUsers = [
       email: "valentine.johnson@entreprise.com",
       poste: "Assistante de Direction",
       departement: "Direction",
+      direction: "Direction Générale",
+      service: "Service Direction",
       statut: "actif"
     }
   ];

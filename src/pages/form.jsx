@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState , useEffect, useMemo } from 'react';
 import axios from 'axios';
 import {
   Checkbox,
@@ -10,6 +10,7 @@ import {
   Dialog,DialogTitle,DialogContent,DialogActions,Button,Stepper,Step,
   StepButton,Typography,Box,Fade,Slide,IconButton,LinearProgress,
   Card,CardContent,Divider,TextField,MenuItem,FormControl,InputLabel,  
+  Table, TableHead, TableBody, TableRow, TableCell
 } from '@mui/material';
 import {
   Search,
@@ -1019,6 +1020,455 @@ const Step5 = ({ formData, setFormData, errors }) => {
   );
 };
 
+const Step6 = ({ formData, setFormData, errors }) => {
+  const [users, setUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedDirection, setSelectedDirection] = useState('');
+  const [selectedService, setSelectedService] = useState('');
+  const [directions, setDirections] = useState([]);
+  const [services, setServices] = useState([]);
+  const [usersByService, setUsersByService] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Charger les données au montage du composant
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await mockApiCall();
+        const userData = response.data;
+        
+        setUsers(userData);
+        
+        // Extraire les directions uniques
+        const uniqueDirections = [...new Set(userData.map(user => user.direction))];
+        setDirections(uniqueDirections);
+
+        // Organiser les utilisateurs par service
+        const usersByServiceMap = userData.reduce((acc, user) => {
+          if (!acc[user.service]) {
+            acc[user.service] = [];
+          }
+          acc[user.service].push(user);
+          return acc;
+        }, {});
+        
+        setUsersByService(usersByServiceMap);
+        setServices(Object.keys(usersByServiceMap));
+
+        if (formData?.step6?.selected_users) {
+          setSelectedUsers(formData.step6.selected_users);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  // Filtrer les services en fonction de la direction sélectionnée
+  const filteredServices = useMemo(() => {
+    if (!selectedDirection) return services;
+    return services.filter(service => 
+      usersByService[service]?.some(user => user.direction === selectedDirection)
+    );
+  }, [selectedDirection, services, usersByService]);
+
+  // Filtrer les utilisateurs en fonction du service sélectionné et du terme de recherche
+  const filteredUsers = useMemo(() => {
+    if (!selectedService) return [];
+    let users = usersByService[selectedService] || [];
+    
+    if (searchTerm) {
+      users = users.filter(user =>
+        `${user.nom} ${user.prenom}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.poste?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return users;
+  }, [selectedService, usersByService, searchTerm]);
+
+  const handleUserSelection = (userId) => {
+    setSelectedUsers(prev => {
+      const newSelection = prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId];
+      
+      setFormData(prev => ({
+        ...prev,
+        step6: { 
+          ...prev.step6, 
+          selected_users: newSelection 
+        }
+      }));
+      
+      return newSelection;
+    });
+  };
+
+  // Grouper les utilisateurs sélectionnés par service
+  const selectedUsersByService = useMemo(() => {
+    return selectedUsers.reduce((acc, userId) => {
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        if (!acc[user.service]) {
+          acc[user.service] = [];
+        }
+        acc[user.service].push(user);
+      }
+      return acc;
+    }, {});
+  }, [selectedUsers, users]);
+
+  if (loading) {
+    return (
+      <StepComponent
+        title="Sélection des Participants par Direction"
+        description="Chargement des données..."
+        icon={<People sx={{ color: 'white', fontSize: 28 }} />}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+          <Typography>Chargement...</Typography>
+        </Box>
+      </StepComponent>
+    );
+  }
+
+  return (
+    <StepComponent
+      title="Sélection des Participants par Direction"
+      description="Sélectionnez les participants par direction et service"
+      icon={<People sx={{ color: 'white', fontSize: 28 }} />}
+    >
+      <Grid container spacing={3}>
+        {/* Sélection de la direction et du service */}
+        <Grid item xs={12}>
+          <Box sx={{ mb: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Direction</InputLabel>
+                  <Select
+                    value={selectedDirection}
+                    label="Direction"
+                    onChange={(e) => {
+                      setSelectedDirection(e.target.value);
+                      setSelectedService('');
+                      setSearchTerm('');
+                    }}
+                    sx={{
+                      borderRadius: 2,
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#667eea'
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#764ba2'
+                      }
+                    }}
+                  >
+                    <MenuItem value="">Sélectionnez une direction</MenuItem>
+                    {directions.map(direction => (
+                      <MenuItem key={direction} value={direction}>
+                        {direction}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Service</InputLabel>
+                  <Select
+                    value={selectedService}
+                    label="Service"
+                    onChange={(e) => {
+                      setSelectedService(e.target.value);
+                      setSearchTerm('');
+                    }}
+                    disabled={!selectedDirection}
+                    sx={{
+                      borderRadius: 2,
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#667eea'
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#764ba2'
+                      }
+                    }}
+                  >
+                    <MenuItem value="">Sélectionnez un service</MenuItem>
+                    {filteredServices.map(service => (
+                      <MenuItem key={service} value={service}>
+                        {service}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Box>
+        </Grid>
+
+        {/* Barre de recherche */}
+        {selectedService && (
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              placeholder="Rechercher un participant..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+                endAdornment: searchTerm && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => setSearchTerm('')}
+                      edge="end"
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#667eea'
+                  }
+                }
+              }}
+            />
+          </Grid>
+        )}
+
+        {/* Liste des utilisateurs du service sélectionné */}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+            Utilisateurs du service {selectedService || 'sélectionné'}
+          </Typography>
+          <Box sx={{ 
+            maxHeight: 400, 
+            overflow: 'auto', 
+            border: '1px solid #e0e0e0', 
+            borderRadius: 2,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}>
+            {filteredUsers.length === 0 ? (
+              <Alert severity="info" sx={{ m: 2 }}>
+                Aucun utilisateur disponible dans ce service
+              </Alert>
+            ) : (
+              filteredUsers.map((user) => (
+                <Box
+                  key={user.id}
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                    },
+                    backgroundColor: selectedUsers.includes(user.id) 
+                      ? 'rgba(102, 126, 234, 0.2)' 
+                      : 'transparent',
+                    borderBottom: '1px solid #e0e0e0'
+                  }}
+                  onClick={() => handleUserSelection(user.id)}
+                >
+                  <Checkbox
+                    checked={selectedUsers.includes(user.id)}
+                    onChange={() => handleUserSelection(user.id)}
+                    sx={{
+                      color: '#667eea',
+                      '&.Mui-checked': {
+                        color: '#764ba2'
+                      }
+                    }}
+                  />
+                  <Avatar 
+                    sx={{ 
+                      ml: 2, 
+                      mr: 2, 
+                      bgcolor: 'primary.main',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                    }}
+                  >
+                    {user.nom.charAt(0)}{user.prenom.charAt(0)}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="medium">
+                      {user.nom} {user.prenom}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {user.poste}
+                    </Typography>
+                    {user.email && (
+                      <Typography variant="caption" color="text.secondary">
+                        {user.email}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              ))
+            )}
+          </Box>
+        </Grid>
+
+        {/* Tableau des participants sélectionnés */}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 'bold', mt: 3 }}>
+            Participants sélectionnés
+          </Typography>
+          <Box sx={{ 
+            border: '1px solid #e0e0e0', 
+            borderRadius: 2,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            overflow: 'hidden'
+          }}>
+            {Object.keys(selectedUsersByService).length === 0 ? (
+              <Alert severity="info" sx={{ m: 2 }}>
+                Aucun participant sélectionné
+              </Alert>
+            ) : (
+              <Box sx={{ overflowX: 'auto' }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}>Service</TableCell>
+                      <TableCell sx={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}>Nom</TableCell>
+                      <TableCell sx={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}>Poste</TableCell>
+                      <TableCell sx={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}>Email</TableCell>
+                      <TableCell sx={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {Object.entries(selectedUsersByService).map(([service, users]) => (
+                      <React.Fragment key={service}>
+                        {users.map((user, index) => (
+                          <TableRow 
+                            key={user.id}
+                            sx={{ 
+                              '&:nth-of-type(odd)': { backgroundColor: 'rgba(102, 126, 234, 0.05)' },
+                              '&:hover': { backgroundColor: 'rgba(102, 126, 234, 0.1)' }
+                            }}
+                          >
+                            <TableCell>{index === 0 ? service : ''}</TableCell>
+                            <TableCell>
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar 
+                                  sx={{ 
+                                    mr: 2, 
+                                    width: 32, 
+                                    height: 32,
+                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                  }}
+                                >
+                                  {user.nom.charAt(0)}{user.prenom.charAt(0)}
+                                </Avatar>
+                                {user.nom} {user.prenom}
+                              </Box>
+                            </TableCell>
+                            <TableCell>{user.poste}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleUserSelection(user.id)}
+                                sx={{ 
+                                  color: '#667eea',
+                                  '&:hover': {
+                                    color: '#764ba2',
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                                  }
+                                }}
+                              >
+                                <Close fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            )}
+          </Box>
+        </Grid>
+
+        {/* Résumé et validation */}
+        <Grid item xs={12}>
+          <Alert 
+            severity={selectedUsers.length > 0 ? "success" : "info"} 
+            sx={{ 
+              mt: 2,
+              borderRadius: 2,
+              '& .MuiAlert-icon': {
+                color: selectedUsers.length > 0 ? '#4CAF50' : '#667eea'
+              }
+            }}
+          >
+            <Typography variant="subtitle2" fontWeight="medium">
+              {selectedUsers.length} participant(s) sélectionné(s) au total
+            </Typography>
+          </Alert>
+        </Grid>
+
+        {errors?.step6?.selected_users && (
+          <Grid item xs={12}>
+            <Alert 
+              severity="error"
+              sx={{ 
+                borderRadius: 2,
+                '& .MuiAlert-icon': {
+                  color: '#f44336'
+                }
+              }}
+            >
+              {errors.step6.selected_users}
+            </Alert>
+          </Grid>
+        )}
+      </Grid>
+    </StepComponent>
+  );
+};
+
 // Composant de félicitations
 const SuccessComponent = ({ formData, onRestart }) => (
   <Fade in={true} timeout={800}>
@@ -1069,10 +1519,11 @@ const WizardFormModal = ({ open, onClose }) => {
     step2: {},
     step3: {},
     step4: {},
-    step5: {}
+    step5: {},
+    step6: {}
   });
 
-  const steps = ['Formation', 'Programme', 'Planning', 'Coûts', 'Participants'];
+  const steps = ['Formation', 'Programme', 'Planning', 'Coûts', 'Participants', 'Sélection par Direction'];
   const totalSteps = steps.length;
 
   // Validation des champs obligatoires pour chaque étape
@@ -1112,6 +1563,11 @@ const WizardFormModal = ({ open, onClose }) => {
         break;
       case 4:
         if (!formData.step5?.selected_users?.length) {
+          newErrors.selected_users = 'Veuillez sélectionner au moins un participant';
+        }
+        break;
+      case 5:
+        if (!formData.step6?.selected_users?.length) {
           newErrors.selected_users = 'Veuillez sélectionner au moins un participant';
         }
         break;
@@ -1155,7 +1611,8 @@ const WizardFormModal = ({ open, onClose }) => {
         step2: {},
         step3: {},
         step4: {},
-        step5: {}
+        step5: {},
+        step6: {}
       });
     }
   }, [open]);
@@ -1172,7 +1629,8 @@ const WizardFormModal = ({ open, onClose }) => {
       step2: {},
       step3: {},
       step4: {},
-      step5: {}
+      step5: {},
+      step6: {}
     });
     onClose();
     //setOpen(false);
@@ -1185,15 +1643,17 @@ const WizardFormModal = ({ open, onClose }) => {
 
     switch (activeStep) {
       case 0:
-        return <Step1 formData={formData} setFormData={setFormData} errors={errors} />;
+        return <Step6 formData={formData} setFormData={setFormData} errors={errors} />;
       case 1:
-        return <Step2 formData={formData} setFormData={setFormData} errors={errors} />;
+        return <Step5 formData={formData} setFormData={setFormData} errors={errors} />;
       case 2:
         return <Step3 formData={formData} setFormData={setFormData} errors={errors} />;
       case 3:
         return <Step4 formData={formData} setFormData={setFormData} errors={errors} />;
       case 4:
-        return <Step5 formData={formData} setFormData={setFormData} errors={errors} />;
+        return <Step1 formData={formData} setFormData={setFormData} errors={errors} />;
+      case 5:
+        return <Step2 formData={formData} setFormData={setFormData} errors={errors} />;
       default:
         return null;
     }
