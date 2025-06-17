@@ -1,55 +1,28 @@
 import React, { useState , useEffect } from 'react';
+import axios from 'axios';
 import {
-  Dialog,DialogTitle,DialogContent,DialogActions,Button,TextField,Stepper,Step,StepLabel,StepButton,Typography,Box,Paper,Fade,Slide,IconButton,LinearProgress,Card,CardContent,Divider,Grid,MenuItem,FormControl,InputLabel,Select,Alert
+  Checkbox,
+  Alert,
+  InputAdornment,
+  Chip,
+  Select,Grid,
+  Avatar,
+  Dialog,DialogTitle,DialogContent,DialogActions,Button,Stepper,Step,
+  StepButton,Typography,Box,Fade,Slide,IconButton,LinearProgress,
+  Card,CardContent,Divider,TextField,MenuItem,FormControl,InputLabel,  
 } from '@mui/material';
 import {
-  School, Business, Schedule, Euro, Close, NavigateNext, NavigateBefore, Check, Celebration
+  Search,
+  SelectAll,
+  Clear,
+  School, Business,  
+  Schedule, Euro, Close,
+   NavigateNext, NavigateBefore, Check, Celebration, People,
+  
 } from '@mui/icons-material';
-import axios from 'axios';
+import { testUsers, mockApiCall } from './testUsersData';
 
-// Fonction pour envoyer le formulaire à l'API avec tous les paramètres attendus
-const envoyerFormation = async (formData) => {
-  try {
-    // Construction de l'objet avec tous les champs attendus par l'API
-    const donnees = {
-      code_formation: formData.step1.code_formation || "",
-      intitule_formation: formData.step1.intitule_formation || "",
-      objectif_formation: formData.step1.objectif_formation || "",
-      ogf: formData.step1.ogf || "",
-      thematique: formData.step1.thematique || "",
-      type_de_programme: formData.step2.type_de_programme || "",
-      origine_de_la_demande: formData.step2.origine_de_la_demande || "",
-      formation_obligatoire: formData.step2.formation_obligatoire || "",
-      formation_diplomante: formData.step2.formation_diplomante || "",
-      priorite: formData.step2.priorite || "",
-      mode_diffusion: formData.step2.mode_diffusion || "",
-      direction: formData.step3.direction || "",
-      profil_cible: formData.step3.profil_cible || "",
-      effectif: formData.step3.effectif || "",
-      type: formData.step4.type || "",
-      formateur: formData.step3.formateur || "",
-      nbr_session: formData.step4.nbr_session || "",
-      duree_jours: formData.step3.duree_jours || "",
-      duree_heures: formData.step3.duree_heures || "",
-      date_de_debut: formData.step3.date_de_debut || "",
-      date_de_fin: formData.step3.date_de_fin || "",
-      periode_couts: formData.step4.periode_courts || "",
-      conception_animation: formData.step4.conception_animation || "",
-      couts_logistique: formData.step4.couts_logistique || "",
-      couts_total: formData.step4.couts_total || "",
-      statut: "", // à remplir si tu as ce champ dans le formulaire
-      avis_drh: formData.step4.statut_avis_drh || "",
-    };
 
-    // Appel POST vers l'API
-    const response = await axios.post('/api/formation', donnees);
-
-    return response.data;
-  } catch (error) {
-    console.error('Erreur lors de l\'envoi du formulaire :', error);
-    throw error;
-  }
-};
 
 // Composant pour chaque étape avec layout adaptatif
 const StepComponent = ({ title, icon, children, description }) => (
@@ -681,6 +654,370 @@ const Step4 = ({ formData, setFormData, errors }) => {
     </StepComponent>
   );
 };
+const Step5 = ({ formData, setFormData, errors }) => {
+  const [users, setUsers] = useState([]); // Liste complète des utilisateurs
+  const [filteredUsers, setFilteredUsers] = useState([]); // Utilisateurs filtrés
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('');
+  const [posteFilter, setPosteFilter] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Listes uniques pour les filtres
+  const [departments, setDepartments] = useState([]);
+  const [postes, setPostes] = useState([]);
+
+  // Charger la liste des utilisateurs au montage du composant
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        
+        // Option 1: Utiliser les données de test directement
+        // const userData = testUsers;
+        
+        // Option 2: Simuler un appel API avec délai
+        const response = await mockApiCall();
+        const userData = response.data;
+        
+        // Option 3: Utiliser le vrai appel API (à décommenter quand prêt)
+        // const response = await axios.get('/api/users');
+        // const userData = response.data;
+        
+        setUsers(userData);
+        setFilteredUsers(userData);
+        
+        // Extraire les départements et postes uniques
+        const uniqueDepartments = [...new Set(userData.map(user => user.departement))];
+        const uniquePostes = [...new Set(userData.map(user => user.poste))];
+        
+        setDepartments(uniqueDepartments);
+        setPostes(uniquePostes);
+        
+        // Initialiser selectedUsers depuis formData si disponible
+        if (formData?.step5?.selected_users) {
+          setSelectedUsers(formData.step5.selected_users);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des utilisateurs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUsers();
+  }, []);
+
+
+  // Effet pour filtrer les utilisateurs
+  useEffect(() => {
+    let filtered = users;
+
+    // Filtre par terme de recherche
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        `${user.nom} ${user.prenom}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtre par département
+    if (departmentFilter) {
+      filtered = filtered.filter(user => user.departement === departmentFilter);
+    }
+
+    // Filtre par poste
+    if (posteFilter) {
+      filtered = filtered.filter(user => user.poste === posteFilter);
+    }
+
+    setFilteredUsers(filtered);
+  }, [users, searchTerm, departmentFilter, posteFilter]);
+
+  const handleUserSelection = (userId) => {
+    setSelectedUsers(prev => {
+      const newSelection = prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId];
+      
+      // Mettre à jour formData
+      setFormData(prev => ({
+        ...prev,
+        step5: { 
+          ...prev.step5, 
+          selected_users: newSelection 
+        }
+      }));
+      
+      return newSelection;
+    });
+  };
+
+  const handleSelectAll = () => {
+    const allFilteredIds = filteredUsers.map(user => user.id);
+    const newSelection = [...new Set([...selectedUsers, ...allFilteredIds])];
+    
+    setSelectedUsers(newSelection);
+    setFormData(prev => ({
+      ...prev,
+      step5: { 
+        ...prev.step5, 
+        selected_users: newSelection 
+      }
+    }));
+  };
+
+  const handleDeselectAll = () => {
+    const filteredIds = filteredUsers.map(user => user.id);
+    const newSelection = selectedUsers.filter(id => !filteredIds.includes(id));
+    
+    setSelectedUsers(newSelection);
+    setFormData(prev => ({
+      ...prev,
+      step5: { 
+        ...prev.step5, 
+        selected_users: newSelection 
+      }
+    }));
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setDepartmentFilter('');
+    setPosteFilter('');
+  };
+
+  const getSelectedUserNames = () => {
+    return users
+      .filter(user => selectedUsers.includes(user.id))
+      .map(user => `${user.nom} ${user.prenom}`);
+  };
+
+  if (loading) {
+    return (
+      <StepComponent
+        title="Sélection des Participants"
+        description="Chargement des utilisateurs..."
+        icon={<People sx={{ color: 'white', fontSize: 28 }} />}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+          <Typography>Chargement...</Typography>
+        </Box>
+      </StepComponent>
+    );
+  }
+
+  return (
+    <StepComponent
+      title="Sélection des Participants"
+      description="Choisissez les utilisateurs à former"
+      icon={<People sx={{ color: 'white', fontSize: 28 }} />}
+    >
+      <Grid container spacing={3}>
+        {/* Barre de recherche et filtres */}
+        <Grid item xs={12}>
+          <Box sx={{ mb: 3 }}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  placeholder="Rechercher par nom ou email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              
+              <Grid item xs={12} md={3}>
+                <FormControl fullWidth>
+                  <InputLabel>Département</InputLabel>
+                  <Select
+                    value={departmentFilter}
+                    label="Département"
+                    onChange={(e) => setDepartmentFilter(e.target.value)}
+                  >
+                    <MenuItem value="">Tous</MenuItem>
+                    {departments.map(dept => (
+                      <MenuItem key={dept} value={dept}>{dept}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} md={3}>
+                <FormControl fullWidth>
+                  <InputLabel>Poste</InputLabel>
+                  <Select
+                    value={posteFilter}
+                    label="Poste"
+                    onChange={(e) => setPosteFilter(e.target.value)}
+                  >
+                    <MenuItem value="">Tous</MenuItem>
+                    {postes.map(poste => (
+                      <MenuItem key={poste} value={poste}>{poste}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} md={2}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={clearFilters}
+                  startIcon={<Clear />}
+                >
+                  Effacer
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+        </Grid>
+
+        {/* Actions de sélection */}
+        <Grid item xs={12}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <Button
+              variant="outlined"
+              startIcon={<SelectAll />}
+              onClick={handleSelectAll}
+              disabled={filteredUsers.length === 0}
+            >
+              Sélectionner tout ({filteredUsers.length})
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Clear />}
+              onClick={handleDeselectAll}
+              disabled={filteredUsers.length === 0}
+            >
+              Désélectionner tout
+            </Button>
+          </Box>
+        </Grid>
+
+        {/* Liste des utilisateurs */}
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom>
+            Utilisateurs disponibles ({filteredUsers.length})
+          </Typography>
+          
+          {filteredUsers.length === 0 ? (
+            <Alert severity="info">
+              Aucun utilisateur ne correspond aux critères de recherche.
+            </Alert>
+          ) : (
+            <Box sx={{ 
+              maxHeight: 400, 
+              overflow: 'auto', 
+              border: '1px solid #e0e0e0', 
+              borderRadius: 2 
+            }}>
+              {filteredUsers.map((user, index) => (
+                <Box key={user.id}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                      },
+                      backgroundColor: selectedUsers.includes(user.id) 
+                        ? 'rgba(102, 126, 234, 0.2)' 
+                        : 'transparent'
+                    }}
+                    onClick={() => handleUserSelection(user.id)}
+                  >
+                    <Checkbox
+                      checked={selectedUsers.includes(user.id)}
+                      onChange={() => handleUserSelection(user.id)}
+                    />
+                    
+                    <Avatar sx={{ ml: 2, mr: 2, bgcolor: 'primary.main' }}>
+                      {user.nom.charAt(0)}{user.prenom.charAt(0)}
+                    </Avatar>
+                    
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="subtitle1" fontWeight="medium">
+                        {user.nom} {user.prenom}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {user.poste} - {user.departement}
+                      </Typography>
+                      {user.email && (
+                        <Typography variant="caption" color="text.secondary">
+                          {user.email}
+                        </Typography>
+                      )}
+                    </Box>
+                    
+                    {selectedUsers.includes(user.id) && (
+                      <Chip
+                        label="Sélectionné"
+                        color="primary"
+                        size="small"
+                        sx={{ ml: 2 }}
+                      />
+                    )}
+                  </Box>
+                  {index < filteredUsers.length - 1 && <Divider />}
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Grid>
+
+        {/* Résumé de la sélection */}
+        <Grid item xs={12}>
+          <Alert 
+            severity={selectedUsers.length > 0 ? "success" : "info"} 
+            sx={{ mt: 2 }}
+          >
+            <Typography variant="subtitle2" gutterBottom>
+              {selectedUsers.length} utilisateur(s) sélectionné(s)
+            </Typography>
+            {selectedUsers.length > 0 && (
+              <Box sx={{ mt: 1 }}>
+                {getSelectedUserNames().slice(0, 3).map((name, index) => (
+                  <Chip
+                    key={index}
+                    label={name}
+                    size="small"
+                    sx={{ mr: 1, mb: 0.5 }}
+                  />
+                ))}
+                {selectedUsers.length > 3 && (
+                  <Chip
+                    label={`+${selectedUsers.length - 3} autres`}
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+              </Box>
+            )}
+          </Alert>
+        </Grid>
+
+        {/* Validation des erreurs */}
+        {errors?.step5?.selected_users && (
+          <Grid item xs={12}>
+            <Alert severity="error">
+              {errors.step5.selected_users}
+            </Alert>
+          </Grid>
+        )}
+      </Grid>
+    </StepComponent>
+  );
+};
 
 // Composant de félicitations
 const SuccessComponent = ({ formData, onRestart }) => (
@@ -731,10 +1068,11 @@ const WizardFormModal = ({ open, onClose }) => {
     step1: {},
     step2: {},
     step3: {},
-    step4: {}
+    step4: {},
+    step5: {}
   });
 
-  const steps = ['Formation', 'Programme', 'Planning', 'Coûts'];
+  const steps = ['Formation', 'Programme', 'Planning', 'Coûts', 'Participants'];
   const totalSteps = steps.length;
 
   // Validation des champs obligatoires pour chaque étape
@@ -772,6 +1110,11 @@ const WizardFormModal = ({ open, onClose }) => {
         if (!formData.step4.nbr_session) newErrors.nbr_session = 'Nombre de sessions requis';
         if (!formData.step4.type?.trim()) newErrors.type = 'Type requis';
         break;
+      case 4:
+        if (!formData.step5?.selected_users?.length) {
+          newErrors.selected_users = 'Veuillez sélectionner au moins un participant';
+        }
+        break;
     }
     
     setErrors(newErrors);
@@ -801,17 +1144,7 @@ const WizardFormModal = ({ open, onClose }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (validateStep(activeStep)) {
-      try {
-        await envoyerFormation(formData);
-        setShowSuccess(true);
-        console.log('Données de formation envoyées:', formData);
-      } catch (error) {
-        alert("Erreur lors de l'envoi du formulaire. Veuillez réessayer.");
-      }
-    }
-  };
+
   useEffect(() => {
     if (open) {
       setActiveStep(0);
@@ -821,7 +1154,8 @@ const WizardFormModal = ({ open, onClose }) => {
         step1: {},
         step2: {},
         step3: {},
-        step4: {}
+        step4: {},
+        step5: {}
       });
     }
   }, [open]);
@@ -837,7 +1171,8 @@ const WizardFormModal = ({ open, onClose }) => {
       step1: {},
       step2: {},
       step3: {},
-      step4: {}
+      step4: {},
+      step5: {}
     });
     onClose();
     //setOpen(false);
@@ -857,6 +1192,8 @@ const WizardFormModal = ({ open, onClose }) => {
         return <Step3 formData={formData} setFormData={setFormData} errors={errors} />;
       case 3:
         return <Step4 formData={formData} setFormData={setFormData} errors={errors} />;
+      case 4:
+        return <Step5 formData={formData} setFormData={setFormData} errors={errors} />;
       default:
         return null;
     }
@@ -982,7 +1319,7 @@ const WizardFormModal = ({ open, onClose }) => {
               
               {activeStep === totalSteps - 1 ? (
                 <Button
-                  onClick={handleSubmit}
+                  
                   variant="contained"
                   endIcon={<Check />}
                   sx={{
