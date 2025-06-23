@@ -1643,7 +1643,7 @@ const WizardFormModal = ({ open, onClose }) => {
 
     switch (activeStep) {
       case 0:
-        return <Step6 formData={formData} setFormData={setFormData} errors={errors} />;
+        return <Step5 formData={formData} setFormData={setFormData} errors={errors} />;
       case 1:
         return <Step5 formData={formData} setFormData={setFormData} errors={errors} />;
       case 2:
