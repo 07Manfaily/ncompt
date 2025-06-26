@@ -1522,6 +1522,7 @@ const WizardFormModal = ({ open, onClose }) => {
     step5: {},
     step6: {}
   });
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const steps = ['Formation', 'Programme', 'Planning', 'Coûts', 'Participants', 'Sélection par Direction'];
   const totalSteps = steps.length;
@@ -1617,9 +1618,19 @@ const WizardFormModal = ({ open, onClose }) => {
     }
   }, [open]);
 
-  const handleClose = () => {
+  const handleClose = (event, reason) => {
+    if (reason === 'backdropClick' || reason === 'closeButton' || !reason) {
+      setShowConfirm(true);
+    } else {
+      onClose();
+    }
+  };
+
+  const handleConfirmClose = () => {
+    setShowConfirm(false);
     onClose();
   };
+
   const handleRestart = () => {
     setShowSuccess(false);
     setActiveStep(0);
@@ -1662,6 +1673,7 @@ const WizardFormModal = ({ open, onClose }) => {
   const progress = showSuccess ? 100 : ((activeStep + 1) / totalSteps) * 100;
 
   return (
+    <>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -1690,7 +1702,7 @@ const WizardFormModal = ({ open, onClose }) => {
           <Typography variant="h5" fontWeight="bold">
             {showSuccess ? 'Formation Créée !' : `Création de Formation - Étape ${activeStep + 1}/${totalSteps}`}
           </Typography>
-          <IconButton onClick={handleClose} sx={{ color: 'white' }}>
+          <IconButton onClick={() => handleClose(null, 'closeButton')} sx={{ color: 'white' }}>
             <Close />
           </IconButton>
         </DialogTitle>
@@ -1820,7 +1832,18 @@ const WizardFormModal = ({ open, onClose }) => {
           </DialogActions>
         )}
       </Dialog>
-    
+      {/* Dialog de confirmation */}
+      <Dialog open={showConfirm} onClose={() => setShowConfirm(false)}>
+        <DialogTitle>Confirmation</DialogTitle>
+        <DialogContent>
+          Voulez-vous vraiment quitter le formulaire ? Les modifications seront perdues.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowConfirm(false)}>Annuler</Button>
+          <Button onClick={handleConfirmClose} color="error">Quitter</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

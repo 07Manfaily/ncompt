@@ -13,7 +13,7 @@ import {
 
 const Header = () => {
   return (
-    <AppBar position="fixed" sx={{boxShadow: 'none', bgcolor: 'white', color: '#5f6368', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar position="static" sx={{boxShadow: 'none', bgcolor: 'white', color: '#5f6368', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
     <Toolbar sx={{ justifyContent: 'space-between', minHeight: 64 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <IconButton aria-label="menu">

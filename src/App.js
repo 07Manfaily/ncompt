@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import './App.css';
 
@@ -22,17 +22,25 @@ import Form from './pages/form'; // Utilisation du bon formulaire
 import Chart from './pages/chart';
 
 // Le composant de Layout principal qui inclut la Sidebar et le Header
-const AppLayout = () => (
-  <div className="app-layout">
-    <Side />
-    <div className="main-section">
-      <Header />
-      <main className="content-section">
-        <Outlet /> {/* Les routes enfants s'afficheront ici */}
-      </main>
+const AppLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  return (
+    <div className="app-layout">
+      <Side isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      <div className="main-section">
+        <Header toggleSidebar={toggleSidebar} />
+        <main className="content-section">
+          <Outlet /> {/* Les routes enfants s'afficheront ici */}
+        </main>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 function App() {
   return (

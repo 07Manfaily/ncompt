@@ -8,6 +8,7 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
+  Collapse,
 } from "@mui/material";
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
@@ -15,9 +16,11 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import HomeIcon from '@mui/icons-material/Home';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
 const sections = [
-  { 
+  {
     text: 'Formations', 
     icon: <HomeIcon />, 
     path: '/home',
@@ -38,20 +41,13 @@ const sections = [
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [selected, setSelected] = useState(() => {
-    // Déterminer l'élément sélectionné basé sur l'URL actuelle
-    const currentSection = sections.find(section => 
-      section.path === location.pathname || 
-      (section.subItems && section.subItems.some(subItem => subItem.path === location.pathname))
-    );
-    return currentSection ? currentSection.text : "Formations";
-  });
+  const [expanded, setExpanded] = useState({});
 
-  const handleItemClick = (section) => {
-    setSelected(section.text);
-    if (section.path) {
-      navigate(section.path);
-    }
+  const handleExpandClick = (sectionText) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [sectionText]: !prev[sectionText],
+    }));
   };
 
   const handleSubItemClick = (subItem) => {
@@ -83,15 +79,14 @@ export default function Sidebar() {
 
       <List component="nav" sx={{ p: "0 10px" }}>
         {sections.map((section, idx) => {
-          const isSelected = selected === section.text;
           const isActive = location.pathname === section.path || 
             (section.subItems && section.subItems.some(subItem => subItem.path === location.pathname));
-          
+          const hasSubItems = !!section.subItems;
+          const isExpanded = expanded[section.text] || false;
           return (
-            <Box key={idx} sx={{ mb: 2 }}>
+        <Box key={idx} sx={{ mb: 2 }}>
               <ListItem
                 disablePadding
-                onClick={() => handleItemClick(section)}
                 sx={{
                   position: "relative",
                   my: 0.5,
@@ -102,31 +97,32 @@ export default function Sidebar() {
                   marginLeft:"10px",
                   "&::before": {
                     content: '""',
-                    position: "absolute",
-                    top: "-20px",
+                        position: "absolute",
+                        top: "-20px",
                     right: "0px",
-                    height: "20px",
+                        height: "20px",
                     width: "44px",
                     backgroundColor: "transparent",
-                    borderBottomRightRadius: "20px",
+                        borderBottomRightRadius: "20px",
                     boxShadow: isActive ? "5px 5px 0 5px #fff" : "none",
                     transition: "box-shadow 0.2s ease-in-out",
                   },
                   "&::after": {
                     content: '""',
-                    position: "absolute",
-                    bottom: "-20px",
+                        position: "absolute",
+                        bottom: "-20px",
                     right: "0px",
                     height: "20px",
-                    width: "20px",
+                        width: "20px",
                     backgroundColor: "transparent",
-                    borderTopRightRadius: "20px",
+                        borderTopRightRadius: "20px",
                     boxShadow: isActive ? "5px -5px 0 5px #fff" : "none",
                     transition: "box-shadow 0.2s ease-in-out",
                   },
                 }}
               >
                 <ListItemButton
+                  onClick={hasSubItems ? () => handleExpandClick(section.text) : () => navigate(section.path)}
                   sx={{
                     py: 1,
                     "&:hover": {
@@ -146,12 +142,12 @@ export default function Sidebar() {
                     }}
                   >
                     {section.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        sx={{
-                          fontSize: "0.9rem",
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography
+                      sx={{
+                        fontSize: "0.9rem",
                           fontWeight: isActive ? "bold" : 500,
                         }}
                       >
@@ -159,58 +155,60 @@ export default function Sidebar() {
                       </Typography>
                     }
                   />
+                  {hasSubItems && (isExpanded ? <ExpandLess /> : <ExpandMore />)}
                 </ListItemButton>
               </ListItem>
-              
-              {/* Afficher les sous-éléments si ils existent */}
-              {section.subItems && (isSelected || isActive) && (
-                <List component="div" disablePadding>
-                  {section.subItems.map((subItem, subIdx) => {
-                    const isSubActive = location.pathname === subItem.path;
-                    return (
-                      <ListItem
-                        key={subIdx}
-                        disablePadding
-                        onClick={() => handleSubItemClick(subItem)}
-                        sx={{
-                          pl: 4,
-                          my: 0.5,
-                          color: isSubActive ? "#4C1D95" : "#a289f0",
-                          backgroundColor: isSubActive ? "rgba(255, 255, 255, 0.1)" : "transparent",
-                          borderRadius: "0 20px 20px 0",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <ListItemButton
+              {/* Sous-menus */}
+              {hasSubItems && (
+                <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {section.subItems.map((subItem, subIdx) => {
+                      const isSubActive = location.pathname === subItem.path;
+                      return (
+                        <ListItem
+                          key={subIdx}
+                          disablePadding
+                          onClick={() => handleSubItemClick(subItem)}
                           sx={{
-                            py: 0.5,
-                            "&:hover": {
-                              backgroundColor: "rgba(255, 255, 255, 0.1)",
-                              color: "#fff",
-                            },
+                            pl: 4,
+                            my: 0.5,
+                            color: isSubActive ? "#4C1D95" : "#a289f0",
+                            backgroundColor: isSubActive ? "rgba(255, 255, 255, 0.1)" : "transparent",
+                            borderRadius: "0 20px 20px 0",
+                            cursor: "pointer",
                           }}
                         >
-                          <ListItemText
-                            primary={
-                              <Typography
-                                sx={{
-                                  fontSize: "0.8rem",
-                                  fontWeight: isSubActive ? "bold" : 500,
-                                }}
-                              >
-                                {subItem.text}
-                              </Typography>
-                            }
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </List>
+                          <ListItemButton
+                            sx={{
+                              py: 0.5,
+                              "&:hover": {
+                                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                color: "#fff",
+                              },
+                            }}
+                          >
+                            <ListItemText
+                              primary={
+                                <Typography
+                                  sx={{
+                                    fontSize: "0.8rem",
+                                    fontWeight: isSubActive ? "bold" : 500,
+                                  }}
+                                >
+                                  {subItem.text}
+                    </Typography>
+                  }
+                />
+                          </ListItemButton>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </Collapse>
               )}
-            </Box>
-          );
-        })}
+              </Box>
+            );
+          })}
       </List>
     </Box>
   );
