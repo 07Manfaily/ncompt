@@ -663,6 +663,7 @@ const Step5 = ({ formData, setFormData, errors }) => {
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [posteFilter, setPosteFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [departmentSearchTerm, setDepartmentSearchTerm] = useState('');
 
   // Listes uniques pour les filtres
   const [departments, setDepartments] = useState([]);
@@ -786,6 +787,7 @@ const Step5 = ({ formData, setFormData, errors }) => {
     setSearchTerm('');
     setDepartmentFilter('');
     setPosteFilter('');
+    setDepartmentSearchTerm('');
   };
 
   const getSelectedUserNames = () => {
@@ -842,11 +844,52 @@ const Step5 = ({ formData, setFormData, errors }) => {
                     value={departmentFilter}
                     label="Département"
                     onChange={(e) => setDepartmentFilter(e.target.value)}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                          overflow: 'auto',
+                        },
+                      },
+                    }}
                   >
-                    <MenuItem value="">Tous</MenuItem>
-                    {departments.map(dept => (
-                      <MenuItem key={dept} value={dept}>{dept}</MenuItem>
-                    ))}
+                    <Box sx={{ p: 1, borderBottom: '1px solid #e0e0e0' }}>
+                      <TextField
+                        placeholder="Rechercher un département..."
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        value={departmentSearchTerm}
+                        onChange={(e) => setDepartmentSearchTerm(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Search fontSize="small" />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 1,
+                          }
+                        }}
+                      />
+                    </Box>
+                    <MenuItem value="">
+                      Tous
+                    </MenuItem>
+                    {departments
+                      .filter(dept => 
+                        dept.toLowerCase().includes(departmentSearchTerm.toLowerCase())
+                      )
+                      .map(dept => (
+                        <MenuItem key={dept} value={dept}>
+                          {dept}
+                        </MenuItem>
+                      ))
+                    }
                   </Select>
                 </FormControl>
               </Grid>
