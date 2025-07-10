@@ -8,7 +8,7 @@ import Side from './pages/side2'; // Ta nouvelle sidebar
 
 // Pages
 import Home from './pages/Home';
-import Bookings from './pages/Bookings';
+import Bookings from './pages/sessionAfterModal';
 import RatePlans from './pages/RatePlans';
 import Apartments from './pages/Apartments';
 import Pricing from './pages/Pricing';
