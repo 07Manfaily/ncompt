@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Box,
   Card,
@@ -104,7 +104,7 @@ function CreateTrainingSession() {
     2: false
   });
 
-  const handleInputChange = (sessionIndex, field, value) => {
+  const handleInputChange = useCallback((sessionIndex, field, value) => {
     setSessionsData(prev => ({
       ...prev,
       [sessionIndex]: {
@@ -112,9 +112,9 @@ function CreateTrainingSession() {
         [field]: value
       }
     }));
-  };
+  }, []);
 
-  const validateSession = (sessionIndex) => {
+  const validateSession = useCallback((sessionIndex) => {
     const session = sessionsData[sessionIndex];
     return session.code_session && 
            session.intitule_session && 
@@ -122,9 +122,9 @@ function CreateTrainingSession() {
            session.heure_debut && 
            session.ville && 
            session.lieu;
-  };
+  }, [sessionsData]);
 
-  const handleValidateSession = (sessionIndex) => {
+  const handleValidateSession = useCallback((sessionIndex) => {
     if (validateSession(sessionIndex)) {
       setValidatedSessions(prev => ({
         ...prev,
@@ -146,14 +146,14 @@ function CreateTrainingSession() {
         message: 'Veuillez remplir tous les champs obligatoires (Code session, Intitulé, Date, Heure début, Ville, Lieu)'
       });
     }
-  };
+  }, [validateSession]);
 
-  const canAccessTab = (tabIndex) => {
+  const canAccessTab = useCallback((tabIndex) => {
     if (tabIndex === 0) return true;
     return validatedSessions[tabIndex - 1];
-  };
+  }, [validatedSessions]);
 
-  const handleSubmitAll = () => {
+  const handleSubmitAll = useCallback(() => {
     const allValidated = Object.values(validatedSessions).every(v => v);
     if (allValidated) {
       console.log('Toutes les sessions:', sessionsData);
@@ -167,25 +167,27 @@ function CreateTrainingSession() {
         message: 'Veuillez valider toutes les sessions avant de soumettre.'
       });
     }
-  };
+  }, [validatedSessions, sessionsData]);
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const handleCloseSnackbar = useCallback(() => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  }, []);
 
-  const CustomTabPanel = ({ children, value, index, ...other }) => (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`session-tabpanel-${index}`}
-      aria-labelledby={`session-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
-    </div>
-  );
+  const CustomTabPanel = useMemo(() => {
+    return React.memo(({ children, value, index, ...other }) => (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`session-tabpanel-${index}`}
+        aria-labelledby={`session-tab-${index}`}
+        {...other}
+      >
+        {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
+      </div>
+    ));
+  }, []);
 
-  const renderSessionForm = (sessionIndex) => {
+  const renderSessionForm = useCallback((sessionIndex) => {
     const session = sessionsData[sessionIndex];
     const isValidated = validatedSessions[sessionIndex];
 
@@ -207,7 +209,7 @@ function CreateTrainingSession() {
 
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <MenuBook sx={{ mr: 1, fontSize: 20 }} />
+            <MenuBook sx={{ mr: 1, fontSize: 20 }} />
             <Typography variant="h6" component="h3">
               Informations générales
             </Typography>
@@ -223,6 +225,7 @@ function CreateTrainingSession() {
                 placeholder="Ex: SESS-001"
                 required
                 variant="outlined"
+                key={`code_session_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -232,6 +235,7 @@ function CreateTrainingSession() {
                   value={session.statut}
                   onChange={(e) => handleInputChange(sessionIndex, 'statut', e.target.value)}
                   label="Statut"
+                  key={`statut_${sessionIndex}`}
                 >
                   <MenuItem value="planifiee">Planifiée</MenuItem>
                   <MenuItem value="en_cours">En cours</MenuItem>
@@ -250,6 +254,7 @@ function CreateTrainingSession() {
                 placeholder="Ex: Formation avancée en développement web"
                 required
                 variant="outlined"
+                key={`intitule_session_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -261,6 +266,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 placeholder="Ex: FORM-WEB-001"
                 variant="outlined"
+                key={`code_formation_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -272,6 +278,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 placeholder="Ex: Développement Web Full Stack"
                 variant="outlined"
+                key={`intitule_formation_${sessionIndex}`}
               />
             </Grid>
           </Grid>
@@ -281,7 +288,7 @@ function CreateTrainingSession() {
 
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <CalendarToday sx={{ mr: 1, fontSize: 20 }} />
+            <CalendarToday sx={{ mr: 1, fontSize: 20 }} />
             <Typography variant="h6" component="h3">
               Planification
             </Typography>
@@ -298,6 +305,7 @@ function CreateTrainingSession() {
                 required
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
+                key={`date_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -311,6 +319,7 @@ function CreateTrainingSession() {
                 required
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
+                key={`heure_debut_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -323,6 +332,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
+                key={`date_fin_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -335,6 +345,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 variant="outlined"
                 InputLabelProps={{ shrink: true }}
+                key={`heure_fin_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -347,6 +358,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 placeholder="Ex: 5"
                 variant="outlined"
+                key={`duree_jours_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -359,6 +371,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 placeholder="Ex: 40"
                 variant="outlined"
+                key={`duree_heures_${sessionIndex}`}
               />
             </Grid>
           </Grid>
@@ -368,7 +381,7 @@ function CreateTrainingSession() {
 
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <LocationOn sx={{ mr: 1, fontSize: 20 }} />
+            <LocationOn sx={{ mr: 1, fontSize: 20 }} />
             <Typography variant="h6" component="h3">
               Lieu et Configuration
             </Typography>
@@ -384,6 +397,7 @@ function CreateTrainingSession() {
                 placeholder="Ex: Paris"
                 required
                 variant="outlined"
+                key={`ville_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -396,6 +410,7 @@ function CreateTrainingSession() {
                 placeholder="Ex: Centre de formation ABC"
                 required
                 variant="outlined"
+                key={`lieu_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -405,6 +420,7 @@ function CreateTrainingSession() {
                   value={session.type}
                   onChange={(e) => handleInputChange(sessionIndex, 'type', e.target.value)}
                   label="Type de session"
+                  key={`type_${sessionIndex}`}
                 >
                   <MenuItem value="presentiel">Présentiel</MenuItem>
                   <MenuItem value="distanciel">Distanciel</MenuItem>
@@ -419,6 +435,7 @@ function CreateTrainingSession() {
                   value={session.mode_de_diffusion}
                   onChange={(e) => handleInputChange(sessionIndex, 'mode_de_diffusion', e.target.value)}
                   label="Mode de diffusion"
+                  key={`mode_de_diffusion_${sessionIndex}`}
                 >
                   <MenuItem value="intra_entreprise">Intra-entreprise</MenuItem>
                   <MenuItem value="inter_entreprise">Inter-entreprise</MenuItem>
@@ -436,6 +453,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 placeholder="Ex: Jean Dupont"
                 variant="outlined"
+                key={`formateur_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -447,6 +465,7 @@ function CreateTrainingSession() {
                 disabled={isValidated}
                 placeholder="Ex: Accueil des participants"
                 variant="outlined"
+                key={`debut_${sessionIndex}`}
               />
             </Grid>
             <Grid item xs={12}>
@@ -460,6 +479,7 @@ function CreateTrainingSession() {
                 variant="outlined"
                 multiline
                 rows={4}
+                key={`Name_Description_${sessionIndex}`}
               />
             </Grid>
           </Grid>
@@ -492,7 +512,7 @@ function CreateTrainingSession() {
         </Box>
       </Box>
     );
-  };
+  }, [sessionsData, validatedSessions, handleInputChange, handleValidateSession]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
