@@ -1,36 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Button,
-  Tabs,
-  Tab,
-  Grid,
-  Chip,
-  Paper,
-  Container,
-  Divider,
-  Alert,
-  Snackbar
-} from '@mui/material';
-import {
-  CalendarToday,
-  AccessTime,
-  LocationOn,
-  Person,
-  MenuBook,
-  CheckCircle,
-  Save,
-  Lock,
-  Warning
-} from '@mui/icons-material';
+// ... existing code ...
 
 function CreateTrainingSession() {
   const [activeTab, setActiveTab] = useState(0);
