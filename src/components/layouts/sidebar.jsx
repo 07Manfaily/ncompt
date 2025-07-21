@@ -19,7 +19,7 @@ const menuItems = [
     subItems: [
       { text: 'Sessions', path: '/sessions' },
       { text: 'Plan de formation', path: '/formation-plan' },
-      { text: 'Action de formation', path: '/formation-action' },
+      { text: 'Action de formati', path: '/formation-action' },
     ]
   },
   { text: 'Form', icon: <BarChartIcon />, path: '/form' },
@@ -27,6 +27,7 @@ const menuItems = [
   { text: 'Bookings', icon: <CalendarMonthIcon />, path: '/bookings' },
   { text: 'Apartments', icon: <ApartmentIcon />, path: '/apartments' },
   { text: 'Pricing', icon: <LocalOfferIcon />, path: '/pricing' },
+  { text: 'Notifications', icon: <SupportAgentIcon />, path: '/notif' },
   { text: 'Support', icon: <SupportAgentIcon />, path: '/support' },
 ];
 

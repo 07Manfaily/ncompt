@@ -36,6 +36,8 @@ const sections = [
   { text: 'Apartments', icon: <ApartmentIcon />, path: '/apartments' },
   { text: 'Pricing', icon: <LocalOfferIcon />, path: '/pricing' },
   { text: 'Support', icon: <SupportAgentIcon />, path: '/support' },
+  { text: 'Notifications', icon: <SupportAgentIcon />, path: '/notif' },
+  { text: 'Participants', icon: <SupportAgentIcon />, path: '/participantList' },
 ];
 
 export default function Sidebar() {
