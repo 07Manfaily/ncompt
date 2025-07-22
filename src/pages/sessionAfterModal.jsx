@@ -65,24 +65,24 @@ function CreateTrainingSession() {
       
       for (let i = 0; i < count; i++) {
         initialSessionsData[i] = {
-          Name_Description: '',
-          code_session: '',
-          intitule_session: '',
-          statut: '',
-          date: '',
-          debut: '',
-          heure_debut: '',
-          date_fin: '',
-          heure_fin: '',
-          duree_jours: '',
-          duree_heures: '',
-          ville: '',
-          lieu: '',
-          type: '',
-          code_formation: '',
-          intitule_formation: '',
-          mode_de_diffusion: '',
-          formateur: ''
+      Name_Description: '',
+      code_session: '',
+      intitule_session: '',
+      statut: '',
+      date: '',
+      debut: '',
+      heure_debut: '',
+      date_fin: '',
+      heure_fin: '',
+      duree_jours: '',
+      duree_heures: '',
+      ville: '',
+      lieu: '',
+      type: '',
+      code_formation: '',
+      intitule_formation: '',
+      mode_de_diffusion: '',
+      formateur: ''
         };
         initialValidatedSessions[i] = false;
       }
@@ -195,10 +195,10 @@ function CreateTrainingSession() {
           message: `${numberOfSessions} sessions ont été créées avec succès !`
         });
       } catch (err) {
-        setSnackbar({
-          open: true,
+      setSnackbar({
+        open: true,
           message: `Erreur: ${err.message}`
-        });
+      });
       }
     } else {
       setSnackbar({
@@ -214,15 +214,15 @@ function CreateTrainingSession() {
 
   const CustomTabPanel = useMemo(() => {
     return React.memo(({ children, value, index, ...other }) => (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`session-tabpanel-${index}`}
-        aria-labelledby={`session-tab-${index}`}
-        {...other}
-      >
-        {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
-      </div>
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`session-tabpanel-${index}`}
+      aria-labelledby={`session-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
+    </div>
     ));
   }, []);
 
@@ -250,7 +250,7 @@ function CreateTrainingSession() {
 
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <MenuBook sx={{ mr: 1, fontSize: 20 }} />
+                            <MenuBook sx={{ mr: 1, fontSize: 20 }} />
             <Typography variant="h6" component="h3">
               Informations générales
             </Typography>
@@ -329,7 +329,7 @@ function CreateTrainingSession() {
 
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <CalendarToday sx={{ mr: 1, fontSize: 20 }} />
+                            <CalendarToday sx={{ mr: 1, fontSize: 20 }} />
             <Typography variant="h6" component="h3">
               Planification
             </Typography>
@@ -422,7 +422,7 @@ function CreateTrainingSession() {
 
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <LocationOn sx={{ mr: 1, fontSize: 20 }} />
+                            <LocationOn sx={{ mr: 1, fontSize: 20 }} />
             <Typography variant="h6" component="h3">
               Lieu et Configuration
             </Typography>

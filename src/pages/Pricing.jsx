@@ -122,308 +122,749 @@ const GanttChart = () => {
 <Modal open={open} onClose={handleClose}>
   <Box sx={{
     p: 0,
-    bgcolor: 'background.paper',
+    bgcolor: 'transparent',
     m: 'auto',
-    mt: '2%',
-    width: '90%',
-    maxWidth: 1200,
-    maxHeight: '90vh',
-    borderRadius: 3,
-    boxShadow: 24,
+    mt: '1%',
+    width: '95%',
+    maxWidth: 1300,
+    maxHeight: '95vh',
+    borderRadius: 4,
+    boxShadow: 'none',
     overflowY: 'auto',
     overflowX: 'hidden',
   }}>
-    {/* Header coloré */}
-    <Box sx={{ bgcolor: 'primary.main', color: 'white', px: 3, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-      <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <AssignmentIcon sx={{ fontSize: 28 }} /> Détails de la formation
-      </Typography>
-      <IconButton onClick={handleClose} sx={{ color: 'white' }}><CloseIcon /></IconButton>
-    </Box>
-    {/* Contenu en colonne unique avec scroll */}
-    <Box sx={{ p: 3, pt: 2 }}>
-      {selectedData && (
-        <Stack spacing={3} direction="column" width="100%">
-          {/* Les 3 premières sections côte à côte */}
-          <Grid container spacing={2} width="100%">
-            <Grid item xs={12} md={4}>
-              {/* Section 1 : Informations générales */}
-              <Box width="100%">
-                <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                  <SchoolIcon sx={{ mr: 1 }} /> Informations générales
-                </Typography>
-            <Stack spacing={1.5} direction="column" width="100%">
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Code formation :</Typography>
-                {editMode ? 
-                  <TextField name="code_formation" value={editValues.code_formation} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.code_formation}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Intitulé :</Typography>
-                {editMode ? 
-                  <TextField name="intitule_formation" value={editValues.intitule_formation} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.intitule_formation}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Objectif :</Typography>
-                {editMode ? 
-                  <TextField name="objectif_formation" value={editValues.objectif_formation} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.objectif_formation}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>OGF :</Typography>
-                {editMode ? 
-                  <TextField name="ogf" value={editValues.ogf} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.ogf}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Thématique :</Typography>
-                {editMode ? 
-                  <TextField name="thematique" value={editValues.thematique} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.thematique}</Typography>
-                }
-              </Box>
-            </Stack>
-              </Box>
+    {/* Container principal avec glassmorphism */}
+    <Box sx={{
+      bgcolor: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(20px)',
+      border: '1px solid rgba(255, 255, 255, 0.2)',
+      borderRadius: 4,
+      boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
+      overflow: 'hidden',
+    }}>
+      {/* Header moderne avec gradient */}
+      <Box sx={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        px: 4,
+        py: 3,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+        }
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, position: 'relative', zIndex: 1 }}>
+          <Box sx={{
+            p: 1.5,
+            bgcolor: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <AssignmentIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+              Formation Details
+            </Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9, fontSize: '0.9rem' }}>
+              Gestion et suivi des formations
+            </Typography>
+          </Box>
+        </Box>
+        <IconButton 
+          onClick={handleClose} 
+          sx={{ 
+            color: 'white', 
+            bgcolor: 'rgba(255, 255, 255, 0.15)',
+            '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.25)' },
+            position: 'relative',
+            zIndex: 1
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      {/* Contenu principal */}
+      <Box sx={{ p: 4 }}>
+        {selectedData && (
+          <Stack spacing={4} direction="column" width="100%">
+            {/* Les 3 premières sections en cartes */}
+            <Grid container spacing={3} width="100%">
+              <Grid item xs={12} lg={4}>
+                {/* Card 1 : Informations générales */}
+                <Box sx={{
+                  bgcolor: 'white',
+                  borderRadius: 3,
+                  p: 3,
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  height: '100%',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)'
+                  }
+                }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 3,
+                    pb: 2,
+                    borderBottom: '2px solid #f0f0f0'
+                  }}>
+                    <Box sx={{
+                      p: 1,
+                      bgcolor: 'rgba(103, 126, 234, 0.1)',
+                      borderRadius: 2,
+                      mr: 2
+                    }}>
+                      <SchoolIcon sx={{ color: '#667eea', fontSize: 24 }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3748' }}>
+                      Informations générales
+                    </Typography>
+                  </Box>
+                  
+                  <Stack spacing={2.5} direction="column" width="100%">
+                    {[
+                      { label: 'Code formation', key: 'code_formation' },
+                      { label: 'Intitulé', key: 'intitule_formation' },
+                      { label: 'Objectif', key: 'objectif_formation' },
+                      { label: 'OGF', key: 'ogf' },
+                      { label: 'Thématique', key: 'thematique' }
+                    ].map((item) => (
+                      <Box key={item.key} sx={{ 
+                        bgcolor: '#f8fafc',
+                        borderRadius: 2,
+                        p: 2,
+                        border: '1px solid #e2e8f0'
+                      }}>
+                        <Typography sx={{ 
+                          fontSize: '0.85rem', 
+                          fontWeight: 600, 
+                          color: '#64748b',
+                          mb: 0.5,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>
+                          {item.label}
+                        </Typography>
+                        {editMode ? (
+                          <TextField 
+                            name={item.key} 
+                            value={editValues[item.key]} 
+                            onChange={handleChange} 
+                            size="small" 
+                            fullWidth
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                bgcolor: 'white',
+                                borderRadius: 2
+                              }
+                            }}
+                          />
+                        ) : (
+                          <Typography sx={{ 
+                            color: '#2d3748', 
+                            fontWeight: 500,
+                            wordBreak: 'break-word'
+                          }}>
+                            {selectedData[item.key] || 'Non défini'}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12} lg={4}>
+                {/* Card 2 : Organisation */}
+                <Box sx={{
+                  bgcolor: 'white',
+                  borderRadius: 3,
+                  p: 3,
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  height: '100%',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)'
+                  }
+                }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 3,
+                    pb: 2,
+                    borderBottom: '2px solid #f0f0f0'
+                  }}>
+                    <Box sx={{
+                      p: 1,
+                      bgcolor: 'rgba(118, 75, 162, 0.1)',
+                      borderRadius: 2,
+                      mr: 2
+                    }}>
+                      <BusinessIcon sx={{ color: '#764ba2', fontSize: 24 }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3748' }}>
+                      Organisation
+                    </Typography>
+                  </Box>
+                  
+                  <Stack spacing={2.5} direction="column" width="100%">
+                    {[
+                      { label: 'Type de programme', key: 'type_de_programme', type: 'text' },
+                      { label: 'Origine demande', key: 'origine_de_la_demande', type: 'text' },
+                      { label: 'Direction', key: 'direction', type: 'select', options: directions },
+                      { label: 'Profil cible', key: 'profil_cible', type: 'text' },
+                      { label: 'Priorité', key: 'priorite', type: 'select', options: priorites },
+                      { label: 'Mode diffusion', key: 'mode_diffusion', type: 'select', options: modes },
+                      { label: 'Type', key: 'type', type: 'select', options: types },
+                      { label: 'Formateur', key: 'formateur', type: 'text' },
+                      { label: 'Nb sessions', key: 'nbr_session', type: 'number' },
+                      { label: 'Effectif', key: 'effectif', type: 'number' }
+                    ].map((item) => (
+                      <Box key={item.key} sx={{ 
+                        bgcolor: '#f8fafc',
+                        borderRadius: 2,
+                        p: 2,
+                        border: '1px solid #e2e8f0'
+                      }}>
+                        <Typography sx={{ 
+                          fontSize: '0.85rem', 
+                          fontWeight: 600, 
+                          color: '#64748b',
+                          mb: 0.5,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>
+                          {item.label}
+                        </Typography>
+                        {editMode ? (
+                          item.type === 'select' ? (
+                            <FormControl size="small" fullWidth>
+                              <Select 
+                                name={item.key} 
+                                value={editValues[item.key]} 
+                                onChange={handleChange}
+                                sx={{
+                                  bgcolor: 'white',
+                                  borderRadius: 2
+                                }}
+                              >
+                                {item.options.map(option => (
+                                  <MenuItem key={option} value={option}>{option}</MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          ) : (
+                            <TextField 
+                              name={item.key} 
+                              value={editValues[item.key]} 
+                              onChange={handleChange} 
+                              type={item.type}
+                              size="small" 
+                              fullWidth
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  bgcolor: 'white',
+                                  borderRadius: 2
+                                }
+                              }}
+                            />
+                          )
+                        ) : (
+                          <Typography sx={{ 
+                            color: '#2d3748', 
+                            fontWeight: 500,
+                            wordBreak: 'break-word'
+                          }}>
+                            {selectedData[item.key] || 'Non défini'}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12} lg={4}>
+                {/* Card 3 : Dates & Durées */}
+                <Box sx={{
+                  bgcolor: 'white',
+                  borderRadius: 3,
+                  p: 3,
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  height: '100%',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)'
+                  }
+                }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 3,
+                    pb: 2,
+                    borderBottom: '2px solid #f0f0f0'
+                  }}>
+                    <Box sx={{
+                      p: 1,
+                      bgcolor: 'rgba(16, 185, 129, 0.1)',
+                      borderRadius: 2,
+                      mr: 2
+                    }}>
+                      <DateRangeIcon sx={{ color: '#10b981', fontSize: 24 }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3748' }}>
+                      Dates & Durées
+                    </Typography>
+                  </Box>
+                  
+                  <Stack spacing={2.5} direction="column" width="100%">
+                    {[
+                      { label: 'Date début', key: 'date_de_debut' },
+                      { label: 'Date fin', key: 'date_de_fin' },
+                      { label: 'Durée (jours)', key: 'duree_jours', type: 'number' },
+                      { label: 'Durée (heures)', key: 'duree_heures', type: 'number' }
+                    ].map((item) => (
+                      <Box key={item.key} sx={{ 
+                        bgcolor: '#f8fafc',
+                        borderRadius: 2,
+                        p: 2,
+                        border: '1px solid #e2e8f0'
+                      }}>
+                        <Typography sx={{ 
+                          fontSize: '0.85rem', 
+                          fontWeight: 600, 
+                          color: '#64748b',
+                          mb: 0.5,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>
+                          {item.label}
+                        </Typography>
+                        {editMode ? (
+                          <TextField 
+                            name={item.key} 
+                            value={editValues[item.key]} 
+                            onChange={handleChange} 
+                            type={item.type || 'text'}
+                            size="small" 
+                            fullWidth
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                bgcolor: 'white',
+                                borderRadius: 2
+                              }
+                            }}
+                          />
+                        ) : (
+                          <Typography sx={{ 
+                            color: '#2d3748', 
+                            fontWeight: 500,
+                            wordBreak: 'break-word'
+                          }}>
+                            {selectedData[item.key] || 'Non défini'}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+              </Grid>
             </Grid>
             
-            <Grid item xs={12} md={4}>
-              {/* Section 2 : Organisation */}
-              <Box width="100%">
-                <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                  <BusinessIcon sx={{ mr: 1 }} /> Organisation
-                </Typography>
-            <Stack spacing={1.5} direction="column" width="100%">
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Type de programme :</Typography>
-                {editMode ? 
-                  <TextField name="type_de_programme" value={editValues.type_de_programme} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.type_de_programme}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Origine demande :</Typography>
-                {editMode ? 
-                  <TextField name="origine_de_la_demande" value={editValues.origine_de_la_demande} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.origine_de_la_demande}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Direction :</Typography>
-                {editMode ? 
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <Select name="direction" value={editValues.direction} onChange={handleChange}>
-                      {directions.map(dir => <MenuItem key={dir} value={dir}>{dir}</MenuItem>)}
-                    </Select>
-                  </FormControl> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.direction}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Profil cible :</Typography>
-                {editMode ? 
-                  <TextField name="profil_cible" value={editValues.profil_cible} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.profil_cible}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Priorité :</Typography>
-                {editMode ? 
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <Select name="priorite" value={editValues.priorite} onChange={handleChange}>
-                      {priorites.map(p => <MenuItem key={p} value={p}>{p}</MenuItem>)}
-                    </Select>
-                  </FormControl> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.priorite}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Mode diffusion :</Typography>
-                {editMode ? 
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <Select name="mode_diffusion" value={editValues.mode_diffusion} onChange={handleChange}>
-                      {modes.map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
-                    </Select>
-                  </FormControl> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.mode_diffusion}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Type :</Typography>
-                {editMode ? 
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <Select name="type" value={editValues.type} onChange={handleChange}>
-                      {types.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
-                    </Select>
-                  </FormControl> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.type}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Formateur :</Typography>
-                {editMode ? 
-                  <TextField name="formateur" value={editValues.formateur} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.formateur}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Nb sessions :</Typography>
-                {editMode ? 
-                  <TextField name="nbr_session" value={editValues.nbr_session} onChange={handleChange} type="number" size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.nbr_session}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Effectif :</Typography>
-                {editMode ? 
-                  <TextField name="effectif" value={editValues.effectif} onChange={handleChange} type="number" size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.effectif}</Typography>
-                }
-              </Box>
-            </Stack>
-              </Box>
-            </Grid>
-            
-            <Grid item xs={12} md={4}>
-              {/* Section 3 : Dates & Durées */}
-              <Box width="100%">
-                <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-                  <DateRangeIcon sx={{ mr: 1 }} /> Dates & Durées
-                </Typography>
-            <Stack spacing={1.5} direction="column" width="100%">
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Date début :</Typography>
-                {editMode ? 
-                  <TextField name="date_de_debut" value={editValues.date_de_debut} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.date_de_debut}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Date fin :</Typography>
-                {editMode ? 
-                  <TextField name="date_de_fin" value={editValues.date_de_fin} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.date_de_fin}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Durée (jours) :</Typography>
-                {editMode ? 
-                  <TextField name="duree_jours" value={editValues.duree_jours} onChange={handleChange} type="number" size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.duree_jours}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Durée (heures) :</Typography>
-                {editMode ? 
-                  <TextField name="duree_heures" value={editValues.duree_heures} onChange={handleChange} type="number" size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.duree_heures}</Typography>
-                }
-              </Box>
-            </Stack>
-              </Box>
-            </Grid>
-          </Grid>
-          
-          <Divider />
-          
-          {/* Section 4 : Coûts */}
-          <Box width="100%">
-            <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-              <EuroIcon sx={{ mr: 1 }} /> Coûts
-            </Typography>
-            <Stack spacing={1.5} direction="column" width="100%">
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Période coûts :</Typography>
-                {editMode ? 
-                  <TextField name="periode_couts" value={editValues.periode_couts} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.periode_couts}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Conception/Animation :</Typography>
-                {editMode ? 
-                  <TextField name="conception_animation" value={editValues.conception_animation} onChange={handleChange} type="number" size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.conception_animation} €</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Logistique :</Typography>
-                {editMode ? 
-                  <TextField name="couts_logistique" value={editValues.couts_logistique} onChange={handleChange} type="number" size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.couts_logistique} €</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Coût total :</Typography>
-                {editMode ? 
-                  <TextField name="couts_total" value={editValues.couts_total} onChange={handleChange} type="number" size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.couts_total} €</Typography>
-                }
-              </Box>
-            </Stack>
-          </Box>
-          
-          <Divider />
-          
-          {/* Section 5 : Statut & avis */}
-          <Box width="100%">
-            <Typography variant="subtitle1" sx={{ mb: 2, color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center' }}>
-              <StarIcon sx={{ mr: 1 }} /> Statut & avis
-            </Typography>
-            <Stack spacing={1.5} direction="column" width="100%">
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Statut :</Typography>
-                {editMode ? 
-                  <FormControl size="small" sx={{ flex: 1 }}>
-                    <Select name="statut" value={editValues.statut} onChange={handleChange}>
-                      {statuts.map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}
-                    </Select>
-                  </FormControl> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.statut}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Avis DRH :</Typography>
-                {editMode ? 
-                  <TextField name="avis_drh" value={editValues.avis_drh} onChange={handleChange} size="small" sx={{ flex: 1 }} /> : 
-                  <Typography sx={{ flex: 1 }}>{selectedData.avis_drh}</Typography>
-                }
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Obligatoire :</Typography>
-                <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                  {editMode ? 
-                    <Switch checked={editValues.formation_obligatoire} onChange={handleSwitch('formation_obligatoire')} /> : 
-                    (selectedData.formation_obligatoire ? <CheckCircleIcon color="success" /> : <WarningIcon color="warning" />)
+            {/* Sections 4 et 5 en bas */}
+            <Grid container spacing={3} width="100%">
+              <Grid item xs={12} md={6}>
+                {/* Card 4 : Coûts */}
+                <Box sx={{
+                  bgcolor: 'white',
+                  borderRadius: 3,
+                  p: 3,
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  height: '100%',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)'
                   }
+                }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 3,
+                    pb: 2,
+                    borderBottom: '2px solid #f0f0f0'
+                  }}>
+                    <Box sx={{
+                      p: 1,
+                      bgcolor: 'rgba(245, 158, 11, 0.1)',
+                      borderRadius: 2,
+                      mr: 2
+                    }}>
+                      <EuroIcon sx={{ color: '#f59e0b', fontSize: 24 }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3748' }}>
+                      Coûts
+                    </Typography>
+                  </Box>
+                  
+                  <Stack spacing={2.5} direction="column" width="100%">
+                    {[
+                      { label: 'Période coûts', key: 'periode_couts' },
+                      { label: 'Conception/Animation', key: 'conception_animation', type: 'number', suffix: ' €' },
+                      { label: 'Logistique', key: 'couts_logistique', type: 'number', suffix: ' €' },
+                      { label: 'Coût total', key: 'couts_total', type: 'number', suffix: ' €' }
+                    ].map((item) => (
+                      <Box key={item.key} sx={{ 
+                        bgcolor: '#f8fafc',
+                        borderRadius: 2,
+                        p: 2,
+                        border: '1px solid #e2e8f0'
+                      }}>
+                        <Typography sx={{ 
+                          fontSize: '0.85rem', 
+                          fontWeight: 600, 
+                          color: '#64748b',
+                          mb: 0.5,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px'
+                        }}>
+                          {item.label}
+                        </Typography>
+                        {editMode ? (
+                          <TextField 
+                            name={item.key} 
+                            value={editValues[item.key]} 
+                            onChange={handleChange} 
+                            type={item.type || 'text'}
+                            size="small" 
+                            fullWidth
+                            sx={{
+                              '& .MuiOutlinedInput-root': {
+                                bgcolor: 'white',
+                                borderRadius: 2
+                              }
+                            }}
+                          />
+                        ) : (
+                          <Typography sx={{ 
+                            color: '#2d3748', 
+                            fontWeight: 500,
+                            wordBreak: 'break-word'
+                          }}>
+                            {selectedData[item.key] ? selectedData[item.key] + (item.suffix || '') : 'Non défini'}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                  </Stack>
                 </Box>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                <Typography sx={{ minWidth: '140px', fontWeight: 600 }}>Diplômante :</Typography>
-                <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                  {editMode ? 
-                    <Switch checked={editValues.formation_diplomante} onChange={handleSwitch('formation_diplomante')} /> : 
-                    (selectedData.formation_diplomante ? <CheckCircleIcon color="success" /> : <WarningIcon color="warning" />)
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                {/* Card 5 : Statut & avis */}
+                <Box sx={{
+                  bgcolor: 'white',
+                  borderRadius: 3,
+                  p: 3,
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  height: '100%',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12)'
                   }
+                }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 3,
+                    pb: 2,
+                    borderBottom: '2px solid #f0f0f0'
+                  }}>
+                    <Box sx={{
+                      p: 1,
+                      bgcolor: 'rgba(168, 85, 247, 0.1)',
+                      borderRadius: 2,
+                      mr: 2
+                    }}>
+                      <StarIcon sx={{ color: '#a855f7', fontSize: 24 }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3748' }}>
+                      Statut & avis
+                    </Typography>
+                  </Box>
+                  
+                  <Stack spacing={2.5} direction="column" width="100%">
+                    <Box sx={{ 
+                      bgcolor: '#f8fafc',
+                      borderRadius: 2,
+                      p: 2,
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <Typography sx={{ 
+                        fontSize: '0.85rem', 
+                        fontWeight: 600, 
+                        color: '#64748b',
+                        mb: 0.5,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        Statut
+                      </Typography>
+                      {editMode ? (
+                        <FormControl size="small" fullWidth>
+                          <Select 
+                            name="statut" 
+                            value={editValues.statut} 
+                            onChange={handleChange}
+                            sx={{
+                              bgcolor: 'white',
+                              borderRadius: 2
+                            }}
+                          >
+                            {statuts.map(s => (
+                              <MenuItem key={s} value={s}>{s}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      ) : (
+                        <Typography sx={{ 
+                          color: '#2d3748', 
+                          fontWeight: 500,
+                          wordBreak: 'break-word'
+                        }}>
+                          {selectedData.statut || 'Non défini'}
+                        </Typography>
+                      )}
+                    </Box>
+                    
+                    <Box sx={{ 
+                      bgcolor: '#f8fafc',
+                      borderRadius: 2,
+                      p: 2,
+                      border: '1px solid #e2e8f0'
+                    }}>
+                      <Typography sx={{ 
+                        fontSize: '0.85rem', 
+                        fontWeight: 600, 
+                        color: '#64748b',
+                        mb: 0.5,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        Avis DRH
+                      </Typography>
+                      {editMode ? (
+                        <TextField 
+                          name="avis_drh" 
+                          value={editValues.avis_drh} 
+                          onChange={handleChange} 
+                          size="small" 
+                          fullWidth
+                          multiline
+                          rows={2}
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              bgcolor: 'white',
+                              borderRadius: 2
+                            }
+                          }}
+                        />
+                      ) : (
+                        <Typography sx={{ 
+                          color: '#2d3748', 
+                          fontWeight: 500,
+                          wordBreak: 'break-word'
+                        }}>
+                          {selectedData.avis_drh || 'Non défini'}
+                        </Typography>
+                      )}
+                    </Box>
+                    
+                    {/* Switches pour obligatoire et diplômante */}
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Box sx={{ 
+                          bgcolor: '#f8fafc',
+                          borderRadius: 2,
+                          p: 2,
+                          border: '1px solid #e2e8f0',
+                          textAlign: 'center'
+                        }}>
+                          <Typography sx={{ 
+                            fontSize: '0.85rem', 
+                            fontWeight: 600, 
+                            color: '#64748b',
+                            mb: 1,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px'
+                          }}>
+                            Obligatoire
+                          </Typography>
+                          {editMode ? (
+                            <Switch 
+                              checked={editValues.formation_obligatoire} 
+                              onChange={handleSwitch('formation_obligatoire')}
+                              sx={{
+                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                  color: '#10b981',
+                                },
+                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                  backgroundColor: '#10b981',
+                                },
+                              }}
+                            />
+                          ) : (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                              {selectedData.formation_obligatoire ? 
+                                <CheckCircleIcon sx={{ color: '#10b981', fontSize: 28 }} /> : 
+                                <WarningIcon sx={{ color: '#f59e0b', fontSize: 28 }} />
+                              }
+                            </Box>
+                          )}
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box sx={{ 
+                          bgcolor: '#f8fafc',
+                          borderRadius: 2,
+                          p: 2,
+                          border: '1px solid #e2e8f0',
+                          textAlign: 'center'
+                        }}>
+                          <Typography sx={{ 
+                            fontSize: '0.85rem', 
+                            fontWeight: 600, 
+                            color: '#64748b',
+                            mb: 1,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px'
+                          }}>
+                            Diplômante
+                          </Typography>
+                          {editMode ? (
+                            <Switch 
+                              checked={editValues.formation_diplomante} 
+                              onChange={handleSwitch('formation_diplomante')}
+                              sx={{
+                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                  color: '#10b981',
+                                },
+                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                  backgroundColor: '#10b981',
+                                },
+                              }}
+                            />
+                          ) : (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                              {selectedData.formation_diplomante ? 
+                                <CheckCircleIcon sx={{ color: '#10b981', fontSize: 28 }} /> : 
+                                <WarningIcon sx={{ color: '#f59e0b', fontSize: 28 }} />
+                              }
+                            </Box>
+                          )}
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Stack>
                 </Box>
-              </Box>
-            </Stack>
-          </Box>
-        </Stack>
-      )}
-    </Box>
-    {/* Footer avec bouton Modifier/Enregistrer */}
-    <Box sx={{ px: 3, py: 2, bgcolor: 'grey.100', display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-      {editMode ? (
-        <Button variant="contained" color="success" startIcon={<SaveIcon />} onClick={handleSave}>Enregistrer</Button>
-      ) : (
-        <Button variant="contained" startIcon={<EditIcon />} onClick={handleEdit}>Modifier</Button>
-      )}
+              </Grid>
+            </Grid>
+          </Stack>
+        )}
+      </Box>
+      
+      {/* Footer moderne */}
+      <Box sx={{ 
+        px: 4, 
+        py: 3, 
+        bgcolor: '#f8fafc',
+        borderTop: '1px solid #e2e8f0',
+        display: 'flex', 
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <Typography variant="body2" sx={{ color: '#64748b' }}>
+          {editMode ? 'Mode édition activé' : 'Mode lecture seule'}
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {editMode ? (
+            <>
+              <Button 
+                variant="outlined" 
+                onClick={() => setEditMode(false)}
+                sx={{ 
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600
+                }}
+              >
+                Annuler
+              </Button>
+              <Button 
+                variant="contained" 
+                startIcon={<SaveIcon />} 
+                onClick={handleSave}
+                sx={{ 
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                    boxShadow: '0 6px 20px rgba(16, 185, 129, 0.4)'
+                  }
+                }}
+              >
+                Enregistrer
+              </Button>
+            </>
+          ) : (
+            <Button 
+              variant="contained" 
+              startIcon={<EditIcon />} 
+              onClick={handleEdit}
+              sx={{ 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                boxShadow: '0 4px 15px rgba(103, 126, 234, 0.3)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+                  boxShadow: '0 6px 20px rgba(103, 126, 234, 0.4)'
+                }
+              }}
+            >
+              Modifier
+            </Button>
+          )}
+        </Box>
+      </Box>
     </Box>
   </Box>
 </Modal>
