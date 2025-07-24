@@ -21,7 +21,7 @@ import Task from './pages/task';
 import Form from './pages/form'; // Utilisation du bon formulaire
 import Chart from './pages/chart';
 import Notif from './pages/notif';
-import ParticipantList from './pages/participantList';
+import ParticipantList from './pages/cibl';
 
 // Le composant de Layout principal qui inclut la Sidebar et le Header
 const AppLayout = () => {

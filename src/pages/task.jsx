@@ -1,126 +1,174 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Task = () => {
-  const [tasks] = useState([
-    {
-      id: 1,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Design',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'PN', priority: 'High', color: '#ff5722' },
-        { initials: 'YM', priority: 'High', color: '#2196f3' },
-        { initials: 'AB', priority: 'Medium', color: '#4caf50' },
-        { initials: 'CD', priority: 'High', color: '#9c27b0' },
-        { initials: 'EF', priority: 'Low', color: '#ff9800' },
-        { initials: 'GH', priority: 'High', color: '#607d8b' },
-        { initials: 'IJ', priority: 'Medium', color: '#795548' }
-      ],
-      status: 'Not started'
-    },
-    {
-      id: 2,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Content',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'AB', priority: 'Urgent', color: '#ff9800' },
-        { initials: 'CD', priority: 'Urgent', color: '#4caf50' }
-      ],
-      status: 'Started'
-    },
-    {
-      id: 3,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Research',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'EF', priority: 'Medium', color: '#9c27b0' },
-        { initials: 'GH', priority: 'Medium', color: '#607d8b' }
-      ],
-      status: 'In Progress'
-    },
-    {
-      id: 4,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Planning',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'IJ', priority: 'Urgent', color: '#795548' },
-        { initials: 'KL', priority: 'Urgent', color: '#e91e63' }
-      ],
-      status: 'Completed'
-    },
-    {
-      id: 5,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Design',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'MN', priority: 'High', color: '#ff5722' },
-        { initials: 'OP', priority: 'High', color: '#2196f3' }
-      ],
-      status: 'Not started'
-    },
-    {
-      id: 6,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Content',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'QR', priority: 'Urgent', color: '#ff9800' },
-        { initials: 'ST', priority: 'Urgent', color: '#4caf50' }
-      ],
-      status: 'Started'
-    },
-    {
-      id: 7,
-      title: 'High priority mobile app design health',
-      description: 'High priority work will be done on health',
-      category: 'Research',
-      progress: 2,
-      total: 10,
-      comments: 12,
-      attachments: 10,
-      date: 'Nov',
-      assignees: [
-        { initials: 'UV', priority: 'Medium', color: '#9c27b0' },
-        { initials: 'WX', priority: 'Medium', color: '#607d8b' }
-      ],
-      status: 'In Progress'
-    },
-    
-  ]);
+  const [apiData, setApiData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedFormation, setSelectedFormation] = useState('all');
+
+  // Simulation de l'appel API avec vos données
+  useEffect(() => {
+    // Simule votre réponse API
+    const mockApiResponse = {
+      data: [
+        {
+          id: 141,
+          code_formation: "P25039",
+          code_session: "P2503951",
+          formateur: "K",
+          participants: [
+            {
+              email: "mianpaulette@live.fr",
+              matricule: "5063",
+              nom: "MIAN",
+              prenom: "PAUL ELIE"
+            }
+          ],
+        },
+        {
+          id: 144,
+          code_formation: "P25040",
+          code_session: "P2504002",
+          formateur: "N",
+          participants: [
+            {
+              email: "lucas.moreau@example.fr",
+              matricule: "5067",
+              nom: "MOREAU",
+              prenom: "LUCAS"
+            },
+            {
+              email: "claire.petit@example.fr",
+              matricule: "5068",
+              nom: "PETIT",
+              prenom: "CLAIRE"
+            }
+          ]
+        },
+        {
+          id: 145,
+          code_formation: "P25041",
+          code_session: "P2504101",
+          formateur: "O",
+          participants: [
+            {
+              email: "thomas.robert@example.fr",
+              matricule: "5069",
+              nom: "ROBERT",
+              prenom: "THOMAS"
+            }
+          ]
+        } ,
+        {
+          id: 142,
+          code_formation: "P25039",
+          code_session: "P2503952",
+          formateur: "L",
+          participants: [
+            {
+              email: "marie.dupont@example.fr",
+              matricule: "5064",
+              nom: "DUPONT",
+              prenom: "MARIE"
+            },
+            {
+              email: "jean.martin@example.fr",
+              matricule: "5065",
+              nom: "MARTIN",
+              prenom: "JEAN"
+            }
+          ]
+        },
+        {
+          id: 143,
+          code_formation: "P25040",
+          code_session: "P2504001",
+          formateur: "M",
+          participants: [
+            {
+              email: "sophie.bernard@example.fr",
+              matricule: "5066",
+              nom: "BERNARD",
+              prenom: "SOPHIE"
+            }
+          ]
+        }
+      ]
+    };
+
+    // Simule un délai d'API
+    setTimeout(() => {
+      setApiData(mockApiResponse.data);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  // Transformation des données API en format compatible avec votre design
+  // Obtenir les codes de formation uniques
+  const getUniqueFormations = (data) => {
+    const formations = [...new Set(data.map(item => item.code_formation))];
+    return formations.sort();
+  };
+
+  // Filtrer les données selon la formation sélectionnée
+  const getFilteredData = () => {
+    if (selectedFormation === 'all') {
+      return apiData;
+    }
+    return apiData.filter(item => item.code_formation === selectedFormation);
+  };
+
+  const transformApiDataToTasks = (apiData) => {
+    return apiData.map((item, index) => {
+      const statuses = ['Not started', 'Started', 'In Progress', 'Completed'];
+      const categories = ['Formation', 'Session', 'Training', 'Workshop'];
+      const priorities = ['High', 'Medium', 'Urgent', 'Low'];
+      
+      // Génération des assignés basée sur les participants
+      const assignees = item.participants.map((participant, pIndex) => ({
+        initials: `${participant.prenom.charAt(0)}${participant.nom.charAt(0)}`,
+        priority: priorities[pIndex % priorities.length],
+        color: getRandomColor(pIndex),
+        email: participant.email,
+        matricule: participant.matricule,
+        fullName: `${participant.prenom} ${participant.nom}`
+      }));
+
+      // Ajouter le formateur comme assigné principal
+      assignees.unshift({
+        initials: item.formateur,
+        priority: 'High',
+        color: '#ff5722',
+        role: 'Formateur'
+      });
+
+      return {
+        id: item.id,
+        title: `Formation ${item.code_formation}`,
+        description: `Session ${item.code_session} avec ${item.participants.length} participant(s)`,
+        category: categories[index % categories.length],
+        progress: Math.floor(Math.random() * 8) + 2,
+        total: 10,
+        comments: Math.floor(Math.random() * 20) + 5,
+        attachments: Math.floor(Math.random() * 15) + 3,
+        date: 'Nov',
+        assignees: assignees,
+        status: statuses[index % statuses.length],
+        formateur: item.formateur,
+        codeFormation: item.code_formation,
+        codeSession: item.code_session,
+        participantCount: item.participants.length
+      };
+    });
+  };
+
+  const getRandomColor = (index) => {
+    const colors = ['#ff5722', '#2196f3', '#4caf50', '#9c27b0', '#ff9800', '#607d8b', '#795548', '#e91e63'];
+    return colors[index % colors.length];
+  };
+
+  const filteredData = getFilteredData();
+  const uniqueFormations = getUniqueFormations(apiData);
+  const tasks = transformApiDataToTasks(filteredData);
 
   const columns = [
     { id: 'Not started', title: 'Not started', count: 0 },
@@ -136,10 +184,10 @@ const Task = () => {
 
   const getCategoryColor = (category) => {
     const colors = {
-      'Design': '#00bcd4',
-      'Content': '#ff9800',
-      'Research': '#2196f3',
-      'Planning': '#9c27b0'
+      'Formation': '#00bcd4',
+      'Session': '#ff9800',
+      'Training': '#2196f3',
+      'Workshop': '#9c27b0'
     };
     return colors[category] || '#666';
   };
@@ -154,29 +202,100 @@ const Task = () => {
     return colors[priority] || '#666';
   };
 
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#f5f5f5',
+        fontFamily: 'Roboto, sans-serif'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '40px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #e0e0e0',
+            borderTop: '4px solid #4285f4',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>
+            Chargement des formations...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ 
       backgroundColor: '#f5f5f5', 
       marginTop:'60px',
-      fontFamily: 'Roboto, sans-serif'
+      fontFamily: 'Roboto, sans-serif',
+      padding: '20px'
     }}>
       {/* Header */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        marginBottom: '32px',
-       
+        marginBottom: '32px'
       }}>
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: '600', 
-          color: '#333',
-          margin: 0
-        }}>
-          Tasks
-        </h1>
+        <div>
+          <h1 style={{ 
+            fontSize: '32px', 
+            fontWeight: '600', 
+            color: '#333',
+            margin: 0
+          }}>
+            Formations
+          </h1>
+          <p style={{
+            fontSize: '14px',
+            color: '#666',
+            margin: '8px 0 0 0'
+          }}>
+            {selectedFormation === 'all' ? 
+              `${tasks.length} formation(s) • ${tasks.reduce((sum, task) => sum + task.participantCount, 0)} participant(s) total` :
+              `Formation ${selectedFormation} • ${tasks.length} session(s) • ${tasks.reduce((sum, task) => sum + task.participantCount, 0)} participant(s)`
+            }
+          </p>
+        </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* Select pour filtrer par formation */}
+          <select 
+            value={selectedFormation}
+            onChange={(e) => setSelectedFormation(e.target.value)}
+            style={{
+              backgroundColor: 'white',
+              border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+              padding: '10px 16px',
+              fontSize: '14px',
+              color: '#333',
+              cursor: 'pointer',
+              outline: 'none',
+              minWidth: '200px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            <option value="all">Toutes les formations</option>
+            {uniqueFormations.map(formation => (
+              <option key={formation} value={formation}>
+                Formation {formation}
+              </option>
+            ))}
+          </select>
+          
           <div style={{
             width: '40px',
             height: '40px',
@@ -205,7 +324,7 @@ const Task = () => {
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
           }}>
             <span>+</span>
-            Add Tasks
+            Nouvelle Formation
           </button>
         </div>
       </div>
@@ -215,7 +334,7 @@ const Task = () => {
         display: 'grid', 
         gridTemplateColumns: 'repeat(4, 1fr)', 
         gap: '24px',
-        height: 'calc(100vh - 180px)' // Ajustement de la hauteur pour compenser l'espacement
+        height: 'calc(100vh - 200px)'
       }}>
         {columns.map(column => (
           <div key={column.id} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -303,7 +422,7 @@ const Task = () => {
                       {task.category}
                     </div>
 
-                    {/* Title */}
+                    {/* Title - Adapté selon le filtre */}
                     <h4 style={{
                       fontSize: '16px',
                       fontWeight: '600',
@@ -311,18 +430,48 @@ const Task = () => {
                       margin: '0 0 8px 0',
                       lineHeight: '1.4'
                     }}>
-                      {task.title}
+                      {selectedFormation === 'all' ? task.title : `Session ${task.codeSession}`}
                     </h4>
 
-                    {/* Description */}
+                    {/* Description avec informations API - Adaptée selon le filtre */}
                     <p style={{
                       fontSize: '14px',
                       color: '#666',
-                      margin: '0 0 16px 0',
+                      margin: '0 0 12px 0',
                       lineHeight: '1.4'
                     }}>
-                      {task.description}
+                      {selectedFormation === 'all' ? 
+                        task.description : 
+                        `Formation ${task.codeFormation} avec ${task.participantCount} participant(s)`
+                      }
                     </p>
+
+                    {/* Informations spécifiques API - Adaptées selon le filtre */}
+                    <div style={{
+                      backgroundColor: '#f8f9fa',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      marginBottom: '16px'
+                    }}>
+                      {selectedFormation === 'all' && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '12px', color: '#666' }}>Code Formation:</span>
+                          <span style={{ fontSize: '12px', fontWeight: '500', color: '#333' }}>{task.codeFormation}</span>
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '12px', color: '#666' }}>Code Session:</span>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#333' }}>{task.codeSession}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '12px', color: '#666' }}>Formateur:</span>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#333' }}>{task.formateur}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '12px', color: '#666' }}>Participants:</span>
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: '#333' }}>{task.participantCount}</span>
+                      </div>
+                    </div>
 
                     {/* Progress */}
                     <div style={{ marginBottom: '16px' }}>
@@ -397,7 +546,7 @@ const Task = () => {
                               zIndex: task.assignees.length - index,
                               cursor: 'pointer'
                             }}
-                            title={`${assignee.initials} - ${assignee.priority}`}>
+                            title={assignee.fullName || `${assignee.initials} - ${assignee.priority}${assignee.role ? ` (${assignee.role})` : ''}`}>
                               {assignee.initials}
                             </div>
                           ))}
@@ -418,7 +567,7 @@ const Task = () => {
                               cursor: 'pointer',
                               zIndex: 1
                             }}
-                            title={`+${task.assignees.length - 3} autres personnes assignées`}>
+                            title={`+${task.assignees.length - 3} autres personnes`}>
                               +{task.assignees.length - 3}
                             </div>
                           )}
@@ -441,6 +590,13 @@ const Task = () => {
           </div>
         ))}
       </div>
+
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

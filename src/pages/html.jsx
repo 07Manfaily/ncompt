@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Plus, Trash2, User, GraduationCap, Calendar, MapPin, Eye, Users } from 'lucide-react';
-
+import {
+Grid
+} from "@mui/material";
 const initialData = {
   people: {
     'person-1': { 
@@ -96,7 +98,7 @@ const getLevelColor = (level) => {
 };
 
 const PersonCard = ({ person, onDelete, columnId, onDragStart, onViewDetails }) => (
-  <div
+  <Grid
     className="person-card"
     draggable
     onDragStart={(e) => onDragStart(e, person.id, columnId)}
@@ -121,19 +123,19 @@ const PersonCard = ({ person, onDelete, columnId, onDragStart, onViewDetails }) 
       e.target.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
     }}
   >
-    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: `linear-gradient(90deg, #00c9ff 0%, ${getLevelColor(person.level)} ${person.progress}%, rgba(255,255,255,0.3) ${person.progress}%)` }}></div>
+    <Grid style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: `linear-gradient(90deg, #00c9ff 0%, ${getLevelColor(person.level)} ${person.progress}%, rgba(255,255,255,0.3) ${person.progress}%)` }}></Grid>
     
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ fontSize: '2rem', background: 'rgba(255,255,255,0.2)', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Grid style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+      <Grid style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <Grid style={{ fontSize: '2rem', background: 'rgba(255,255,255,0.2)', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {person.avatar}
-        </div>
-        <div>
+        </Grid>
+        <Grid>
           <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>{person.name}</h3>
           <p style={{ margin: '2px 0', fontSize: '0.85rem', opacity: 0.8 }}>{person.email}</p>
-        </div>
-      </div>
-      <div style={{ display: 'flex', gap: '4px' }}>
+        </Grid>
+      </Grid>
+      <Grid style={{ display: 'flex', gap: '4px' }}>
         <button
           onClick={() => onViewDetails(person)}
           style={{
@@ -164,15 +166,15 @@ const PersonCard = ({ person, onDelete, columnId, onDragStart, onViewDetails }) 
         >
           <Trash2 size={14} />
         </button>
-      </div>
-    </div>
+      </Grid>
+    </Grid>
 
-    <div style={{ marginBottom: '12px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+    <Grid style={{ marginBottom: '12px' }}>
+      <Grid style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
         <GraduationCap size={16} />
         <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{person.formation}</span>
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      </Grid>
+      <Grid style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{
           background: getLevelColor(person.level),
           padding: '2px 8px',
@@ -185,9 +187,9 @@ const PersonCard = ({ person, onDelete, columnId, onDragStart, onViewDetails }) 
         <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>
           Progression: {person.progress}%
         </span>
-      </div>
-    </div>
-  </div>
+      </Grid>
+    </Grid>
+  </Grid>
 );
 
 const PeopleTrainingKanban = () => {
@@ -287,27 +289,27 @@ const PeopleTrainingKanban = () => {
   const totalFormations = new Set(Object.values(data.people).map(p => p.formation)).size;
 
   return (
-    <div style={{ padding: '24px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', minHeight: '100vh' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+    <Grid style={{ padding: '24px', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', minHeight: '100vh' }}>
+      <Grid style={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px', color: 'white' }}>
+        <Grid style={{ textAlign: 'center', marginBottom: '32px', color: 'white' }}>
           <h1 style={{ fontSize: '2.5rem', margin: '0 0 8px 0', fontWeight: '700' }}>
             🎓 Formation Management System
           </h1>
           <p style={{ fontSize: '1.1rem', opacity: 0.9, margin: 0 }}>
             Gérez vos apprenants et leurs parcours de formation
           </p>
-        </div>
+        </Grid>
 
         {/* Stats */}
         {stats && (
-          <div style={{ 
+          <Grid style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
             gap: '16px', 
             marginBottom: '32px' 
           }}>
-            <div style={{ 
+            <Grid style={{ 
               background: 'rgba(255,255,255,0.1)', 
               backdropFilter: 'blur(10px)', 
               borderRadius: '12px', 
@@ -318,8 +320,8 @@ const PeopleTrainingKanban = () => {
               <Users size={32} style={{ marginBottom: '8px' }} />
               <h3 style={{ margin: '0 0 4px 0', fontSize: '2rem' }}>{totalPeople}</h3>
               <p style={{ margin: 0, opacity: 0.8 }}>Total Apprenants</p>
-            </div>
-            <div style={{ 
+            </Grid>
+            <Grid style={{ 
               background: 'rgba(255,255,255,0.1)', 
               backdropFilter: 'blur(10px)', 
               borderRadius: '12px', 
@@ -330,8 +332,8 @@ const PeopleTrainingKanban = () => {
               <GraduationCap size={32} style={{ marginBottom: '8px' }} />
               <h3 style={{ margin: '0 0 4px 0', fontSize: '2rem' }}>{totalFormations}</h3>
               <p style={{ margin: 0, opacity: 0.8 }}>Formations Actives</p>
-            </div>
-            <div style={{ 
+            </Grid>
+            <Grid style={{ 
               background: 'rgba(255,255,255,0.1)', 
               backdropFilter: 'blur(10px)', 
               borderRadius: '12px', 
@@ -342,8 +344,8 @@ const PeopleTrainingKanban = () => {
               <Calendar size={32} style={{ marginBottom: '8px' }} />
               <h3 style={{ margin: '0 0 4px 0', fontSize: '2rem' }}>{data.columns['column-2'].personIds.length}</h3>
               <p style={{ margin: 0, opacity: 0.8 }}>En Formation</p>
-            </div>
-            <div style={{ 
+            </Grid>
+            <Grid style={{ 
               background: 'rgba(255,255,255,0.1)', 
               backdropFilter: 'blur(10px)', 
               borderRadius: '12px', 
@@ -354,18 +356,18 @@ const PeopleTrainingKanban = () => {
               <span style={{ fontSize: '2rem', marginBottom: '8px', display: 'block' }}>🏆</span>
               <h3 style={{ margin: '0 0 4px 0', fontSize: '2rem' }}>{data.columns['column-3'].personIds.length}</h3>
               <p style={{ margin: 0, opacity: 0.8 }}>Certifiés</p>
-            </div>
-          </div>
+            </Grid>
+          </Grid>
         )}
 
         {/* Kanban Board */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+        <Grid style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
           {data.columnOrder.map(columnId => {
             const column = data.columns[columnId];
             const people = column.personIds.map(personId => data.people[personId]);
 
             return (
-              <div
+              <Grid
                 key={columnId}
                 style={{
                   background: 'rgba(255,255,255,0.95)',
@@ -379,7 +381,7 @@ const PeopleTrainingKanban = () => {
                 onDrop={e => handleDrop(e, columnId)}
               >
                 {/* Column Header */}
-                <div style={{ 
+                <Grid style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'space-between', 
@@ -389,14 +391,14 @@ const PeopleTrainingKanban = () => {
                   borderRadius: '12px',
                   color: 'white'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Grid style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '1.5rem' }}>{column.icon}</span>
-                    <div>
+                    <Grid>
                       <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '600' }}>{column.title}</h2>
                       <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.9 }}>{column.subtitle}</p>
-                    </div>
-                  </div>
-                  <div style={{
+                    </Grid>
+                  </Grid>
+                  <Grid style={{
                     background: 'rgba(255,255,255,0.2)',
                     borderRadius: '20px',
                     padding: '4px 12px',
@@ -404,11 +406,11 @@ const PeopleTrainingKanban = () => {
                     fontWeight: '600'
                   }}>
                     {people.length}
-                  </div>
-                </div>
+                  </Grid>
+                </Grid>
 
                 {/* People Cards */}
-                <div style={{ marginBottom: '16px' }}>
+                <Grid style={{ marginBottom: '16px' }}>
                   {people.map(person => (
                     <PersonCard
                       key={person.id}
@@ -419,11 +421,11 @@ const PeopleTrainingKanban = () => {
                       onViewDetails={setSelectedPerson}
                     />
                   ))}
-                </div>
+                </Grid>
 
                 {/* Add Form */}
                 {showAddForm === columnId ? (
-                  <div style={{ 
+                  <Grid style={{ 
                     background: 'rgba(108, 92, 231, 0.1)', 
                     borderRadius: '12px', 
                     padding: '16px',
@@ -457,7 +459,7 @@ const PeopleTrainingKanban = () => {
                         fontSize: '1rem'
                       }}
                     />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
+                    <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
                       <select
                         value={newPerson.formation}
                         onChange={(e) => setNewPerson({...newPerson, formation: e.target.value})}
@@ -472,8 +474,8 @@ const PeopleTrainingKanban = () => {
                       >
                         {levels.map(l => <option key={l} value={l}>{l}</option>)}
                       </select>
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                    </Grid>
+                    <Grid style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                       <button
                         onClick={() => addPerson(columnId)}
                         style={{
@@ -503,8 +505,8 @@ const PeopleTrainingKanban = () => {
                       >
                         ❌ Annuler
                       </button>
-                    </div>
-                  </div>
+                    </Grid>
+                  </Grid>
                 ) : (
                   <button
                     onClick={() => setShowAddForm(columnId)}
@@ -535,14 +537,14 @@ const PeopleTrainingKanban = () => {
                     Ajouter une personne
                   </button>
                 )}
-              </div>
+              </Grid>
             );
           })}
-        </div>
+        </Grid>
 
         {/* Modal de détails */}
         {selectedPerson && (
-          <div style={{
+          <Grid style={{
             position: 'fixed',
             top: 0,
             left: 0,
@@ -554,7 +556,7 @@ const PeopleTrainingKanban = () => {
             justifyContent: 'center',
             zIndex: 1000
           }} onClick={() => setSelectedPerson(null)}>
-            <div style={{
+            <Grid style={{
               background: 'white',
               borderRadius: '16px',
               padding: '32px',
@@ -562,17 +564,17 @@ const PeopleTrainingKanban = () => {
               width: '90%',
               boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
             }} onClick={e => e.stopPropagation()}>
-              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                <div style={{ fontSize: '4rem', marginBottom: '12px' }}>{selectedPerson.avatar}</div>
+              <Grid style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <Grid style={{ fontSize: '4rem', marginBottom: '12px' }}>{selectedPerson.avatar}</Grid>
                 <h2 style={{ margin: '0 0 8px 0', color: '#333' }}>{selectedPerson.name}</h2>
                 <p style={{ margin: 0, color: '#666' }}>{selectedPerson.email}</p>
-              </div>
+              </Grid>
               
-              <div style={{ marginBottom: '24px' }}>
-                <div style={{ marginBottom: '16px' }}>
+              <Grid style={{ marginBottom: '24px' }}>
+                <Grid style={{ marginBottom: '16px' }}>
                   <strong>Formation:</strong> {selectedPerson.formation}
-                </div>
-                <div style={{ marginBottom: '16px' }}>
+                </Grid>
+                <Grid style={{ marginBottom: '16px' }}>
                   <strong>Niveau:</strong> <span style={{ 
                     background: getLevelColor(selectedPerson.level),
                     color: 'white',
@@ -580,27 +582,27 @@ const PeopleTrainingKanban = () => {
                     borderRadius: '12px',
                     fontSize: '0.9rem'
                   }}>{selectedPerson.level}</span>
-                </div>
-                <div style={{ marginBottom: '16px' }}>
+                </Grid>
+                <Grid style={{ marginBottom: '16px' }}>
                   <strong>Progression:</strong>
-                  <div style={{ 
+                  <Grid style={{ 
                     background: '#f0f0f0',
                     height: '10px',
                     borderRadius: '5px',
                     margin: '8px 0',
                     overflow: 'hidden'
                   }}>
-                    <div style={{
+                    <Grid style={{
                       background: `linear-gradient(90deg, #667eea 0%, #764ba2 100%)`,
                       height: '100%',
                       width: `${selectedPerson.progress}%`,
                       borderRadius: '5px',
                       transition: 'width 0.3s ease'
-                    }}></div>
-                  </div>
+                    }}></Grid>
+                  </Grid>
                   <span>{selectedPerson.progress}% complété</span>
-                </div>
-              </div>
+                </Grid>
+              </Grid>
               
               <button
                 onClick={() => setSelectedPerson(null)}
@@ -618,11 +620,11 @@ const PeopleTrainingKanban = () => {
               >
                 Fermer
               </button>
-            </div>
-          </div>
+            </Grid>
+          </Grid>
         )}
-      </div>
-    </div>
+      </Grid>
+    </Grid>
   );
 };
 
