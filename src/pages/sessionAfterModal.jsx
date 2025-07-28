@@ -39,20 +39,20 @@ const CreateTrainingSession = () => {
         code_formation: item.code_formation,
         code_session: item.code_session,
         intitule_formation: item.intitule_formation,
-        intitule_session: '',
-        statut: '',
-        date: '',
-        heure_debut: '',
-        date_fin: '',
-        heure_fin: '',
-        duree_jours: '',
-        duree_heures: '',
-        ville: '',
-        lieu: '',
-        type: '',
-        mode_de_diffusion: '',
+      intitule_session: '',
+      statut: '',
+      date: '',
+      heure_debut: '',
+      date_fin: '',
+      heure_fin: '',
+      duree_jours: '',
+      duree_heures: '',
+      ville: '',
+      lieu: '',
+      type: '',
+      mode_de_diffusion: '',
         formateur: '',
-        Name_Description: '',
+      Name_Description: '',
         debut: ''
       };
       initialValidation[index] = false;
@@ -107,7 +107,7 @@ const CreateTrainingSession = () => {
     return <Typography>Chargement des sessions simulées...</Typography>;
   }
 
-  return (
+    return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" sx={{ mb: 3 }}>Créer des Sessions de Formation</Typography>
 
@@ -130,45 +130,45 @@ const CreateTrainingSession = () => {
               <Box key={index}>
                 <Typography variant="h6" sx={{ mb: 2 }}>
                   Détails de la session {session.code_session}
-                </Typography>
+            </Typography>
 
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6}>
                     <TextField fullWidth label="Code session" value={session.code_session} disabled />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
+            </Grid>
+            <Grid item xs={12} md={6}>
                     <TextField fullWidth label="Code formation" value={session.code_formation} disabled />
-                  </Grid>
-                  <Grid item xs={12}>
+            </Grid>
+            <Grid item xs={12}>
                     <TextField fullWidth label="Intitulé formation" value={session.intitule_formation} disabled />
-                  </Grid>
+            </Grid>
                   <Grid item xs={12}>
                     <TextField fullWidth label="Intitulé session" value={session.intitule_session} onChange={(e) => handleInputChange(index, 'intitule_session', e.target.value)} />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
+            </Grid>
+            <Grid item xs={12} md={6}>
                     <TextField fullWidth label="Date début" type="date" InputLabelProps={{ shrink: true }} value={session.date} onChange={(e) => handleInputChange(index, 'date', e.target.value)} />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
+            </Grid>
+            <Grid item xs={12} md={6}>
                     <TextField fullWidth label="Heure début" type="time" InputLabelProps={{ shrink: true }} value={session.heure_debut} onChange={(e) => handleInputChange(index, 'heure_debut', e.target.value)} />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
+            </Grid>
+            <Grid item xs={12} md={6}>
                     <TextField fullWidth label="Ville" value={session.ville} onChange={(e) => handleInputChange(index, 'ville', e.target.value)} />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
+            </Grid>
+            <Grid item xs={12} md={6}>
                     <TextField fullWidth label="Lieu" value={session.lieu} onChange={(e) => handleInputChange(index, 'lieu', e.target.value)} />
-                  </Grid>
-                </Grid>
+            </Grid>
+          </Grid>
 
                 <Box sx={{ mt: 3 }}>
-                  <Button
+            <Button
                     variant={validatedSessions[index] ? 'outlined' : 'contained'}
                     color={validatedSessions[index] ? 'success' : 'primary'}
                     onClick={() => handleValidateSession(parseInt(index))}
                   >
                     {validatedSessions[index] ? 'Session validée' : 'Valider la session'}
-                  </Button>
-                </Box>
-              </Box>
+            </Button>
+        </Box>
+      </Box>
             )
           ))}
         </CardContent>
