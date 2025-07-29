@@ -19,13 +19,20 @@ import {
   CheckCircle,
   AlertCircle,
   X,
-  Info
+  Info,
+  Search,
+  Plus,
+  Trash2
 } from 'lucide-react';
 
 const ProfileDashboard = () => {
   const [currentMonthIndex, setCurrentMonthIndex] = useState(2);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [searchFilter, setSearchFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMemberName, setNewMemberName] = useState('');
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June', 
@@ -46,7 +53,19 @@ const ProfileDashboard = () => {
     }
   };
 
-  const projects = [
+  // Avatars et noms prédéfinis pour les membres
+  const memberPool = [
+    { avatar: '👨‍💻', name: 'John Doe' },
+    { avatar: '👩‍💼', name: 'Sarah Smith' },
+    { avatar: '👨‍🎨', name: 'Mike Johnson' },
+    { avatar: '👩‍🔬', name: 'Lisa Chen' },
+    { avatar: '👨‍⚖️', name: 'David Brown' },
+    { avatar: '👩‍🎓', name: 'Emma Wilson' },
+    { avatar: '👨‍🏫', name: 'Alex Garcia' },
+    { avatar: '👩‍⚕️', name: 'Maria Rodriguez' }
+  ];
+
+  const [projects, setProjects] = useState([
     {
       id: 1,
       title: "Web Designing",
@@ -55,7 +74,11 @@ const ProfileDashboard = () => {
       progress: 90,
       color: "yellow",
       daysLeft: 2,
-      team: ["👨", "👩", "👨"],
+      team: [
+        { avatar: '👨‍💻', name: 'John Doe' },
+        { avatar: '👩‍💼', name: 'Sarah Smith' },
+        { avatar: '👨‍🎨', name: 'Mike Johnson' }
+      ],
       description: "Création d'une interface web moderne avec React et Material-UI",
       budget: "$15,000",
       priority: "High",
@@ -69,7 +92,10 @@ const ProfileDashboard = () => {
       progress: 50,
       color: "blue",
       daysLeft: 5,
-      team: ["👨", "👩", "👨"],
+      team: [
+        { avatar: '👩‍🔬', name: 'Lisa Chen' },
+        { avatar: '👨‍⚖️', name: 'David Brown' }
+      ],
       description: "Développement d'une application mobile native pour iOS et Android",
       budget: "$25,000",
       priority: "Medium",
@@ -83,7 +109,11 @@ const ProfileDashboard = () => {
       progress: 70,
       color: "pink",
       daysLeft: 8,
-      team: ["👨", "👩", "👨"],
+      team: [
+        { avatar: '👩‍🎓', name: 'Emma Wilson' },
+        { avatar: '👨‍🏫', name: 'Alex Garcia' },
+        { avatar: '👩‍⚕️', name: 'Maria Rodriguez' }
+      ],
       description: "Conception d'un tableau de bord analytique pour la gestion des données",
       budget: "$20,000",
       priority: "High",
@@ -97,7 +127,10 @@ const ProfileDashboard = () => {
       progress: 30,
       color: "green",
       daysLeft: 12,
-      team: ["👨", "👩", "👨"],
+      team: [
+        { avatar: '👨‍💻', name: 'John Doe' },
+        { avatar: '👩‍💼', name: 'Sarah Smith' }
+      ],
       description: "Plateforme e-commerce complète avec système de paiement intégré",
       budget: "$35,000",
       priority: "High",
@@ -111,13 +144,118 @@ const ProfileDashboard = () => {
       progress: 85,
       color: "purple",
       daysLeft: 3,
-      team: ["👨", "👩", "👨"],
+      team: [
+        { avatar: '👩‍🔬', name: 'Lisa Chen' }
+      ],
       description: "Intégration d'APIs tierces pour synchronisation des données",
       budget: "$12,000",
       priority: "Medium",
       status: "Testing"
+    },
+    {
+      id: 6,
+      title: "CRM System",
+      date: "March 20, 2024",
+      phase: "Planning",
+      progress: 15,
+      color: "blue",
+      daysLeft: 20,
+      team: [
+        { avatar: '👨‍🎨', name: 'Mike Johnson' },
+        { avatar: '👩‍🎓', name: 'Emma Wilson' }
+      ],
+      description: "Système de gestion de la relation client complet",
+      budget: "$40,000",
+      priority: "Medium",
+      status: "Planning"
+    },
+    {
+      id: 7,
+      title: "Marketing Site",
+      date: "March 22, 2024",
+      phase: "Design",
+      progress: 25,
+      color: "yellow",
+      daysLeft: 15,
+      team: [
+        { avatar: '👨‍🏫', name: 'Alex Garcia' }
+      ],
+      description: "Site web marketing pour promouvoir nos services",
+      budget: "$8,000",
+      priority: "Low",
+      status: "Design"
+    },
+    {
+      id: 8,
+      title: "Analytics Tool",
+      date: "March 25, 2024",
+      phase: "Research",
+      progress: 5,
+      color: "green",
+      daysLeft: 30,
+      team: [
+        { avatar: '👩‍⚕️', name: 'Maria Rodriguez' },
+        { avatar: '👨‍💻', name: 'John Doe' }
+      ],
+      description: "Outil d'analyse avancée pour les données métier",
+      budget: "$22,000",
+      priority: "Medium",
+      status: "Research"
     }
-  ];
+  ]);
+
+  // Fonction pour filtrer les projets
+  const filteredProjects = projects.filter(project => {
+    const matchesSearch = project.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
+                         project.description.toLowerCase().includes(searchFilter.toLowerCase()) ||
+                         project.phase.toLowerCase().includes(searchFilter.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || 
+                         project.status.toLowerCase().replace(' ', '').includes(statusFilter.toLowerCase());
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  // Fonction pour ajouter un membre à un projet
+  const addMemberToProject = (projectId, member) => {
+    setProjects(prev => prev.map(project => {
+      if (project.id === projectId) {
+        const isAlreadyMember = project.team.some(teamMember => teamMember.name === member.name);
+        if (!isAlreadyMember) {
+          return { ...project, team: [...project.team, member] };
+        }
+      }
+      return project;
+    }));
+    
+    // Mettre à jour le projet sélectionné aussi
+    if (selectedProject && selectedProject.id === projectId) {
+      const updatedProject = projects.find(p => p.id === projectId);
+      if (updatedProject) {
+        const isAlreadyMember = updatedProject.team.some(teamMember => teamMember.name === member.name);
+        if (!isAlreadyMember) {
+          setSelectedProject({ ...updatedProject, team: [...updatedProject.team, member] });
+        }
+      }
+    }
+  };
+
+  // Fonction pour supprimer un membre d'un projet
+  const removeMemberFromProject = (projectId, memberIndex) => {
+    setProjects(prev => prev.map(project => {
+      if (project.id === projectId) {
+        const newTeam = project.team.filter((_, index) => index !== memberIndex);
+        return { ...project, team: newTeam };
+      }
+      return project;
+    }));
+    
+    // Mettre à jour le projet sélectionné aussi
+    if (selectedProject && selectedProject.id === projectId) {
+      const newTeam = selectedProject.team.filter((_, index) => index !== memberIndex);
+      setSelectedProject({ ...selectedProject, team: newTeam });
+    }
+  };
 
   const messages = [
     {
@@ -361,7 +499,7 @@ const ProfileDashboard = () => {
               </div>
             </div>
 
-            {/* Detailed Information */}
+            {/* Formulaire Chaud */}
             <div style={{
               background: 'white',
               borderRadius: '12px',
@@ -373,66 +511,264 @@ const ProfileDashboard = () => {
                   fontSize: '18px', 
                   fontWeight: '600', 
                   color: '#111827',
-                  margin: 0
+                  margin: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}>
-                  Detailed Information
+                  🔥 Formulaire Chaud
                 </h3>
               </div>
               <div style={{ padding: '0 24px 24px' }}>
-                {[
-                  { label: 'Full Name', value: 'Robert Smith', status: 'online', icon: <User size={16} /> },
-                  { label: 'Email Address', value: 'robertsmith84@gmail.com', status: 'offline', icon: <Mail size={16} /> },
-                  { label: 'Contact Number', value: '(555) 555-5674', status: 'offline', icon: <Phone size={16} /> },
-                  { label: 'Designation', value: 'Product Designer', status: 'offline', icon: <User size={16} /> },
-                  { label: 'Availability', value: 'Schedule the time slot', status: 'offline', icon: <Clock size={16} /> }
-                ].map((item, index) => (
-                  <div key={index} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '12px 0',
-                    borderBottom: index < 4 ? '1px solid #f3f4f6' : 'none'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{
-                        width: '8px',
-                        height: '8px',
-                        borderRadius: '50%',
-                        backgroundColor: item.status === 'online' ? '#10b981' : '#d1d5db'
-                      }} />
-                      <div>
-                        <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 2px 0' }}>
-                          {item.label}
-                        </p>
-                        <p style={{ color: '#111827', fontWeight: '500', margin: 0 }}>
-                          {item.value}
-                        </p>
-                      </div>
-                    </div>
-                    {item.status === 'online' ? (
-                      <span style={{
-                        backgroundColor: '#d1fae5',
-                        color: '#065f46',
-                        padding: '2px 8px',
-                        borderRadius: '4px',
-                        fontSize: '12px'
-                      }}>
-                        Online
-                      </span>
-                    ) : (
-                      <div style={{ color: '#6b7280' }}>
-                        {item.icon}
-                      </div>
-                    )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      color: '#374151', 
+                      marginBottom: '6px' 
+                    }}>
+                      Urgence
+                    </label>
+                    <select style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '2px solid #ef4444',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      backgroundColor: '#fef2f2',
+                      color: '#dc2626',
+                      fontWeight: '500'
+                    }}>
+                      <option>Critique - Immédiat</option>
+                      <option>Urgent - Sous 1h</option>
+                      <option>Important - Sous 4h</option>
+                    </select>
                   </div>
-                ))}
+                  
+                  <div>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      color: '#374151', 
+                      marginBottom: '6px' 
+                    }}>
+                      Description Rapide
+                    </label>
+                    <textarea 
+                      placeholder="Décrivez l'urgence..."
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '2px solid #ef4444',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        backgroundColor: '#fef2f2',
+                        resize: 'vertical',
+                        minHeight: '80px'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button style={{
+                      flex: 1,
+                      padding: '12px 20px',
+                      backgroundColor: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}>
+                      <AlertCircle size={16} />
+                      Envoyer Urgent
+                    </button>
+                    <button style={{
+                      padding: '12px',
+                      backgroundColor: '#f3f4f6',
+                      color: '#6b7280',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer'
+                    }}>
+                      <X size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Formulaire Froid */}
+            <div style={{
+              background: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              overflow: 'hidden'
+            }}>
+              <div style={{ padding: '24px 24px 16px' }}>
+                <h3 style={{ 
+                  fontSize: '18px', 
+                  fontWeight: '600', 
+                  color: '#111827',
+                  margin: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  ❄️ Formulaire Froid
+                </h3>
+              </div>
+              <div style={{ padding: '0 24px 24px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      color: '#374151', 
+                      marginBottom: '6px' 
+                    }}>
+                      Priorité
+                    </label>
+                    <select style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '2px solid #3b82f6',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      backgroundColor: '#eff6ff',
+                      color: '#1d4ed8'
+                    }}>
+                      <option>Basse - Quand possible</option>
+                      <option>Normale - Cette semaine</option>
+                      <option>Élevée - Dans 2-3 jours</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      color: '#374151', 
+                      marginBottom: '6px' 
+                    }}>
+                      Catégorie
+                    </label>
+                    <select style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '2px solid #3b82f6',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      backgroundColor: '#eff6ff',
+                      color: '#1d4ed8'
+                    }}>
+                      <option>Amélioration</option>
+                      <option>Nouvelle fonctionnalité</option>
+                      <option>Documentation</option>
+                      <option>Formation</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      color: '#374151', 
+                      marginBottom: '6px' 
+                    }}>
+                      Description Détaillée
+                    </label>
+                    <textarea 
+                      placeholder="Décrivez votre demande en détail..."
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '2px solid #3b82f6',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        backgroundColor: '#eff6ff',
+                        resize: 'vertical',
+                        minHeight: '100px'
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: '500', 
+                      color: '#374151', 
+                      marginBottom: '6px' 
+                    }}>
+                      Date limite souhaitée
+                    </label>
+                    <input 
+                      type="date"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '2px solid #3b82f6',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        backgroundColor: '#eff6ff',
+                        color: '#1d4ed8'
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button style={{
+                      flex: 1,
+                      padding: '12px 20px',
+                      backgroundColor: '#3b82f6',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}>
+                      <CheckCircle size={16} />
+                      Planifier
+                    </button>
+                    <button style={{
+                      padding: '12px 20px',
+                      backgroundColor: '#f3f4f6',
+                      color: '#6b7280',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      cursor: 'pointer'
+                    }}>
+                      Brouillon
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Right Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* Calendar */}
+            {/* Ongoing Projects */}
             <div style={{
               background: 'white',
               borderRadius: '12px',
@@ -440,406 +776,240 @@ const ProfileDashboard = () => {
               overflow: 'hidden'
             }}>
               <div style={{ padding: '24px 24px 16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h3 style={{ 
                     fontSize: '18px', 
                     fontWeight: '600', 
                     color: '#111827',
                     margin: 0
                   }}>
-                    Calendar
+                    Ongoing Projects
                   </h3>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <Calendar size={20} color="#6b7280" />
-                    <MoreHorizontal size={20} color="#6b7280" style={{ cursor: 'pointer' }} />
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <Settings size={20} color="#6b7280" />
+                    <Filter size={20} color="#6b7280" />
+                    <Heart size={20} color="#6b7280" />
                   </div>
                 </div>
-              </div>
-              <div style={{ padding: '0 24px 24px' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center', 
-                  marginBottom: '24px' 
-                }}>
-                  <button 
-                    onClick={previousMonth}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px'
-                    }}
-                  >
-                    <ChevronLeft size={20} color="#6b7280" />
-                  </button>
-                  <h4 style={{ 
-                    fontWeight: '600', 
-                    color: '#111827',
-                    margin: 0
-                  }}>
-                    {months[currentMonthIndex]}
-                  </h4>
-                  <button 
-                    onClick={nextMonth}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '4px'
-                    }}
-                  >
-                    <ChevronRight size={20} color="#6b7280" />
-                  </button>
-                </div>
-
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(7, 1fr)', 
-                  gap: '4px', 
-                  textAlign: 'center' 
-                }}>
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-                    <div key={index} style={{
-                      padding: '8px',
-                      fontSize: '14px',
-                      color: '#6b7280',
-                      fontWeight: '500'
-                    }}>
-                      {day}
-                    </div>
-                  ))}
-                  
-                  {calendarDays.map((day, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleDayClick(day)}
+                
+                {/* Barre de recherche et filtres */}
+                <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                  <div style={{ flex: 1, position: 'relative' }}>
+                    <Search size={16} color="#6b7280" style={{
+                      position: 'absolute',
+                      left: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)'
+                    }} />
+                    <input
+                      type="text"
+                      placeholder="Rechercher des projets..."
+                      value={searchFilter}
+                      onChange={(e) => setSearchFilter(e.target.value)}
                       style={{
-                        height: '40px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        width: '100%',
+                        padding: '8px 12px 8px 36px',
+                        border: '1px solid #d1d5db',
                         borderRadius: '8px',
-                        cursor: day ? 'pointer' : 'default',
                         fontSize: '14px',
-                        transition: 'background-color 0.2s',
-                        backgroundColor: day && getDayHighlight(day) === 'highlight-red' ? '#ef4444' :
-                                       day && getDayHighlight(day) === 'highlight-dark' ? '#1f2937' :
-                                       day && getDayHighlight(day) === 'highlight-blue' ? '#93c5fd' :
-                                       day && getDayHighlight(day) === 'highlight-green' ? '#16a34a' :
-                                       day && getDayHighlight(day) === 'highlight-yellow' ? '#facc15' :
-                                       day && getDayHighlight(day) === 'highlight-purple' ? '#a855f7' : 'transparent',
-                        color: day && (getDayHighlight(day).includes('red') || 
-                                      getDayHighlight(day).includes('dark') || 
-                                      getDayHighlight(day).includes('blue') || 
-                                      getDayHighlight(day).includes('green') || 
-                                      getDayHighlight(day).includes('purple')) ? 'white' : 'inherit'
+                        backgroundColor: '#f9fafb'
+                      }}
+                    />
+                  </div>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    style={{
+                      padding: '8px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      backgroundColor: '#f9fafb',
+                      minWidth: '120px'
+                    }}
+                  >
+                    <option value="all">Tous statuts</option>
+                    <option value="inprogress">En cours</option>
+                    <option value="planning">Planification</option>
+                    <option value="development">Développement</option>
+                    <option value="testing">Test</option>
+                    <option value="design">Design</option>
+                    <option value="research">Recherche</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ 
+                padding: '0 24px 24px',
+                maxHeight: '600px',
+                overflowY: 'auto'
+              }}>
+                <div style={{ 
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '16px'
+                }}>
+                  {filteredProjects.map((project) => (
+                    <div 
+                      key={project.id} 
+                      onClick={() => setSelectedProject(project)}
+                      style={{
+                        padding: '16px',
+                        borderRadius: '12px',
+                        border: '1px solid',
+                        backgroundColor: project.color === 'yellow' ? '#fefce8' : 
+                                       project.color === 'blue' ? '#eff6ff' : 
+                                       project.color === 'pink' ? '#fdf2f8' :
+                                       project.color === 'green' ? '#f0fdf4' : '#faf5ff',
+                        borderColor: project.color === 'yellow' ? '#fde047' : 
+                                    project.color === 'blue' ? '#93c5fd' : 
+                                    project.color === 'pink' ? '#f9a8d4' :
+                                    project.color === 'green' ? '#86efac' : '#c084fc',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        position: 'relative'
                       }}
                       onMouseEnter={(e) => {
-                        if (day) {
-                          e.target.style.backgroundColor = '#f3f4f6';
-                        }
+                        e.currentTarget.style.transform = 'translateY(-4px)';
+                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
                       }}
                       onMouseLeave={(e) => {
-                        if (day && !getDayHighlight(day)) {
-                          e.target.style.backgroundColor = 'transparent';
-                        }
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
-                      {day}
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        marginBottom: '8px' 
+                      }}>
+                        <span style={{ fontSize: '11px', color: '#6b7280' }}>
+                          {project.date}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Info size={12} color="#6b7280" />
+                          <MoreHorizontal size={12} color="#6b7280" />
+                        </div>
+                      </div>
+                      
+                      <h4 style={{ 
+                        fontWeight: '600', 
+                        color: '#111827', 
+                        margin: '0 0 6px 0',
+                        fontSize: '13px'
+                      }}>
+                        {project.title}
+                      </h4>
+                      
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        marginBottom: '8px' 
+                      }}>
+                        <span style={{ fontSize: '11px', color: '#6b7280' }}>
+                          {project.phase}
+                        </span>
+                        <span style={{
+                          padding: '2px 6px',
+                          borderRadius: '6px',
+                          fontSize: '9px',
+                          fontWeight: '500',
+                          backgroundColor: project.color === 'yellow' ? '#fef3c7' : 
+                                         project.color === 'blue' ? '#dbeafe' : 
+                                         project.color === 'pink' ? '#fce7f3' :
+                                         project.color === 'green' ? '#dcfce7' : '#f3e8ff',
+                          color: project.color === 'yellow' ? '#92400e' : 
+                                 project.color === 'blue' ? '#1e40af' : 
+                                 project.color === 'pink' ? '#be185d' :
+                                 project.color === 'green' ? '#166534' : '#7c3aed'
+                        }}>
+                          {project.progress}%
+                        </span>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div style={{ marginBottom: '8px' }}>
+                        <div style={{
+                          width: '100%',
+                          height: '3px',
+                          backgroundColor: '#e5e7eb',
+                          borderRadius: '2px',
+                          overflow: 'hidden'
+                        }}>
+                          <div style={{
+                            width: `${project.progress}%`,
+                            height: '100%',
+                            backgroundColor: getProgressColor(project.progress),
+                            borderRadius: '2px',
+                            transition: 'width 0.3s ease'
+                          }} />
+                        </div>
+                      </div>
+
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center' 
+                      }}>
+                        <div style={{ display: 'flex' }}>
+                          {project.team.slice(0, 2).map((member, index) => (
+                            <div key={index} style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: '2px solid white',
+                              marginLeft: index > 0 ? '-4px' : '0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '8px',
+                              backgroundColor: index === 0 ? '#fb923c' : '#60a5fa',
+                              zIndex: project.team.length - index,
+                              title: member.name
+                            }}>
+                              {member.avatar}
+                            </div>
+                          ))}
+                          <div style={{
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            border: '2px solid white',
+                            marginLeft: '-4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '8px',
+                            backgroundColor: '#e5e7eb',
+                            color: '#6b7280'
+                          }}>
+                            +
+                          </div>
+                        </div>
+                        <span style={{ fontSize: '9px', color: '#6b7280', fontWeight: '500' }}>
+                          {project.daysLeft}d
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
+                
+                {filteredProjects.length === 0 && (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '40px 20px',
+                    color: '#6b7280'
+                  }}>
+                    <Search size={48} color="#d1d5db" style={{ marginBottom: '16px' }} />
+                    <p style={{ margin: 0, fontSize: '16px' }}>Aucun projet trouvé</p>
+                    <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>
+                      Essayez de modifier vos critères de recherche
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Ongoing Projects - Horizontal Scroll */}
-        <div style={{
-          background: 'white',
-          borderRadius: '12px',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          overflow: 'hidden',
-          marginBottom: '24px'
-        }}>
-          <div style={{ padding: '24px 24px 16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ 
-                fontSize: '18px', 
-                fontWeight: '600', 
-                color: '#111827',
-                margin: 0
-              }}>
-                Ongoing Projects
-              </h3>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <Settings size={20} color="#6b7280" />
-                <Filter size={20} color="#6b7280" />
-                <Heart size={20} color="#6b7280" />
-              </div>
-            </div>
-          </div>
-          <div style={{ 
-            padding: '0 24px 24px',
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              gap: '16px',
-              minWidth: 'max-content',
-              paddingBottom: '8px'
-            }}>
-              {projects.map((project) => (
-                <div 
-                  key={project.id} 
-                  onClick={() => setSelectedProject(project)}
-                  style={{
-                    minWidth: '320px',
-                    padding: '20px',
-                    borderRadius: '12px',
-                    border: '1px solid',
-                    backgroundColor: project.color === 'yellow' ? '#fefce8' : 
-                                   project.color === 'blue' ? '#eff6ff' : 
-                                   project.color === 'pink' ? '#fdf2f8' :
-                                   project.color === 'green' ? '#f0fdf4' : '#faf5ff',
-                    borderColor: project.color === 'yellow' ? '#fde047' : 
-                                project.color === 'blue' ? '#93c5fd' : 
-                                project.color === 'pink' ? '#f9a8d4' :
-                                project.color === 'green' ? '#86efac' : '#c084fc',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-4px)';
-                    e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                >
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    marginBottom: '12px' 
-                  }}>
-                    <span style={{ fontSize: '14px', color: '#6b7280' }}>
-                      {project.date}
-                    </span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Info size={16} color="#6b7280" />
-                      <MoreHorizontal size={16} color="#6b7280" />
-                    </div>
-                  </div>
-                  
-                  <h4 style={{ 
-                    fontWeight: '600', 
-                    color: '#111827', 
-                    margin: '0 0 8px 0',
-                    fontSize: '16px'
-                  }}>
-                    {project.title}
-                  </h4>
-                  
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    marginBottom: '16px' 
-                  }}>
-                    <span style={{ fontSize: '14px', color: '#6b7280' }}>
-                      {project.phase}
-                    </span>
-                    <span style={{
-                      padding: '4px 8px',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                      fontWeight: '500',
-                      backgroundColor: project.color === 'yellow' ? '#fef3c7' : 
-                                     project.color === 'blue' ? '#dbeafe' : 
-                                     project.color === 'pink' ? '#fce7f3' :
-                                     project.color === 'green' ? '#dcfce7' : '#f3e8ff',
-                      color: project.color === 'yellow' ? '#92400e' : 
-                             project.color === 'blue' ? '#1e40af' : 
-                             project.color === 'pink' ? '#be185d' :
-                             project.color === 'green' ? '#166534' : '#7c3aed'
-                    }}>
-                      {project.progress}% Progress
-                    </span>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div style={{ marginBottom: '16px' }}>
-                    <div style={{
-                      width: '100%',
-                      height: '6px',
-                      backgroundColor: '#e5e7eb',
-                      borderRadius: '3px',
-                      overflow: 'hidden'
-                    }}>
-                      <div style={{
-                        width: `${project.progress}%`,
-                        height: '100%',
-                        backgroundColor: getProgressColor(project.progress),
-                        borderRadius: '3px',
-                        transition: 'width 0.3s ease'
-                      }} />
-                    </div>
-                  </div>
-
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center' 
-                  }}>
-                    <div style={{ display: 'flex' }}>
-                      {project.team.map((member, index) => (
-                        <div key={index} style={{
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '50%',
-                          border: '2px solid white',
-                          marginLeft: index > 0 ? '-8px' : '0',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '12px',
-                          backgroundColor: index === 0 ? '#fb923c' : 
-                                         index === 1 ? '#60a5fa' : '#34d399',
-                          zIndex: project.team.length - index
-                        }}>
-                          {member}
-                        </div>
-                      ))}
-                      <div style={{
-                        width: '28px',
-                        height: '28px',
-                        borderRadius: '50%',
-                        border: '2px solid white',
-                        marginLeft: '-8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '12px',
-                        backgroundColor: '#e5e7eb',
-                        color: '#6b7280'
-                      }}>
-                        +
-                      </div>
-                    </div>
-                    <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500' }}>
-                      {project.daysLeft} Days Left
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Inbox Section - Bottom */}
-        <div style={{
-          background: 'white',
-          borderRadius: '12px',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-          overflow: 'hidden'
-        }}>
-          <div style={{ padding: '24px 24px 16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 style={{ 
-                  fontSize: '18px', 
-                  fontWeight: '600', 
-                  color: '#111827',
-                  margin: 0
-                }}>
-                  Inbox
-                </h3>
-                <div style={{
-                  width: '8px',
-                  height: '8px',
-                  backgroundColor: '#6b7280',
-                  borderRadius: '50%'
-                }} />
-              </div>
-              <MoreHorizontal size={20} color="#6b7280" style={{ cursor: 'pointer' }} />
-            </div>
-          </div>
-          <div style={{ padding: '0 24px 24px' }}>
-            {messages.map((message) => (
-              <div key={message.id} style={{
-                display: 'flex',
-                gap: '12px',
-                padding: '16px',
-                borderRadius: '12px',
-                marginBottom: '16px',
-                transition: 'all 0.3s ease',
-                backgroundColor: message.isDark ? '#1f2937' : 'transparent',
-                color: message.isDark ? 'white' : 'inherit',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = message.isDark ? '#374151' : '#f9fafb';
-                e.target.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = message.isDark ? '#1f2937' : 'transparent';
-                e.target.style.transform = 'translateY(0)';
-              }}
-              >
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  flexShrink: 0,
-                  background: message.avatarColor === 'blue' ? 'linear-gradient(135deg, #60a5fa, #2563eb)' :
-                             message.avatarColor === 'yellow' ? 'linear-gradient(135deg, #facc15, #f59e0b)' :
-                             'linear-gradient(135deg, #34d399, #10b981)'
-                }}>
-                  {message.avatar}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px', 
-                    marginBottom: '6px' 
-                  }}>
-                    <h4 style={{ 
-                      fontWeight: '600', 
-                      color: message.isDark ? 'white' : '#111827',
-                      margin: 0,
-                      fontSize: '16px'
-                    }}>
-                      {message.name}
-                    </h4>
-                    <div style={{
-                      width: '6px',
-                      height: '6px',
-                      backgroundColor: message.isDark ? '#34d399' : '#10b981',
-                      borderRadius: '50%'
-                    }} />
-                  </div>
-                  <p style={{ 
-                    fontSize: '14px', 
-                    color: message.isDark ? '#d1d5db' : '#6b7280', 
-                    lineHeight: '1.5',
-                    margin: 0
-                  }}>
-                    {message.message}
-                  </p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -861,7 +1031,7 @@ const ProfileDashboard = () => {
             <div style={{
               background: 'white',
               borderRadius: '16px',
-              maxWidth: '600px',
+              maxWidth: '700px',
               width: '100%',
               maxHeight: '90vh',
               overflow: 'hidden',
@@ -921,10 +1091,10 @@ const ProfileDashboard = () => {
                     transition: 'all 0.2s'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = '#f3f4f6';
+                    e.currentTarget.style.backgroundColor = '#f3f4f6';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
                   <X size={20} />
@@ -1100,74 +1270,203 @@ const ProfileDashboard = () => {
 
                 {/* Team Section */}
                 <div>
-                  <h3 style={{ 
-                    fontSize: '16px', 
-                    fontWeight: '600', 
-                    color: '#111827',
-                    margin: '0 0 16px 0'
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                    marginBottom: '16px'
                   }}>
-                    Team Members
-                  </h3>
-                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <h3 style={{ 
+                      fontSize: '16px', 
+                      fontWeight: '600', 
+                      color: '#111827',
+                      margin: 0
+                    }}>
+                      Team Members ({selectedProject.team.length})
+                    </h3>
+                    <button
+                      onClick={() => setShowAddMember(!showAddMember)}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#2563eb';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#3b82f6';
+                      }}
+                    >
+                      <Plus size={14} />
+                      Ajouter
+                    </button>
+                  </div>
+
+                  {/* Add Member Form */}
+                  {showAddMember && (
+                    <div style={{
+                      padding: '16px',
+                      backgroundColor: '#f0f9ff',
+                      borderRadius: '8px',
+                      marginBottom: '16px',
+                      border: '1px solid #bae6fd'
+                    }}>
+                      <h4 style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '600', 
+                        color: '#111827',
+                        margin: '0 0 12px 0'
+                      }}>
+                        Ajouter un membre
+                      </h4>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {memberPool.filter(member => 
+                          !selectedProject.team.some(teamMember => teamMember.name === member.name)
+                        ).map((member, index) => (
+                          <button
+                            key={index}
+                            onClick={() => {
+                              addMemberToProject(selectedProject.id, member);
+                              setShowAddMember(false);
+                            }}
+                            style={{
+                              padding: '8px 12px',
+                              backgroundColor: 'white',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#f3f4f6';
+                              e.currentTarget.style.borderColor = '#9ca3af';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'white';
+                              e.currentTarget.style.borderColor = '#d1d5db';
+                            }}
+                          >
+                            <span style={{ fontSize: '16px' }}>{member.avatar}</span>
+                            {member.name}
+                          </button>
+                        ))}
+                      </div>
+                      <button
+                        onClick={() => setShowAddMember(false)}
+                        style={{
+                          marginTop: '12px',
+                          padding: '6px 12px',
+                          backgroundColor: '#f3f4f6',
+                          color: '#6b7280',
+                          border: 'none',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Team Members List */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
                     {selectedProject.team.map((member, index) => (
                       <div key={index} style={{
                         display: 'flex',
-                        flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        padding: '8px 12px',
+                        backgroundColor: '#f9fafb',
+                        borderRadius: '8px',
+                        border: '1px solid #e5e7eb'
                       }}>
                         <div style={{
-                          width: '48px',
-                          height: '48px',
+                          width: '32px',
+                          height: '32px',
                           borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '20px',
+                          fontSize: '16px',
                           backgroundColor: index === 0 ? '#fb923c' : 
-                                         index === 1 ? '#60a5fa' : '#34d399'
+                                         index === 1 ? '#60a5fa' : 
+                                         index === 2 ? '#34d399' : '#f59e0b'
                         }}>
-                          {member}
+                          {member.avatar}
                         </div>
-                        <span style={{
-                          fontSize: '12px',
-                          color: '#6b7280',
-                          textAlign: 'center'
-                        }}>
-                          Member {index + 1}
-                        </span>
+                        <div style={{ flex: 1 }}>
+                          <p style={{
+                            fontSize: '13px',
+                            fontWeight: '500',
+                            color: '#111827',
+                            margin: 0
+                          }}>
+                            {member.name}
+                          </p>
+                          <p style={{
+                            fontSize: '11px',
+                            color: '#6b7280',
+                            margin: 0
+                          }}>
+                            Membre #{index + 1}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => removeMemberFromProject(selectedProject.id, index)}
+                          style={{
+                            padding: '4px',
+                            backgroundColor: '#fef2f2',
+                            color: '#dc2626',
+                            border: '1px solid #fecaca',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#fee2e2';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#fef2f2';
+                          }}
+                          title="Supprimer ce membre"
+                        >
+                          <Trash2 size={12} />
+                        </button>
                       </div>
                     ))}
-                    <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <div style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        backgroundColor: '#e5e7eb',
-                        color: '#6b7280',
-                        cursor: 'pointer',
-                        border: '2px dashed #d1d5db'
-                      }}>
-                        +
-                      </div>
-                      <span style={{
-                        fontSize: '12px',
-                        color: '#6b7280',
-                        textAlign: 'center'
-                      }}>
-                        Add Member
-                      </span>
-                    </div>
                   </div>
+
+                  {selectedProject.team.length === 0 && (
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '32px 16px',
+                      color: '#6b7280'
+                    }}>
+                      <Users size={32} color="#d1d5db" style={{ marginBottom: '12px' }} />
+                      <p style={{ margin: 0, fontSize: '14px' }}>Aucun membre assigné</p>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '12px' }}>
+                        Cliquez sur "Ajouter" pour assigner des membres à ce projet
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1175,9 +1474,23 @@ const ProfileDashboard = () => {
         )}
       </div>
 
-      <style jsx>{`
+      <style>{`
         ::-webkit-scrollbar {
-          display: none;
+          width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
         }
       `}</style>
     </div>
