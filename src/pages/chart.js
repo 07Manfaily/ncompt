@@ -1,20 +1,16 @@
-import React, { useState } from 'react';
-import { 
-  ArrowLeft, 
-  Calendar, 
-  Settings, 
-  Filter, 
-  Heart, 
-  Mail, 
-  Phone, 
-  MessageCircle, 
-  Video, 
-  Edit, 
+import React, { useState, useEffect } from 'react';
+import {
+  ArrowLeft,
+  Calendar,
+  Settings,
+  Filter,
+  Heart,
+  Mail,
+  Phone,
+  MessageCircle,
+  Video,
+  Edit,
   MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  User,
-  Clock,
   Users,
   CheckCircle,
   AlertCircle,
@@ -22,280 +18,278 @@ import {
   Info,
   Search,
   Plus,
-  Trash2
+  Trash2,Camera
 } from 'lucide-react';
 
 const ProfileDashboard = () => {
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(2);
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showAddMember, setShowAddMember] = useState(false);
-  const [newMemberName, setNewMemberName] = useState('');
-
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June', 
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const previousMonth = () => {
-    setCurrentMonthIndex((prev) => (prev - 1 + 12) % 12);
-  };
-
-  const nextMonth = () => {
-    setCurrentMonthIndex((prev) => (prev + 1) % 12);
-  };
-
-  const handleDayClick = (day) => {
-    if (day) {
-      setSelectedDay(day);
+  const [sessions, setSessions] = useState([]);
+  const [participants, setParticipants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState(null);
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProfileImage(e.target.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
-
-  // Avatars et noms prédéfinis pour les membres
-  const memberPool = [
-    { avatar: '👨‍💻', name: 'John Doe' },
-    { avatar: '👩‍💼', name: 'Sarah Smith' },
-    { avatar: '👨‍🎨', name: 'Mike Johnson' },
-    { avatar: '👩‍🔬', name: 'Lisa Chen' },
-    { avatar: '👨‍⚖️', name: 'David Brown' },
-    { avatar: '👩‍🎓', name: 'Emma Wilson' },
-    { avatar: '👨‍🏫', name: 'Alex Garcia' },
-    { avatar: '👩‍⚕️', name: 'Maria Rodriguez' }
+  // Simulation des données API basées sur vos images
+  const mockSessionsData = [
+    {
+      id: 47,
+      city: null,
+      code_formation: "P25028",
+      code_session: "P2502851",
+      duration_hours: null,
+      end_datetime: null,
+      participants: [
+        {
+          email: "mianpaulelie@live.fr",
+          matricule: "123",
+          nom: "MIAN",
+          prenom: "PAULELIE"
+        }
+      ],
+      place: null,
+      start_datetime: null,
+      status: null,
+      teacher: null,
+      type: null,
+      title: "Formation Data Analysis",
+      description: "Formation avancée en analyse de données avec Python et R",
+      progress: 0,
+      color: "gray",
+      daysLeft: 15
+    },
+    {
+      id: 48,
+      city: null,
+      code_formation: "P25028",
+      code_session: "P2502852",
+      duration_hours: null,
+      end_datetime: null,
+      participants: [
+        {
+          email: "yaolucien@live.fr",
+          matricule: "456",
+          nom: "YAO",
+          prenom: "LUCIEN"
+        }
+      ],
+      place: null,
+      start_datetime: null,
+      status: null,
+      teacher: null,
+      type: null,
+      title: "Machine Learning Basics",
+      description: "Introduction aux concepts fondamentaux du machine learning",
+      progress: 0,
+      color: "gray",
+      daysLeft: 8
+    },
+    {
+      id: 49,
+      city: null,
+      code_formation: "P25029",
+      code_session: "P2502953",
+      duration_hours: null,
+      end_datetime: null,
+      participants: [
+        {
+          email: "innovation@live.fr",
+          matricule: "789",
+          nom: "SMITH",
+          prenom: "JOHN"
+        }
+      ],
+      place: null,
+      start_datetime: null,
+      status: "session validé",
+      teacher: null,
+      type: null,
+      title: "Innovation Workshop",
+      description: "Atelier sur les méthodes d'innovation en entreprise",
+      progress: 100,
+      color: "green",
+      daysLeft: 0
+    }
   ];
 
-  const [projects, setProjects] = useState([
+  const mockParticipantsData = [
     {
-      id: 1,
-      title: "Web Designing",
-      date: "March 05, 2024",
-      phase: "Prototyping",
-      progress: 90,
-      color: "yellow",
-      daysLeft: 2,
-      team: [
-        { avatar: '👨‍💻', name: 'John Doe' },
-        { avatar: '👩‍💼', name: 'Sarah Smith' },
-        { avatar: '👨‍🎨', name: 'Mike Johnson' }
-      ],
-      description: "Création d'une interface web moderne avec React et Material-UI",
-      budget: "$15,000",
-      priority: "High",
-      status: "In Progress"
+      activite: "",
+      departement: "",
+      direction: "Innovation",
+      email: "innovation@live.fr",
+      entite: "",
+      fonction: "Data Analyst",
+      matricule: "789",
+      nom: "MIAN",
+      nom_manager: "MANAGER1",
+      prenom: "PAULELIE",
+      service: "Data"
     },
     {
-      id: 2,
-      title: "Mobile App",
-      date: "March 08, 2024",
-      phase: "Design",
-      progress: 50,
-      color: "blue",
-      daysLeft: 5,
-      team: [
-        { avatar: '👩‍🔬', name: 'Lisa Chen' },
-        { avatar: '👨‍⚖️', name: 'David Brown' }
-      ],
-      description: "Développement d'une application mobile native pour iOS et Android",
-      budget: "$25,000",
-      priority: "Medium",
-      status: "Planning"
-    },
-    {
-      id: 3,
-      title: "Dashboard",
-      date: "March 12, 2024",
-      phase: "Wireframe",
-      progress: 70,
-      color: "pink",
-      daysLeft: 8,
-      team: [
-        { avatar: '👩‍🎓', name: 'Emma Wilson' },
-        { avatar: '👨‍🏫', name: 'Alex Garcia' },
-        { avatar: '👩‍⚕️', name: 'Maria Rodriguez' }
-      ],
-      description: "Conception d'un tableau de bord analytique pour la gestion des données",
-      budget: "$20,000",
-      priority: "High",
-      status: "In Progress"
-    },
-    {
-      id: 4,
-      title: "E-commerce Platform",
-      date: "March 15, 2024",
-      phase: "Development",
-      progress: 30,
-      color: "green",
-      daysLeft: 12,
-      team: [
-        { avatar: '👨‍💻', name: 'John Doe' },
-        { avatar: '👩‍💼', name: 'Sarah Smith' }
-      ],
-      description: "Plateforme e-commerce complète avec système de paiement intégré",
-      budget: "$35,000",
-      priority: "High",
-      status: "Development"
-    },
-    {
-      id: 5,
-      title: "API Integration",
-      date: "March 18, 2024",
-      phase: "Testing",
-      progress: 85,
-      color: "purple",
-      daysLeft: 3,
-      team: [
-        { avatar: '👩‍🔬', name: 'Lisa Chen' }
-      ],
-      description: "Intégration d'APIs tierces pour synchronisation des données",
-      budget: "$12,000",
-      priority: "Medium",
-      status: "Testing"
-    },
-    {
-      id: 6,
-      title: "CRM System",
-      date: "March 20, 2024",
-      phase: "Planning",
-      progress: 15,
-      color: "blue",
-      daysLeft: 20,
-      team: [
-        { avatar: '👨‍🎨', name: 'Mike Johnson' },
-        { avatar: '👩‍🎓', name: 'Emma Wilson' }
-      ],
-      description: "Système de gestion de la relation client complet",
-      budget: "$40,000",
-      priority: "Medium",
-      status: "Planning"
-    },
-    {
-      id: 7,
-      title: "Marketing Site",
-      date: "March 22, 2024",
-      phase: "Design",
-      progress: 25,
-      color: "yellow",
-      daysLeft: 15,
-      team: [
-        { avatar: '👨‍🏫', name: 'Alex Garcia' }
-      ],
-      description: "Site web marketing pour promouvoir nos services",
-      budget: "$8,000",
-      priority: "Low",
-      status: "Design"
-    },
-    {
-      id: 8,
-      title: "Analytics Tool",
-      date: "March 25, 2024",
-      phase: "Research",
-      progress: 5,
-      color: "green",
-      daysLeft: 30,
-      team: [
-        { avatar: '👩‍⚕️', name: 'Maria Rodriguez' },
-        { avatar: '👨‍💻', name: 'John Doe' }
-      ],
-      description: "Outil d'analyse avancée pour les données métier",
-      budget: "$22,000",
-      priority: "Medium",
-      status: "Research"
+      activite: "",
+      departement: "",
+      direction: "DCPP",
+      email: "dcpp@live.fr",
+      entite: "",
+      fonction: "Gestionnaire",
+      matricule: "101112",
+      nom: "YAO",
+      nom_manager: "DJENEBA",
+      prenom: "LUCIEN",
+      service: ""
     }
-  ]);
+  ];
 
-  // Fonction pour filtrer les projets
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = project.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchFilter.toLowerCase()) ||
-                         project.phase.toLowerCase().includes(searchFilter.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || 
-                         project.status.toLowerCase().replace(' ', '').includes(statusFilter.toLowerCase());
-    
+  // Fonction pour générer les initiales
+  const getInitials = (nom, prenom) => {
+    const firstInitial = nom ? nom.charAt(0).toUpperCase() : '';
+    const lastInitial = prenom ? prenom.charAt(0).toUpperCase() : '';
+    return firstInitial + lastInitial;
+  };
+
+  // Simulation du chargement des données
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      // Simulation d'un délai d'API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setSessions(mockSessionsData);
+      setParticipants(mockParticipantsData);
+      setLoading(false);
+    };
+
+    loadData();
+  }, []);
+
+  // Fonction pour filtrer les sessions
+  const filteredSessions = sessions.filter(session => {
+    const matchesSearch = session.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      session.description.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      session.code_formation.toLowerCase().includes(searchFilter.toLowerCase());
+
+    const matchesStatus = statusFilter === 'all' ||
+      session.status.toLowerCase().replace(' ', '').includes(statusFilter.toLowerCase().replace(' ', ''));
+
     return matchesSearch && matchesStatus;
   });
 
-  // Fonction pour ajouter un membre à un projet
-  const addMemberToProject = (projectId, member) => {
-    setProjects(prev => prev.map(project => {
-      if (project.id === projectId) {
-        const isAlreadyMember = project.team.some(teamMember => teamMember.name === member.name);
-        if (!isAlreadyMember) {
-          return { ...project, team: [...project.team, member] };
+  // Fonction pour mettre à jour le statut d'une session
+  const updateSessionStatus = (sessionId, newStatus) => {
+    setSessions(prev => prev.map(session => {
+      if (session.id === sessionId) {
+        let newProgress = session.progress;
+        let newColor = session.color;
+
+        switch (newStatus) {
+          case "session validé":
+            newProgress = 100;
+            newColor = "green";
+            break;
+          case "en cours":
+            newProgress = Math.max(session.progress, 50);
+            newColor = "yellow";
+            break;
+          case "terminé":
+            newProgress = 100;
+            newColor = "pink";
+            break;
+          case "non démarré":
+            newProgress = 0;
+            newColor = "blue";
+            break;
+          default:
+            // Si statut null ou autre, garde l'apparence par défaut
+            newProgress = 0;
+            newColor = "gray";
+            break;
+        }
+
+        return { ...session, status: newStatus, progress: newProgress, color: newColor };
+      }
+      return session;
+    }));
+
+    // Mettre à jour la session sélectionnée aussi
+    if (selectedSession && selectedSession.id === sessionId) {
+      let newProgress = selectedSession.progress;
+      let newColor = selectedSession.color;
+
+      switch (newStatus) {
+        case "session validé":
+          newProgress = 100;
+          newColor = "green";
+          break;
+        case "en cours":
+          newProgress = Math.max(selectedSession.progress, 50);
+          newColor = "yellow";
+          break;
+        case "terminé":
+          newProgress = 100;
+          newColor = "pink";
+          break;
+        case "non démarré":
+          newProgress = 0;
+          newColor = "blue";
+          break;
+        default:
+          newProgress = 0;
+          newColor = "gray";
+          break;
+      }
+
+      setSelectedSession({ ...selectedSession, status: newStatus, progress: newProgress, color: newColor });
+    }
+  };
+
+  // Fonction pour ajouter un participant à une session
+  const addParticipantToSession = (sessionId, participant) => {
+    setSessions(prev => prev.map(session => {
+      if (session.id === sessionId) {
+        const isAlreadyParticipant = session.participants.some(p => p.matricule === participant.matricule);
+        if (!isAlreadyParticipant) {
+          return { ...session, participants: [...session.participants, participant] };
         }
       }
-      return project;
+      return session;
     }));
-    
-    // Mettre à jour le projet sélectionné aussi
-    if (selectedProject && selectedProject.id === projectId) {
-      const updatedProject = projects.find(p => p.id === projectId);
-      if (updatedProject) {
-        const isAlreadyMember = updatedProject.team.some(teamMember => teamMember.name === member.name);
-        if (!isAlreadyMember) {
-          setSelectedProject({ ...updatedProject, team: [...updatedProject.team, member] });
+
+    if (selectedSession && selectedSession.id === sessionId) {
+      const updatedSession = sessions.find(s => s.id === sessionId);
+      if (updatedSession) {
+        const isAlreadyParticipant = updatedSession.participants.some(p => p.matricule === participant.matricule);
+        if (!isAlreadyParticipant) {
+          setSelectedSession({ ...updatedSession, participants: [...updatedSession.participants, participant] });
         }
       }
     }
   };
 
-  // Fonction pour supprimer un membre d'un projet
-  const removeMemberFromProject = (projectId, memberIndex) => {
-    setProjects(prev => prev.map(project => {
-      if (project.id === projectId) {
-        const newTeam = project.team.filter((_, index) => index !== memberIndex);
-        return { ...project, team: newTeam };
+  // Fonction pour supprimer un participant d'une session
+  const removeParticipantFromSession = (sessionId, participantIndex) => {
+    setSessions(prev => prev.map(session => {
+      if (session.id === sessionId) {
+        const newParticipants = session.participants.filter((_, index) => index !== participantIndex);
+        return { ...session, participants: newParticipants };
       }
-      return project;
+      return session;
     }));
-    
-    // Mettre à jour le projet sélectionné aussi
-    if (selectedProject && selectedProject.id === projectId) {
-      const newTeam = selectedProject.team.filter((_, index) => index !== memberIndex);
-      setSelectedProject({ ...selectedProject, team: newTeam });
+
+    if (selectedSession && selectedSession.id === sessionId) {
+      const newParticipants = selectedSession.participants.filter((_, index) => index !== participantIndex);
+      setSelectedSession({ ...selectedSession, participants: newParticipants });
     }
-  };
-
-  const messages = [
-    {
-      id: 1,
-      name: "Web Designing",
-      avatar: "👩",
-      avatarColor: "blue",
-      message: "Hey let me know progress of project? Waiting for your response",
-      isDark: false
-    },
-    {
-      id: 2,
-      name: "Stephanie",
-      avatar: "👨",
-      avatarColor: "yellow",
-      message: "I got your first assignment. It was quite good 👍",
-      isDark: true
-    },
-    {
-      id: 3,
-      name: "William",
-      avatar: "👨",
-      avatarColor: "green",
-      message: "I want some changes in previous work you receive. Waiting for your reply.",
-      isDark: false
-    }
-  ];
-
-  const calendarDays = [
-    null, null, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
-  ];
-
-  const getDayHighlight = (day) => {
-    if (day === 5) return 'highlight-red';
-    if (day === 7 || day === 25) return 'highlight-dark';
-    if (day === 12) return 'highlight-blue';
-    if (day === 20) return 'highlight-green';
-    if (day === 23) return 'highlight-yellow';
-    if (day === 27) return 'highlight-purple';
-    return '';
   };
 
   const getProgressColor = (progress) => {
@@ -305,30 +299,80 @@ const ProfileDashboard = () => {
     return '#ef4444';
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "session validé": return '#10b981';
+      case "en cours": return '#f59e0b';
+      case "terminé": return '#8b5cf6';
+      case "non démarré": return '#6b7280';
+      case null:
+      default: return '#9ca3af';
+    }
+  };
+
+  const isSessionActive = (session) => {
+    return session.status === "session validé";
+  };
+
+  const getSessionDisplayStatus = (status) => {
+    return status === null ? "En attente de validation" : status;
+  };
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f9fafb'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid #e5e7eb',
+            borderTop: '3px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p style={{ color: '#6b7280', fontSize: '16px' }}>Chargement des données...</p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      padding: '24px', 
+    <div style={{
+      minHeight: '100vh',
+      padding: '24px',
       backgroundColor: '#f9fafb',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          marginBottom: '32px' 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '32px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <ArrowLeft size={24} color="#6b7280" style={{ cursor: 'pointer' }} />
-            <h1 style={{ 
-              fontSize: '28px', 
-              fontWeight: '600', 
+            <h1 style={{
+              fontSize: '28px',
+              fontWeight: '600',
               color: '#111827',
               margin: 0
             }}>
-              My Profile
+              Sessions de Formation
             </h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -339,19 +383,19 @@ const ProfileDashboard = () => {
               borderRadius: '20px',
               fontSize: '14px'
             }}>
-              Pending
+              {sessions.length} Sessions
             </span>
             <span style={{ color: '#6b7280', fontSize: '16px' }}>
-              March, 2024
+              Mars, 2024
             </span>
             <Calendar size={20} color="#6b7280" />
           </div>
         </div>
 
         {/* Main Grid - 2 Columns */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 1fr', 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
           gap: '24px',
           marginBottom: '24px'
         }}>
@@ -360,139 +404,226 @@ const ProfileDashboard = () => {
             {/* Profile Card */}
             <div style={{
               background: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-              overflow: 'hidden'
+              borderRadius: '20px',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+              overflow: 'hidden',
+              position: 'relative'
             }}>
-              <div style={{ padding: '24px' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'flex-start', 
-                  marginBottom: '24px' 
+              {/* Cover Image */}
+              <div style={{
+                height: '120px',
+                background: profileImage
+                  ? `linear-gradient(rgba(102, 126, 234, 0.7), rgba(118, 75, 162, 0.7)), url(${profileImage})`
+                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                position: 'relative'
+              }}>
+                {/* Profile Image Container */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-40px',
+                  left: '24px',
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  border: '4px solid white',
+                  overflow: 'hidden',
+                  backgroundColor: '#f3f4f6'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+               
                     <div style={{
-                      width: '64px',
-                      height: '64px',
-                      borderRadius: '50%',
+                      width: '100%',
+                      height: '100%',
                       background: 'linear-gradient(135deg, #fb923c, #ea580c)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '32px'
+                      fontSize: '24px',
+                      fontWeight: '600',
+                      color: 'white'
                     }}>
-                      👨‍💼
+                      YR
+                    </div>
+             
+
+                </div>
+
+                {/* Camera Button */}
+                <div style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(10px)'
+                }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <Camera size={20} color="white" />
+                </div>
+              </div>
+
+              <div style={{ padding: '60px 24px 24px' }}>
+                {/* Profile Info */}
+                <div>
+                  <h2 style={{
+                    fontSize: '24px',
+                    fontWeight: '700',
+                    color: '#111827',
+                    margin: '0 0 4px 0'
+                  }}>
+                    Yeray Rosales
+                  </h2>
+                  <p style={{ color: '#6b7280', fontSize: '16px', margin: '0 0 24px 0' }}>
+                    UI/UX Designer
+                  </p>
+
+                  {/* Stats */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-around',
+                    textAlign: 'center',
+                    marginBottom: '24px'
+                  }}>
+                    <div>
+                      <div style={{ fontSize: '24px', fontWeight: '700', color: '#111827' }}>
+                        430
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                        Posts
+                      </div>
                     </div>
                     <div>
-                      <h2 style={{ 
-                        fontSize: '20px', 
-                        fontWeight: '600', 
-                        color: '#111827', 
-                        margin: '0 0 4px 0' 
-                      }}>
-                        Robert Smith
-                      </h2>
-                      <p style={{ color: '#6b7280', fontSize: '16px', margin: 0 }}>
-                        Product Designer
-                      </p>
+                      <div style={{ fontSize: '24px', fontWeight: '700', color: '#111827' }}>
+                        2.32K
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                        Following
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '24px', fontWeight: '700', color: '#111827' }}>
+                        21.7K
+                      </div>
+                      <div style={{ fontSize: '14px', color: '#6b7280' }}>
+                        Followers
+                      </div>
                     </div>
                   </div>
-                  <MoreHorizontal size={20} color="#6b7280" style={{ cursor: 'pointer' }} />
-                </div>
 
-                <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-                  <button style={{
-                    width: '48px',
-                    height: '48px',
-                    border: 'none',
-                    borderRadius: '50%',
-                    backgroundColor: '#111827',
-                    color: 'white',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s'
-                  }}>
-                    <Mail size={16} />
-                  </button>
-                  <button style={{
-                    width: '48px',
-                    height: '48px',
-                    border: 'none',
-                    borderRadius: '50%',
-                    backgroundColor: '#f3f4f6',
-                    color: '#6b7280',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s'
-                  }}>
-                    <Phone size={16} />
-                  </button>
-                  <button style={{
-                    width: '48px',
-                    height: '48px',
-                    border: 'none',
-                    borderRadius: '50%',
-                    backgroundColor: '#f3f4f6',
-                    color: '#6b7280',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s'
-                  }}>
-                    <MessageCircle size={16} />
-                  </button>
-                  <button style={{
-                    width: '48px',
-                    height: '48px',
-                    border: 'none',
-                    borderRadius: '50%',
-                    backgroundColor: '#f3f4f6',
-                    color: '#6b7280',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s'
-                  }}>
-                    <Video size={16} />
-                  </button>
-                </div>
-
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    marginBottom: '12px' 
-                  }}>
-                    <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#111827' }}>
-                      Time Slots
-                    </h3>
-                    <Edit size={16} color="#6b7280" />
+                  {/* Action Buttons */}
+                  <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+                    <button style={{
+                      width: '48px',
+                      height: '48px',
+                      border: 'none',
+                      borderRadius: '50%',
+                      backgroundColor: '#111827',
+                      color: 'white',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}>
+                      <Mail size={16} />
+                    </button>
+                    <button style={{
+                      width: '48px',
+                      height: '48px',
+                      border: 'none',
+                      borderRadius: '50%',
+                      backgroundColor: '#f3f4f6',
+                      color: '#6b7280',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}>
+                      <Phone size={16} />
+                    </button>
+                    <button style={{
+                      width: '48px',
+                      height: '48px',
+                      border: 'none',
+                      borderRadius: '50%',
+                      backgroundColor: '#f3f4f6',
+                      color: '#6b7280',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}>
+                      <MessageCircle size={16} />
+                    </button>
+                    <button style={{
+                      width: '48px',
+                      height: '48px',
+                      border: 'none',
+                      borderRadius: '50%',
+                      backgroundColor: '#f3f4f6',
+                      color: '#6b7280',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}>
+                      <Video size={16} />
+                    </button>
                   </div>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center' 
-                  }}>
-                    <span>April, 2024</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '14px', color: '#6b7280' }}>Meetings</span>
-                      <span style={{
-                        backgroundColor: '#111827',
-                        color: 'white',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        fontSize: '12px'
-                      }}>
-                        3
-                      </span>
+
+                  {/* Sessions Statistics */}
+                  <div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '12px'
+                    }}>
+                      <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#111827' }}>
+                        Statistiques
+                      </h3>
+                      <Edit size={16} color="#6b7280" />
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <span>Sessions actives</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '14px', color: '#6b7280' }}>Total</span>
+                        <span style={{
+                          backgroundColor: '#111827',
+                          color: 'white',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          fontSize: '12px'
+                        }}>
+                          {sessions.length}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -507,27 +638,27 @@ const ProfileDashboard = () => {
               overflow: 'hidden'
             }}>
               <div style={{ padding: '24px 24px 16px' }}>
-                <h3 style={{ 
-                  fontSize: '18px', 
-                  fontWeight: '600', 
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: '600',
                   color: '#111827',
                   margin: 0,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}>
-                  🔥 Formulaire Chaud
+                  🔥 Demande Urgente
                 </h3>
               </div>
               <div style={{ padding: '0 24px 24px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '14px', 
-                      fontWeight: '500', 
-                      color: '#374151', 
-                      marginBottom: '6px' 
+                    <label style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      marginBottom: '6px'
                     }}>
                       Urgence
                     </label>
@@ -541,24 +672,24 @@ const ProfileDashboard = () => {
                       color: '#dc2626',
                       fontWeight: '500'
                     }}>
-                      <option>Critique - Immédiat</option>
-                      <option>Urgent - Sous 1h</option>
-                      <option>Important - Sous 4h</option>
+                      <option>Critique - Session bloquée</option>
+                      <option>Urgent - Problème technique</option>
+                      <option>Important - Modification requise</option>
                     </select>
                   </div>
-                  
+
                   <div>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '14px', 
-                      fontWeight: '500', 
-                      color: '#374151', 
-                      marginBottom: '6px' 
+                    <label style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      marginBottom: '6px'
                     }}>
                       Description Rapide
                     </label>
-                    <textarea 
-                      placeholder="Décrivez l'urgence..."
+                    <textarea
+                      placeholder="Décrivez le problème urgent..."
                       style={{
                         width: '100%',
                         padding: '12px',
@@ -615,29 +746,29 @@ const ProfileDashboard = () => {
               overflow: 'hidden'
             }}>
               <div style={{ padding: '24px 24px 16px' }}>
-                <h3 style={{ 
-                  fontSize: '18px', 
-                  fontWeight: '600', 
+                <h3 style={{
+                  fontSize: '18px',
+                  fontWeight: '600',
                   color: '#111827',
                   margin: 0,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}>
-                  ❄️ Formulaire Froid
+                  ❄️ Demande Standard
                 </h3>
               </div>
               <div style={{ padding: '0 24px 24px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '14px', 
-                      fontWeight: '500', 
-                      color: '#374151', 
-                      marginBottom: '6px' 
+                    <label style={{
+                      display: 'block',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: '#374151',
+                      marginBottom: '6px'
                     }}>
-                      Priorité
+                      Type de demande
                     </label>
                     <select style={{
                       width: '100%',
@@ -648,49 +779,24 @@ const ProfileDashboard = () => {
                       backgroundColor: '#eff6ff',
                       color: '#1d4ed8'
                     }}>
-                      <option>Basse - Quand possible</option>
-                      <option>Normale - Cette semaine</option>
-                      <option>Élevée - Dans 2-3 jours</option>
+                      <option>Nouvelle session</option>
+                      <option>Modification planning</option>
+                      <option>Ajout participants</option>
+                      <option>Support technique</option>
                     </select>
                   </div>
 
                   <div>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '14px', 
-                      fontWeight: '500', 
-                      color: '#374151', 
-                      marginBottom: '6px' 
-                    }}>
-                      Catégorie
-                    </label>
-                    <select style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '2px solid #3b82f6',
-                      borderRadius: '8px',
+                    <label style={{
+                      display: 'block',
                       fontSize: '14px',
-                      backgroundColor: '#eff6ff',
-                      color: '#1d4ed8'
-                    }}>
-                      <option>Amélioration</option>
-                      <option>Nouvelle fonctionnalité</option>
-                      <option>Documentation</option>
-                      <option>Formation</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '14px', 
-                      fontWeight: '500', 
-                      color: '#374151', 
-                      marginBottom: '6px' 
+                      fontWeight: '500',
+                      color: '#374151',
+                      marginBottom: '6px'
                     }}>
                       Description Détaillée
                     </label>
-                    <textarea 
+                    <textarea
                       placeholder="Décrivez votre demande en détail..."
                       style={{
                         width: '100%',
@@ -701,30 +807,6 @@ const ProfileDashboard = () => {
                         backgroundColor: '#eff6ff',
                         resize: 'vertical',
                         minHeight: '100px'
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ 
-                      display: 'block', 
-                      fontSize: '14px', 
-                      fontWeight: '500', 
-                      color: '#374151', 
-                      marginBottom: '6px' 
-                    }}>
-                      Date limite souhaitée
-                    </label>
-                    <input 
-                      type="date"
-                      style={{
-                        width: '100%',
-                        padding: '12px',
-                        border: '2px solid #3b82f6',
-                        borderRadius: '8px',
-                        fontSize: '14px',
-                        backgroundColor: '#eff6ff',
-                        color: '#1d4ed8'
                       }}
                     />
                   </div>
@@ -747,7 +829,7 @@ const ProfileDashboard = () => {
                       gap: '8px'
                     }}>
                       <CheckCircle size={16} />
-                      Planifier
+                      Envoyer
                     </button>
                     <button style={{
                       padding: '12px 20px',
@@ -768,7 +850,7 @@ const ProfileDashboard = () => {
 
           {/* Right Column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* Ongoing Projects */}
+            {/* Sessions de Formation */}
             <div style={{
               background: 'white',
               borderRadius: '12px',
@@ -777,13 +859,13 @@ const ProfileDashboard = () => {
             }}>
               <div style={{ padding: '24px 24px 16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <h3 style={{ 
-                    fontSize: '18px', 
-                    fontWeight: '600', 
+                  <h3 style={{
+                    fontSize: '18px',
+                    fontWeight: '600',
                     color: '#111827',
                     margin: 0
                   }}>
-                    Ongoing Projects
+                    Sessions de Formation
                   </h3>
                   <div style={{ display: 'flex', gap: '12px' }}>
                     <Settings size={20} color="#6b7280" />
@@ -791,7 +873,7 @@ const ProfileDashboard = () => {
                     <Heart size={20} color="#6b7280" />
                   </div>
                 </div>
-                
+
                 {/* Barre de recherche et filtres */}
                 <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                   <div style={{ flex: 1, position: 'relative' }}>
@@ -803,7 +885,7 @@ const ProfileDashboard = () => {
                     }} />
                     <input
                       type="text"
-                      placeholder="Rechercher des projets..."
+                      placeholder="Rechercher des sessions..."
                       value={searchFilter}
                       onChange={(e) => setSearchFilter(e.target.value)}
                       style={{
@@ -825,48 +907,49 @@ const ProfileDashboard = () => {
                       borderRadius: '8px',
                       fontSize: '14px',
                       backgroundColor: '#f9fafb',
-                      minWidth: '120px'
+                      minWidth: '140px'
                     }}
                   >
                     <option value="all">Tous statuts</option>
-                    <option value="inprogress">En cours</option>
-                    <option value="planning">Planification</option>
-                    <option value="development">Développement</option>
-                    <option value="testing">Test</option>
-                    <option value="design">Design</option>
-                    <option value="research">Recherche</option>
+                    <option value="sessionvalide">Session validé</option>
+                    <option value="encours">En cours</option>
+                    <option value="termine">Terminé</option>
+                    <option value="nondémarre">Non démarré</option>
                   </select>
                 </div>
               </div>
-              <div style={{ 
+              <div style={{
                 padding: '0 24px 24px',
                 maxHeight: '600px',
                 overflowY: 'auto'
               }}>
-                <div style={{ 
+                <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(3, 1fr)',
                   gap: '16px'
                 }}>
-                  {filteredProjects.map((project) => (
-                    <div 
-                      key={project.id} 
-                      onClick={() => setSelectedProject(project)}
+                  {filteredSessions.map((session) => (
+                    <div
+                      key={session.id}
+                      onClick={() => setSelectedSession(session)}
                       style={{
                         padding: '16px',
                         borderRadius: '12px',
                         border: '1px solid',
-                        backgroundColor: project.color === 'yellow' ? '#fefce8' : 
-                                       project.color === 'blue' ? '#eff6ff' : 
-                                       project.color === 'pink' ? '#fdf2f8' :
-                                       project.color === 'green' ? '#f0fdf4' : '#faf5ff',
-                        borderColor: project.color === 'yellow' ? '#fde047' : 
-                                    project.color === 'blue' ? '#93c5fd' : 
-                                    project.color === 'pink' ? '#f9a8d4' :
-                                    project.color === 'green' ? '#86efac' : '#c084fc',
+                        backgroundColor: session.color === 'yellow' ? '#fefce8' :
+                          session.color === 'blue' ? '#eff6ff' :
+                            session.color === 'pink' ? '#fdf2f8' :
+                              session.color === 'green' ? '#f0fdf4' :
+                                session.color === 'gray' ? '#f9fafb' : '#faf5ff',
+                        borderColor: session.color === 'yellow' ? '#fde047' :
+                          session.color === 'blue' ? '#93c5fd' :
+                            session.color === 'pink' ? '#f9a8d4' :
+                              session.color === 'green' ? '#86efac' :
+                                session.color === 'gray' ? '#d1d5db' : '#c084fc',
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
-                        position: 'relative'
+                        position: 'relative',
+                        opacity: isSessionActive(session) ? 1 : 0.8
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-4px)';
@@ -877,54 +960,80 @@ const ProfileDashboard = () => {
                         e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
-                      <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        marginBottom: '8px' 
+                      {!isSessionActive(session) && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: '8px',
+                          width: '20px',
+                          height: '20px',
+                          backgroundColor: '#ef4444',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '10px',
+                          color: 'white',
+                          fontWeight: 'bold'
+                        }}>
+                          🔒
+                        </div>
+                      )}
+
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '8px'
                       }}>
                         <span style={{ fontSize: '11px', color: '#6b7280' }}>
-                          {project.date}
+                          {session.code_formation}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <Info size={12} color="#6b7280" />
                           <MoreHorizontal size={12} color="#6b7280" />
                         </div>
                       </div>
-                      
-                      <h4 style={{ 
-                        fontWeight: '600', 
-                        color: '#111827', 
+
+                      <h4 style={{
+                        fontWeight: '600',
+                        color: '#111827',
                         margin: '0 0 6px 0',
                         fontSize: '13px'
                       }}>
-                        {project.title}
+                        {session.title}
                       </h4>
-                      
-                      <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        marginBottom: '8px' 
+
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '8px'
                       }}>
-                        <span style={{ fontSize: '11px', color: '#6b7280' }}>
-                          {project.phase}
+                        <span style={{
+                          fontSize: '11px',
+                          color: getStatusColor(session.status),
+                          fontWeight: '500'
+                        }}>
+                          {getSessionDisplayStatus(session.status)}
                         </span>
                         <span style={{
                           padding: '2px 6px',
                           borderRadius: '6px',
                           fontSize: '9px',
                           fontWeight: '500',
-                          backgroundColor: project.color === 'yellow' ? '#fef3c7' : 
-                                         project.color === 'blue' ? '#dbeafe' : 
-                                         project.color === 'pink' ? '#fce7f3' :
-                                         project.color === 'green' ? '#dcfce7' : '#f3e8ff',
-                          color: project.color === 'yellow' ? '#92400e' : 
-                                 project.color === 'blue' ? '#1e40af' : 
-                                 project.color === 'pink' ? '#be185d' :
-                                 project.color === 'green' ? '#166534' : '#7c3aed'
+                          backgroundColor: session.color === 'yellow' ? '#fef3c7' :
+                            session.color === 'blue' ? '#dbeafe' :
+                              session.color === 'pink' ? '#fce7f3' :
+                                session.color === 'green' ? '#dcfce7' :
+                                  session.color === 'gray' ? '#f3f4f6' : '#f3e8ff',
+                          color: session.color === 'yellow' ? '#92400e' :
+                            session.color === 'blue' ? '#1e40af' :
+                              session.color === 'pink' ? '#be185d' :
+                                session.color === 'green' ? '#166534' :
+                                  session.color === 'gray' ? '#6b7280' : '#7c3aed'
                         }}>
-                          {project.progress}%
+                          {session.progress}%
                         </span>
                       </div>
 
@@ -938,22 +1047,22 @@ const ProfileDashboard = () => {
                           overflow: 'hidden'
                         }}>
                           <div style={{
-                            width: `${project.progress}%`,
+                            width: `${session.progress}%`,
                             height: '100%',
-                            backgroundColor: getProgressColor(project.progress),
+                            backgroundColor: getProgressColor(session.progress),
                             borderRadius: '2px',
                             transition: 'width 0.3s ease'
                           }} />
                         </div>
                       </div>
 
-                      <div style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center' 
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
                       }}>
                         <div style={{ display: 'flex' }}>
-                          {project.team.slice(0, 2).map((member, index) => (
+                          {session.participants.slice(0, 2).map((participant, index) => (
                             <div key={index} style={{
                               width: '20px',
                               height: '20px',
@@ -964,45 +1073,49 @@ const ProfileDashboard = () => {
                               alignItems: 'center',
                               justifyContent: 'center',
                               fontSize: '8px',
+                              fontWeight: '600',
                               backgroundColor: index === 0 ? '#fb923c' : '#60a5fa',
-                              zIndex: project.team.length - index,
-                              title: member.name
+                              color: 'white',
+                              zIndex: session.participants.length - index,
+                              title: `${participant.nom} ${participant.prenom}`
                             }}>
-                              {member.avatar}
+                              {getInitials(participant.nom, participant.prenom)}
                             </div>
                           ))}
-                          <div style={{
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '50%',
-                            border: '2px solid white',
-                            marginLeft: '-4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '8px',
-                            backgroundColor: '#e5e7eb',
-                            color: '#6b7280'
-                          }}>
-                            +
-                          </div>
+                          {session.participants.length > 2 && (
+                            <div style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: '2px solid white',
+                              marginLeft: '-4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '8px',
+                              backgroundColor: '#e5e7eb',
+                              color: '#6b7280'
+                            }}>
+                              +{session.participants.length - 2}
+                            </div>
+                          )}
                         </div>
                         <span style={{ fontSize: '9px', color: '#6b7280', fontWeight: '500' }}>
-                          {project.daysLeft}d
+                          {session.daysLeft}j
                         </span>
                       </div>
                     </div>
                   ))}
                 </div>
-                
-                {filteredProjects.length === 0 && (
+
+                {filteredSessions.length === 0 && (
                   <div style={{
                     textAlign: 'center',
                     padding: '40px 20px',
                     color: '#6b7280'
                   }}>
                     <Search size={48} color="#d1d5db" style={{ marginBottom: '16px' }} />
-                    <p style={{ margin: 0, fontSize: '16px' }}>Aucun projet trouvé</p>
+                    <p style={{ margin: 0, fontSize: '16px' }}>Aucune session trouvée</p>
                     <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>
                       Essayez de modifier vos critères de recherche
                     </p>
@@ -1013,8 +1126,8 @@ const ProfileDashboard = () => {
           </div>
         </div>
 
-        {/* Project Details Modal */}
-        {selectedProject && (
+        {/* Session Details Modal */}
+        {selectedSession && (
           <div style={{
             position: 'fixed',
             top: 0,
@@ -1027,7 +1140,7 @@ const ProfileDashboard = () => {
             justifyContent: 'center',
             zIndex: 1000,
             padding: '20px'
-          }} onClick={() => setSelectedProject(null)}>
+          }} onClick={() => setSelectedSession(null)}>
             <div style={{
               background: 'white',
               borderRadius: '16px',
@@ -1050,37 +1163,37 @@ const ProfileDashboard = () => {
                     width: '40px',
                     height: '40px',
                     borderRadius: '8px',
-                    backgroundColor: selectedProject.color === 'yellow' ? '#fefce8' : 
-                                   selectedProject.color === 'blue' ? '#eff6ff' : 
-                                   selectedProject.color === 'pink' ? '#fdf2f8' :
-                                   selectedProject.color === 'green' ? '#f0fdf4' : '#faf5ff',
+                    backgroundColor: selectedSession.color === 'yellow' ? '#fefce8' :
+                      selectedSession.color === 'blue' ? '#eff6ff' :
+                        selectedSession.color === 'pink' ? '#fdf2f8' :
+                          selectedSession.color === 'green' ? '#f0fdf4' : '#faf5ff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '20px'
                   }}>
-                    📋
+                    📚
                   </div>
                   <div>
-                    <h2 style={{ 
-                      fontSize: '20px', 
-                      fontWeight: '600', 
+                    <h2 style={{
+                      fontSize: '20px',
+                      fontWeight: '600',
                       color: '#111827',
                       margin: '0 0 4px 0'
                     }}>
-                      {selectedProject.title}
+                      {selectedSession.title}
                     </h2>
-                    <p style={{ 
-                      fontSize: '14px', 
+                    <p style={{
+                      fontSize: '14px',
                       color: '#6b7280',
                       margin: 0
                     }}>
-                      {selectedProject.date}
+                      {selectedSession.code_session}
                     </p>
                   </div>
                 </div>
-                <button 
-                  onClick={() => setSelectedProject(null)}
+                <button
+                  onClick={() => setSelectedSession(null)}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -1103,30 +1216,30 @@ const ProfileDashboard = () => {
 
               {/* Modal Content */}
               <div style={{ padding: '24px', overflowY: 'auto', maxHeight: 'calc(90vh - 120px)' }}>
-                {/* Project Description */}
+                {/* Session Description */}
                 <div style={{ marginBottom: '24px' }}>
-                  <h3 style={{ 
-                    fontSize: '16px', 
-                    fontWeight: '600', 
+                  <h3 style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
                     color: '#111827',
                     margin: '0 0 12px 0'
                   }}>
                     Description
                   </h3>
-                  <p style={{ 
-                    fontSize: '14px', 
-                    color: '#6b7280', 
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#6b7280',
                     lineHeight: '1.6',
                     margin: 0
                   }}>
-                    {selectedProject.description}
+                    {selectedSession.description}
                   </p>
                 </div>
 
-                {/* Project Details Grid */}
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+                {/* Session Details Grid */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                   gap: '16px',
                   marginBottom: '24px'
                 }}>
@@ -1135,23 +1248,36 @@ const ProfileDashboard = () => {
                     backgroundColor: '#f9fafb',
                     borderRadius: '8px'
                   }}>
-                    <p style={{ 
-                      fontSize: '12px', 
-                      color: '#6b7280', 
+                    <p style={{
+                      fontSize: '12px',
+                      color: '#6b7280',
                       margin: '0 0 4px 0',
                       textTransform: 'uppercase',
                       fontWeight: '500'
                     }}>
                       Status
                     </p>
-                    <p style={{ 
-                      fontSize: '14px', 
-                      color: '#111827', 
-                      margin: 0,
-                      fontWeight: '600'
-                    }}>
-                      {selectedProject.status}
-                    </p>
+                    <input
+                      type="text"
+                      value={selectedSession.status || ''}
+                      onChange={(e) => updateSessionStatus(selectedSession.id, e.target.value)}
+                      style={{
+                        width: '100%',
+                        fontSize: '14px',
+                        color: getStatusColor(selectedSession.status),
+                        fontWeight: '600',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        padding: '4px 0',
+                        outline: 'none'
+                      }}
+                      placeholder="Tapez: session validé, en cours, terminé, non démarré"
+                    />
+                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#6b7280' }}>
+                      <strong>Options disponibles:</strong><br />
+                      • session validé (pour activer la session)<br />
+                      • en cours, terminé, non démarré
+                    </div>
                   </div>
 
                   <div style={{
@@ -1159,130 +1285,66 @@ const ProfileDashboard = () => {
                     backgroundColor: '#f9fafb',
                     borderRadius: '8px'
                   }}>
-                    <p style={{ 
-                      fontSize: '12px', 
-                      color: '#6b7280', 
+                    <p style={{
+                      fontSize: '12px',
+                      color: '#6b7280',
                       margin: '0 0 4px 0',
                       textTransform: 'uppercase',
                       fontWeight: '500'
                     }}>
-                      Priority
+                      Code Formation
                     </p>
-                    <p style={{ 
-                      fontSize: '14px', 
-                      color: '#111827', 
-                      margin: 0,
-                      fontWeight: '600'
-                    }}>
-                      {selectedProject.priority}
-                    </p>
-                  </div>
-
-                  <div style={{
-                    padding: '16px',
-                    backgroundColor: '#f9fafb',
-                    borderRadius: '8px'
-                  }}>
-                    <p style={{ 
-                      fontSize: '12px', 
-                      color: '#6b7280', 
-                      margin: '0 0 4px 0',
-                      textTransform: 'uppercase',
-                      fontWeight: '500'
-                    }}>
-                      Budget
-                    </p>
-                    <p style={{ 
-                      fontSize: '14px', 
-                      color: '#111827', 
-                      margin: 0,
-                      fontWeight: '600'
-                    }}>
-                      {selectedProject.budget}
-                    </p>
-                  </div>
-
-                  <div style={{
-                    padding: '16px',
-                    backgroundColor: '#f9fafb',
-                    borderRadius: '8px'
-                  }}>
-                    <p style={{ 
-                      fontSize: '12px', 
-                      color: '#6b7280', 
-                      margin: '0 0 4px 0',
-                      textTransform: 'uppercase',
-                      fontWeight: '500'
-                    }}>
-                      Phase
-                    </p>
-                    <p style={{ 
-                      fontSize: '14px', 
-                      color: '#111827', 
-                      margin: 0,
-                      fontWeight: '600'
-                    }}>
-                      {selectedProject.phase}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Progress Section */}
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    marginBottom: '12px'
-                  }}>
-                    <h3 style={{ 
-                      fontSize: '16px', 
-                      fontWeight: '600', 
+                    <p style={{
+                      fontSize: '14px',
                       color: '#111827',
-                      margin: 0
+                      margin: 0,
+                      fontWeight: '600'
                     }}>
-                      Progress
-                    </h3>
-                    <span style={{
-                      fontSize: '18px',
-                      fontWeight: '700',
-                      color: getProgressColor(selectedProject.progress)
-                    }}>
-                      {selectedProject.progress}%
-                    </span>
+                      {selectedSession.code_formation}
+                    </p>
                   </div>
+
                   <div style={{
-                    width: '100%',
-                    height: '8px',
-                    backgroundColor: '#e5e7eb',
-                    borderRadius: '4px',
-                    overflow: 'hidden'
+                    padding: '16px',
+                    backgroundColor: '#f9fafb',
+                    borderRadius: '8px'
                   }}>
-                    <div style={{
-                      width: `${selectedProject.progress}%`,
-                      height: '100%',
-                      backgroundColor: getProgressColor(selectedProject.progress),
-                      borderRadius: '4px',
-                      transition: 'width 0.3s ease'
-                    }} />
+                    <p style={{
+                      fontSize: '12px',
+                      color: '#6b7280',
+                      margin: '0 0 4px 0',
+                      textTransform: 'uppercase',
+                      fontWeight: '500'
+                    }}>
+                      Progression
+                    </p>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#111827',
+                      margin: 0,
+                      fontWeight: '600'
+                    }}>
+                      {selectedSession.progress}%
+                    </p>
                   </div>
                 </div>
 
-                {/* Team Section */}
+
+                {/* Participants Section */}
                 <div>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
                     marginBottom: '16px'
                   }}>
-                    <h3 style={{ 
-                      fontSize: '16px', 
-                      fontWeight: '600', 
+                    <h3 style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
                       color: '#111827',
                       margin: 0
                     }}>
-                      Team Members ({selectedProject.team.length})
+                      Participants ({selectedSession.participants.length})
                     </h3>
                     <button
                       onClick={() => setShowAddMember(!showAddMember)}
@@ -1312,7 +1374,7 @@ const ProfileDashboard = () => {
                     </button>
                   </div>
 
-                  {/* Add Member Form */}
+                  {/* Add Participant Form */}
                   {showAddMember && (
                     <div style={{
                       padding: '16px',
@@ -1321,22 +1383,22 @@ const ProfileDashboard = () => {
                       marginBottom: '16px',
                       border: '1px solid #bae6fd'
                     }}>
-                      <h4 style={{ 
-                        fontSize: '14px', 
-                        fontWeight: '600', 
+                      <h4 style={{
+                        fontSize: '14px',
+                        fontWeight: '600',
                         color: '#111827',
                         margin: '0 0 12px 0'
                       }}>
-                        Ajouter un membre
+                        Ajouter un participant
                       </h4>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        {memberPool.filter(member => 
-                          !selectedProject.team.some(teamMember => teamMember.name === member.name)
-                        ).map((member, index) => (
+                        {participants.filter(participant =>
+                          !selectedSession.participants.some(p => p.matricule === participant.matricule)
+                        ).map((participant, index) => (
                           <button
                             key={index}
                             onClick={() => {
-                              addMemberToProject(selectedProject.id, member);
+                              addParticipantToSession(selectedSession.id, participant);
                               setShowAddMember(false);
                             }}
                             style={{
@@ -1360,8 +1422,21 @@ const ProfileDashboard = () => {
                               e.currentTarget.style.borderColor = '#d1d5db';
                             }}
                           >
-                            <span style={{ fontSize: '16px' }}>{member.avatar}</span>
-                            {member.name}
+                            <div style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              backgroundColor: '#3b82f6',
+                              color: 'white',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '10px',
+                              fontWeight: '600'
+                            }}>
+                              {getInitials(participant.nom, participant.prenom)}
+                            </div>
+                            {participant.nom} {participant.prenom}
                           </button>
                         ))}
                       </div>
@@ -1383,57 +1458,66 @@ const ProfileDashboard = () => {
                     </div>
                   )}
 
-                  {/* Team Members List */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-                    {selectedProject.team.map((member, index) => (
+                  {/* Participants List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {selectedSession.participants.map((participant, index) => (
                       <div key={index} style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 12px',
+                        gap: '12px',
+                        padding: '12px',
                         backgroundColor: '#f9fafb',
                         borderRadius: '8px',
                         border: '1px solid #e5e7eb'
                       }}>
                         <div style={{
-                          width: '32px',
-                          height: '32px',
+                          width: '40px',
+                          height: '40px',
                           borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           fontSize: '16px',
-                          backgroundColor: index === 0 ? '#fb923c' : 
-                                         index === 1 ? '#60a5fa' : 
-                                         index === 2 ? '#34d399' : '#f59e0b'
+                          fontWeight: '600',
+                          backgroundColor: index === 0 ? '#fb923c' :
+                            index === 1 ? '#60a5fa' :
+                              index === 2 ? '#34d399' : '#f59e0b',
+                          color: 'white'
                         }}>
-                          {member.avatar}
+                          {getInitials(participant.nom, participant.prenom)}
                         </div>
                         <div style={{ flex: 1 }}>
                           <p style={{
-                            fontSize: '13px',
-                            fontWeight: '500',
+                            fontSize: '14px',
+                            fontWeight: '600',
                             color: '#111827',
-                            margin: 0
+                            margin: '0 0 4px 0'
                           }}>
-                            {member.name}
+                            {participant.nom} {participant.prenom}
+                          </p>
+                          <p style={{
+                            fontSize: '12px',
+                            color: '#6b7280',
+                            margin: '0 0 2px 0'
+                          }}>
+                            {participant.email}
                           </p>
                           <p style={{
                             fontSize: '11px',
-                            color: '#6b7280',
+                            color: '#9ca3af',
                             margin: 0
                           }}>
-                            Membre #{index + 1}
+                            Matricule: {participant.matricule}
                           </p>
                         </div>
                         <button
-                          onClick={() => removeMemberFromProject(selectedProject.id, index)}
+                          onClick={() => removeParticipantFromSession(selectedSession.id, index)}
                           style={{
-                            padding: '4px',
+                            padding: '8px',
                             backgroundColor: '#fef2f2',
                             color: '#dc2626',
                             border: '1px solid #fecaca',
-                            borderRadius: '4px',
+                            borderRadius: '6px',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
@@ -1446,24 +1530,24 @@ const ProfileDashboard = () => {
                           onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = '#fef2f2';
                           }}
-                          title="Supprimer ce membre"
+                          title="Supprimer ce participant"
                         >
-                          <Trash2 size={12} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     ))}
                   </div>
 
-                  {selectedProject.team.length === 0 && (
+                  {selectedSession.participants.length === 0 && (
                     <div style={{
                       textAlign: 'center',
                       padding: '32px 16px',
                       color: '#6b7280'
                     }}>
                       <Users size={32} color="#d1d5db" style={{ marginBottom: '12px' }} />
-                      <p style={{ margin: 0, fontSize: '14px' }}>Aucun membre assigné</p>
+                      <p style={{ margin: 0, fontSize: '14px' }}>Aucun participant assigné</p>
                       <p style={{ margin: '4px 0 0 0', fontSize: '12px' }}>
-                        Cliquez sur "Ajouter" pour assigner des membres à ce projet
+                        Cliquez sur "Ajouter" pour assigner des participants à cette session
                       </p>
                     </div>
                   )}
@@ -1491,6 +1575,11 @@ const ProfileDashboard = () => {
         
         ::-webkit-scrollbar-thumb:hover {
           background: #94a3b8;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>
