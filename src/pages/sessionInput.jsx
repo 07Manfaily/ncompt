@@ -28,8 +28,6 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import moment from "moment";
-import { DateTimePicker } from "react-tempusdominus-bootstrap"
 
 const ProfileDashboard = () => {
   const options = ['Validé', 'Terminé', 'En cours'];
@@ -48,20 +46,8 @@ const ProfileDashboard = () => {
 
   // Nouveaux champs pour le modal
   const [sessionData, setSessionData] = useState({
-    startDate: moment()
-      .add(1, "day")
-      .hour(8)
-      .minute(0)
-      .second(0)
-      .millisecond(0)
-      .format("YYYY-MM-DD HH:mm"),
-    endDate: moment()
-      .add(1, "day")
-      .hour(12)
-      .minute(0)
-      .second(0)
-      .millisecond(0)
-      .format("YYYY-MM-DD HH:mm"),
+    startDate: '',
+    endDate: '',
     lieu: '',
     ville: '',
     status: ''
@@ -86,7 +72,7 @@ const ProfileDashboard = () => {
     const prenoms = ['Jean', 'Marie', 'Pierre', 'Michel', 'Alain', 'Philippe', 'Daniel', 'Patrick', 'François', 'Jacques', 'André', 'René', 'Louis', 'Bernard', 'Claude', 'Paul', 'Gérard', 'Roger', 'Marcel', 'Henri'];
     const directions = ['Innovation', 'DCPP', 'RH', 'Finance', 'Marketing', 'IT', 'Production', 'Qualité'];
     const fonctions = ['Data Analyst', 'Gestionnaire', 'Manager', 'Développeur', 'Consultant', 'Chef de projet', 'Analyste', 'Technicien'];
-
+   
     const mockList = [];
     for (let i = 0; i < 50; i++) {
       mockList.push({
@@ -252,7 +238,7 @@ const ProfileDashboard = () => {
   // Déterminer la couleur de la session
   const getSessionColor = (session) => {
     if (!session.start_datetime || !session.end_datetime) return 'gray';
-
+   
     switch (session.status) {
       case "Validé": return 'green';
       case "En cours": return 'yellow';
@@ -277,10 +263,10 @@ const ProfileDashboard = () => {
   // Fonction pour sauvegarder la session
   const saveSession = async () => {
     setSaving(true);
-
+   
     // Simulation d'un appel API
     await new Promise(resolve => setTimeout(resolve, 1000));
-
+   
     // Mettre à jour la session dans la liste
     setSessions(prev => prev.map(session => {
       if (session.id === selectedSession.id) {
@@ -291,9 +277,9 @@ const ProfileDashboard = () => {
           lieu: sessionData.lieu,
           ville: sessionData.ville,
           status: sessionData.status,
-          color: getSessionColor({ ...session, ...sessionData })
+          color: getSessionColor({...session, ...sessionData})
         };
-
+       
         // Mettre à jour aussi la session sélectionnée
         setSelectedSession(updatedSession);
         return updatedSession;
@@ -680,7 +666,7 @@ const ProfileDashboard = () => {
                   {filteredSessions.map((session) => {
                     const sessionColor = getSessionColor(session);
                     const active = isSessionActive(session);
-
+                   
                     return (
                       <div
                         key={session.id}
@@ -1002,7 +988,7 @@ const ProfileDashboard = () => {
                   }}>
                     Détails de la session
                   </h3>
-
+                 
                   <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(2, 1fr)',
@@ -1010,7 +996,7 @@ const ProfileDashboard = () => {
                     marginBottom: '16px'
                   }}>
                     {/* Date de début */}
-                    <div style={{position:"relative"}}>
+                    <div>
                       <label style={{
                         display: 'block',
                         fontSize: '12px',
@@ -1022,20 +1008,19 @@ const ProfileDashboard = () => {
                         <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
                         Date de début
                       </label>
-                      <DateTimePicker
-                        onChange={(e) =>
-                          setSessionData((prev) => ({
-                            ...prev,
-                            startDate: moment(e.date).format("YYYY-MM-DD HH:mm")
-                          }))
-                        }
-                        sideBySide
-                        date={moment(sessionData.startDate, "YYYY-MM-DD HH:mm")}
-                        format="DD/MM/YYYY HH:mm"
-                        locale="fr-FR"
-                        enabledHours={[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}
+                      <input
+                        type="datetime-local"
+                        value={sessionData.startDate}
+                        onChange={(e) => setSessionData(prev => ({ ...prev, startDate: e.target.value }))}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          backgroundColor: '#fff'
+                        }}
                       />
-
                     </div>
 
                     {/* Date de fin */}
@@ -1051,20 +1036,19 @@ const ProfileDashboard = () => {
                         <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
                         Date de fin
                       </label>
-                      <DateTimePicker
-                        onChange={(e) =>
-                          setSessionData((prev) => ({
-                            ...prev,
-                            endDate: moment(e.date).format("YYYY-MM-DD HH:mm")
-                          }))
-                        }
-                        sideBySide
-                        date={moment(sessionData.endDate, "YYYY-MM-DD HH:mm")}
-                        format="DD/MM/YYYY HH:mm"
-                        locale="fr-FR"
-                        enabledHours={[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}
+                      <input
+                        type="datetime-local"
+                        value={sessionData.endDate}
+                        onChange={(e) => setSessionData(prev => ({ ...prev, endDate: e.target.value }))}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          backgroundColor: '#fff'
+                        }}
                       />
-
                     </div>
 
                     {/* Lieu */}
@@ -1254,7 +1238,7 @@ const ProfileDashboard = () => {
                       }}>
                         Ajouter un participant
                       </h4>
-
+                     
                       {/* Barre de recherche pour participants */}
                       <div style={{ marginBottom: '12px' }}>
                         <div style={{ position: 'relative' }}>
@@ -1336,7 +1320,7 @@ const ProfileDashboard = () => {
                             </div>
                           </div>
                         ))}
-
+                       
                         {filteredParticipants.length > 10 && !showAllParticipants && (
                           <div
                             onClick={() => setShowAllParticipants(true)}
@@ -1354,7 +1338,7 @@ const ProfileDashboard = () => {
                             Voir {filteredParticipants.length - 10} participants de plus
                           </div>
                         )}
-
+                       
                         {showAllParticipants && filteredParticipants.length > 10 && (
                           <div
                             onClick={() => setShowAllParticipants(false)}
@@ -1372,7 +1356,7 @@ const ProfileDashboard = () => {
                             Réduire la liste
                           </div>
                         )}
-
+                       
                         {filteredParticipants.length === 0 && (
                           <div style={{
                             padding: '20px',
