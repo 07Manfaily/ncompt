@@ -28,8 +28,6 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import moment from "moment";
-import { DateTimePicker } from "react-tempusdominus-bootstrap"
 
 const ProfileDashboard = () => {
   const options = ['Validé', 'Terminé', 'En cours'];
@@ -45,23 +43,12 @@ const ProfileDashboard = () => {
   const [participantSearch, setParticipantSearch] = useState('');
   const [showAllParticipants, setShowAllParticipants] = useState(false);
   const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [isNewSession, setIsNewSession] = useState(false);
 
   // Nouveaux champs pour le modal
   const [sessionData, setSessionData] = useState({
-    startDate: moment()
-      .add(1, "day")
-      .hour(8)
-      .minute(0)
-      .second(0)
-      .millisecond(0)
-      .format("YYYY-MM-DD HH:mm"),
-    endDate: moment()
-      .add(1, "day")
-      .hour(12)
-      .minute(0)
-      .second(0)
-      .millisecond(0)
-      .format("YYYY-MM-DD HH:mm"),
+    startDate: '',
+    endDate: '',
     lieu: '',
     ville: '',
     status: ''
@@ -193,6 +180,57 @@ const ProfileDashboard = () => {
     }
   ];
 
+  // Fonction pour créer une nouvelle session vide
+  const createNewSession = () => {
+    const newSessionId = Math.max(...sessions.map(s => s.id), 0) + 1;
+    const newCodeSession = `P25029${newSessionId}`;
+    
+    const newSession = {
+      id: newSessionId,
+      city: null,
+      code_formation: "P25029",
+      code_session: newCodeSession,
+      duration_hours: null,
+      end_datetime: null,
+      participants: [],
+      place: null,
+      start_datetime: null,
+      status: null,
+      teacher: null,
+      type: null,
+      title: "Nouvelle Session de Formation",
+      description: "Description de la nouvelle session de formation",
+      progress: 0,
+      color: "gray",
+      daysLeft: 0,
+      lieu: "",
+      ville: ""
+    };
+
+    return newSession;
+  };
+
+  // Fonction pour gérer l'ajout d'une nouvelle session
+  const handleAddNewSession = () => {
+    const newSession = createNewSession();
+    setSelectedSession(newSession);
+    setIsNewSession(true);
+    setSessionData({
+      startDate: '',
+      endDate: '',
+      lieu: '',
+      ville: '',
+      status: ''
+    });
+    setShowAddMember(false);
+  };
+
+  // Fonction pour gérer la sélection d'une session existante
+  const handleSelectExistingSession = (session) => {
+    setSelectedSession(session);
+    setIsNewSession(false);
+  };
+
   // Fonction pour générer les initiales
   const getInitials = (nom, prenom) => {
     const firstInitial = nom ? nom.charAt(0).toUpperCase() : '';
@@ -263,7 +301,7 @@ const ProfileDashboard = () => {
 
   // Mise à jour de la session sélectionnée
   useEffect(() => {
-    if (selectedSession) {
+    if (selectedSession && !isNewSession) {
       setSessionData({
         startDate: selectedSession.start_datetime || '',
         endDate: selectedSession.end_datetime || '',
@@ -272,7 +310,7 @@ const ProfileDashboard = () => {
         status: selectedSession.status || ''
       });
     }
-  }, [selectedSession]);
+  }, [selectedSession, isNewSession]);
 
   // Fonction pour sauvegarder la session
   const saveSession = async () => {
@@ -281,60 +319,99 @@ const ProfileDashboard = () => {
     // Simulation d'un appel API
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Mettre à jour la session dans la liste
-    setSessions(prev => prev.map(session => {
-      if (session.id === selectedSession.id) {
-        const updatedSession = {
-          ...session,
-          start_datetime: sessionData.startDate,
-          end_datetime: sessionData.endDate,
-          lieu: sessionData.lieu,
-          ville: sessionData.ville,
-          status: sessionData.status,
-          color: getSessionColor({ ...session, ...sessionData })
-        };
+    if (isNewSession) {
+      // Ajouter la nouvelle session à la liste
+      const updatedSession = {
+        ...selectedSession,
+        start_datetime: sessionData.startDate,
+        end_datetime: sessionData.endDate,
+        lieu: sessionData.lieu,
+        ville: sessionData.ville,
+        status: sessionData.status,
+        color: getSessionColor({ ...selectedSession, ...sessionData })
+      };
 
-        // Mettre à jour aussi la session sélectionnée
-        setSelectedSession(updatedSession);
-        return updatedSession;
-      }
-      return session;
-    }));
+      setSessions(prev => [...prev, updatedSession]);
+      setSelectedSession(updatedSession);
+      setIsNewSession(false);
+      alert('Nouvelle session créée avec succès !');
+    } else {
+      // Mettre à jour la session existante dans la liste
+      setSessions(prev => prev.map(session => {
+        if (session.id === selectedSession.id) {
+          const updatedSession = {
+            ...session,
+            start_datetime: sessionData.startDate,
+            end_datetime: sessionData.endDate,
+            lieu: sessionData.lieu,
+            ville: sessionData.ville,
+            status: sessionData.status,
+            color: getSessionColor({ ...session, ...sessionData })
+          };
+
+          // Mettre à jour aussi la session sélectionnée
+          setSelectedSession(updatedSession);
+          return updatedSession;
+        }
+        return session;
+      }));
+      alert('Session modifiée avec succès !');
+    }
 
     setSaving(false);
-    alert('Session enregistrée avec succès !');
   };
 
   // Fonction pour ajouter un participant
   const addParticipantToSession = (sessionId, participant) => {
-    setSessions(prev => prev.map(session => {
-      if (session.id === sessionId) {
-        const isAlreadyParticipant = session.participants.some(p => p.matricule === participant.matricule);
-        if (!isAlreadyParticipant) {
-          const updatedSession = { ...session, participants: [...session.participants, participant] };
+    if (isNewSession) {
+      // Pour une nouvelle session, mettre à jour directement selectedSession
+      const isAlreadyParticipant = selectedSession.participants.some(p => p.matricule === participant.matricule);
+      if (!isAlreadyParticipant) {
+        setSelectedSession(prev => ({
+          ...prev,
+          participants: [...prev.participants, participant]
+        }));
+      }
+    } else {
+      // Pour une session existante, mettre à jour la liste des sessions
+      setSessions(prev => prev.map(session => {
+        if (session.id === sessionId) {
+          const isAlreadyParticipant = session.participants.some(p => p.matricule === participant.matricule);
+          if (!isAlreadyParticipant) {
+            const updatedSession = { ...session, participants: [...session.participants, participant] };
+            if (selectedSession && selectedSession.id === sessionId) {
+              setSelectedSession(updatedSession);
+            }
+            return updatedSession;
+          }
+        }
+        return session;
+      }));
+    }
+  };
+
+  // Fonction pour supprimer un participant
+  const removeParticipantFromSession = (sessionId, participantIndex) => {
+    if (isNewSession) {
+      // Pour une nouvelle session, mettre à jour directement selectedSession
+      setSelectedSession(prev => ({
+        ...prev,
+        participants: prev.participants.filter((_, index) => index !== participantIndex)
+      }));
+    } else {
+      // Pour une session existante, mettre à jour la liste des sessions
+      setSessions(prev => prev.map(session => {
+        if (session.id === sessionId) {
+          const newParticipants = session.participants.filter((_, index) => index !== participantIndex);
+          const updatedSession = { ...session, participants: newParticipants };
           if (selectedSession && selectedSession.id === sessionId) {
             setSelectedSession(updatedSession);
           }
           return updatedSession;
         }
-      }
-      return session;
-    }));
-  };
-
-  // Fonction pour supprimer un participant
-  const removeParticipantFromSession = (sessionId, participantIndex) => {
-    setSessions(prev => prev.map(session => {
-      if (session.id === sessionId) {
-        const newParticipants = session.participants.filter((_, index) => index !== participantIndex);
-        const updatedSession = { ...session, participants: newParticipants };
-        if (selectedSession && selectedSession.id === sessionId) {
-          setSelectedSession(updatedSession);
-        }
-        return updatedSession;
-      }
-      return session;
-    }));
+        return session;
+      }));
+    }
   };
 
   const getProgressColor = (progress) => {
@@ -357,6 +434,15 @@ const ProfileDashboard = () => {
 
   const getSessionDisplayStatus = (status) => {
     return status === null ? "En attente de validation" : status;
+  };
+
+  // Fonction pour fermer le modal
+  const closeModal = () => {
+    setSelectedSession(null);
+    setIsNewSession(false);
+    setShowAddMember(false);
+    setParticipantSearch('');
+    setShowAllParticipants(false);
   };
 
   if (loading) {
@@ -664,6 +750,36 @@ const ProfileDashboard = () => {
                     <option value="encours">En cours</option>
                     <option value="termine">Terminé</option>
                   </select>
+                  
+                  {/* Nouveau bouton Ajouter */}
+                  <button
+                    onClick={handleAddNewSession}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'background-color 0.2s',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#059669';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#10b981';
+                    }}
+                    title="Créer une nouvelle session"
+                  >
+                    <Plus size={16} />
+                    Ajouter
+                  </button>
                 </div>
               </div>
 
@@ -684,7 +800,7 @@ const ProfileDashboard = () => {
                     return (
                       <div
                         key={session.id}
-                        onClick={() => setSelectedSession(session)}
+                        onClick={() => handleSelectExistingSession(session)}
                         style={{
                           padding: '16px',
                           borderRadius: '12px',
@@ -889,7 +1005,7 @@ const ProfileDashboard = () => {
             justifyContent: 'center',
             zIndex: 1000,
             padding: '20px'
-          }} onClick={() => setSelectedSession(null)}>
+          }} onClick={closeModal}>
             <div style={{
               background: 'white',
               borderRadius: '16px',
@@ -912,7 +1028,8 @@ const ProfileDashboard = () => {
                     width: '40px',
                     height: '40px',
                     borderRadius: '8px',
-                    backgroundColor: getSessionColor(selectedSession) === 'yellow' ? '#fefce8' :
+                    backgroundColor: isNewSession ? '#10b981' : 
+                      getSessionColor(selectedSession) === 'yellow' ? '#fefce8' :
                       getSessionColor(selectedSession) === 'blue' ? '#eff6ff' :
                         getSessionColor(selectedSession) === 'pink' ? '#fdf2f8' :
                           getSessionColor(selectedSession) === 'green' ? '#f0fdf4' : '#f9fafb',
@@ -921,7 +1038,7 @@ const ProfileDashboard = () => {
                     justifyContent: 'center',
                     fontSize: '20px'
                   }}>
-                    📚
+                    {isNewSession ? '➕' : '📚'}
                   </div>
                   <div>
                     <h2 style={{
@@ -930,19 +1047,19 @@ const ProfileDashboard = () => {
                       color: '#111827',
                       margin: '0 0 4px 0'
                     }}>
-                      {selectedSession.title}
+                      {isNewSession ? 'Créer une nouvelle session' : selectedSession.title}
                     </h2>
                     <p style={{
                       fontSize: '14px',
                       color: '#6b7280',
                       margin: 0
                     }}>
-                      {selectedSession.code_session}
+                      {isNewSession ? 'Remplissez les informations ci-dessous' : selectedSession.code_session}
                     </p>
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelectedSession(null)}
+                  onClick={closeModal}
                   style={{
                     background: 'none',
                     border: 'none',
@@ -972,25 +1089,134 @@ const ProfileDashboard = () => {
                 flexDirection: 'column',
                 gap: '24px'
               }}>
-                {/* Session Description */}
-                <div>
-                  <h3 style={{
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    color: '#111827',
-                    margin: '0 0 12px 0'
-                  }}>
-                    Description
-                  </h3>
-                  <p style={{
-                    fontSize: '14px',
-                    color: '#6b7280',
-                    lineHeight: '1.6',
-                    margin: 0
-                  }}>
-                    {selectedSession.description}
-                  </p>
-                </div>
+                {/* Session Description - seulement pour les sessions existantes */}
+                {!isNewSession && (
+                  <div>
+                    <h3 style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: '#111827',
+                      margin: '0 0 12px 0'
+                    }}>
+                      Description
+                    </h3>
+                    <p style={{
+                      fontSize: '14px',
+                      color: '#6b7280',
+                      lineHeight: '1.6',
+                      margin: 0
+                    }}>
+                      {selectedSession.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Champs pour nouvelle session */}
+                {isNewSession && (
+                  <div>
+                    <h3 style={{
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: '#111827',
+                      margin: '0 0 16px 0'
+                    }}>
+                      Informations de base
+                    </h3>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(2, 1fr)',
+                      gap: '16px',
+                      marginBottom: '16px'
+                    }}>
+                      {/* Titre */}
+                      <div>
+                        <label style={{
+                          display: 'block',
+                          fontSize: '12px',
+                          color: '#6b7280',
+                          marginBottom: '6px',
+                          textTransform: 'uppercase',
+                          fontWeight: '500'
+                        }}>
+                          Titre de la session
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: Formation React Avancée"
+                          value={selectedSession.title}
+                          onChange={(e) => setSelectedSession(prev => ({ ...prev, title: e.target.value }))}
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            backgroundColor: '#fff'
+                          }}
+                        />
+                      </div>
+
+                      {/* Code formation */}
+                      <div>
+                        <label style={{
+                          display: 'block',
+                          fontSize: '12px',
+                          color: '#6b7280',
+                          marginBottom: '6px',
+                          textTransform: 'uppercase',
+                          fontWeight: '500'
+                        }}>
+                          Code formation
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: P25030"
+                          value={selectedSession.code_formation}
+                          onChange={(e) => setSelectedSession(prev => ({ ...prev, code_formation: e.target.value }))}
+                          style={{
+                            width: '100%',
+                            padding: '10px 12px',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            backgroundColor: '#fff'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{
+                        display: 'block',
+                        fontSize: '12px',
+                        color: '#6b7280',
+                        marginBottom: '6px',
+                        textTransform: 'uppercase',
+                        fontWeight: '500'
+                      }}>
+                        Description
+                      </label>
+                      <textarea
+                        placeholder="Décrivez le contenu et les objectifs de la formation..."
+                        value={selectedSession.description}
+                        onChange={(e) => setSelectedSession(prev => ({ ...prev, description: e.target.value }))}
+                        rows={3}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          backgroundColor: '#fff',
+                          resize: 'vertical',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Session Details Form */}
                 <div>
@@ -1010,7 +1236,7 @@ const ProfileDashboard = () => {
                     marginBottom: '16px'
                   }}>
                     {/* Date de début */}
-                    <div style={{position:"relative"}}>
+                    <div>
                       <label style={{
                         display: 'block',
                         fontSize: '12px',
@@ -1022,20 +1248,19 @@ const ProfileDashboard = () => {
                         <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
                         Date de début
                       </label>
-                      <DateTimePicker
-                        onChange={(e) =>
-                          setSessionData((prev) => ({
-                            ...prev,
-                            startDate: moment(e.date).format("YYYY-MM-DD HH:mm")
-                          }))
-                        }
-                        sideBySide
-                        date={moment(sessionData.startDate, "YYYY-MM-DD HH:mm")}
-                        format="DD/MM/YYYY HH:mm"
-                        locale="fr-FR"
-                        enabledHours={[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}
+                      <input
+                        type="datetime-local"
+                        value={sessionData.startDate}
+                        onChange={(e) => setSessionData(prev => ({ ...prev, startDate: e.target.value }))}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          backgroundColor: '#fff'
+                        }}
                       />
-
                     </div>
 
                     {/* Date de fin */}
@@ -1051,20 +1276,19 @@ const ProfileDashboard = () => {
                         <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
                         Date de fin
                       </label>
-                      <DateTimePicker
-                        onChange={(e) =>
-                          setSessionData((prev) => ({
-                            ...prev,
-                            endDate: moment(e.date).format("YYYY-MM-DD HH:mm")
-                          }))
-                        }
-                        sideBySide
-                        date={moment(sessionData.endDate, "YYYY-MM-DD HH:mm")}
-                        format="DD/MM/YYYY HH:mm"
-                        locale="fr-FR"
-                        enabledHours={[7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]}
+                      <input
+                        type="datetime-local"
+                        value={sessionData.endDate}
+                        onChange={(e) => setSessionData(prev => ({ ...prev, endDate: e.target.value }))}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          backgroundColor: '#fff'
+                        }}
                       />
-
                     </div>
 
                     {/* Lieu */}
@@ -1508,59 +1732,95 @@ const ProfileDashboard = () => {
                   paddingTop: '16px',
                   display: 'flex',
                   gap: '12px',
-                  justifyContent: 'flex-end'
+                  justifyContent: 'space-between'
                 }}>
-                  <button
-                    onClick={() => setSelectedSession(null)}
-                    style={{
-                      padding: '10px 20px',
-                      backgroundColor: '#f3f4f6',
-                      color: '#6b7280',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    onClick={saveSession}
-                    disabled={saving}
-                    style={{
-                      padding: '10px 20px',
-                      backgroundColor: saving ? '#9ca3af' : '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: saving ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                  >
-                    {saving ? (
-                      <>
-                        <div style={{
-                          width: '14px',
-                          height: '14px',
-                          border: '2px solid transparent',
-                          borderTop: '2px solid white',
-                          borderRadius: '50%',
-                          animation: 'spin 1s linear infinite'
-                        }}></div>
-                        Enregistrement...
-                      </>
-                    ) : (
-                      <>
-                        <Save size={14} />
-                        Enregistrer
-                      </>
-                    )}
-                  </button>
+                  {/* Bouton Supprimer à gauche - seulement pour sessions existantes */}
+                  {!isNewSession && (
+                    <button
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#dc2626',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#b91c1c';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#dc2626';
+                      }}
+                      title={`Supprimer la session ${selectedSession.code_session}`}
+                    >
+                      <Trash2 size={14} />
+                      Supprimer
+                    </button>
+                  )}
+
+                  {/* Espace vide pour les nouvelles sessions */}
+                  {isNewSession && <div></div>}
+
+                  {/* Boutons Annuler et Enregistrer à droite */}
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button
+                      onClick={closeModal}
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#f3f4f6',
+                        color: '#6b7280',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={saveSession}
+                      disabled={saving}
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: saving ? '#9ca3af' : (isNewSession ? '#10b981' : '#3b82f6'),
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: saving ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      {saving ? (
+                        <>
+                          <div style={{
+                            width: '14px',
+                            height: '14px',
+                            border: '2px solid transparent',
+                            borderTop: '2px solid white',
+                            borderRadius: '50%',
+                            animation: 'spin 1s linear infinite'
+                          }}></div>
+                          {isNewSession ? 'Création...' : 'Enregistrement...'}
+                        </>
+                      ) : (
+                        <>
+                          <Save size={14} />
+                          {isNewSession ? 'Créer' : 'Enregistrer'}
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
