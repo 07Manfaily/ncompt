@@ -1,0 +1,566 @@
+import React, { useState, useRef } from 'react';
+import { Search, Upload, X, Plus, UserPlus, Users } from 'lucide-react';
+
+const ParticipantsManager = () => {
+  const [isMainModalOpen, setIsMainModalOpen] = useState(false);
+  
+  // Participants déjà sélectionnés (venant de l'API)
+  const [selectedParticipants, setSelectedParticipants] = useState([
+    {
+      id: 1,
+      name: 'SMITH JOHN',
+      email: 'innovation@live.fr',
+      matricule: '789',
+      initials: 'SJ',
+      color: '#FF8C00'
+    }
+  ]);
+
+  // Liste globale des participants disponibles
+  const [availableParticipants, setAvailableParticipants] = useState([
+  
+    { id: 2, name: 'BERNARD Marie', email: 'marie.bernard@company.fr', role: 'Gestionnaire', initials: 'BM', color: '#4A90E2' },
+    { id: 3, name: 'DUBOIS Pierre', email: 'pierre.dubois@company.fr', role: 'Manager', initials: 'DP', color: '#5CB85C' },
+    { id: 4, name: 'THOMAS Michel', email: 'michel.thomas@company.fr', role: 'Développeur', initials: 'TM', color: '#17A2B8' },
+    { id: 5, name: 'ROBERT Alain', email: 'alain.robert@company.fr', role: 'Consultant', initials: 'RA', color: '#DC3545' },
+    { id: 6, name: 'LEFEBVRE Claire', email: 'claire.lefebvre@company.fr', role: 'Chef de projet', initials: 'CL', color: '#FFC107' },
+    { id: 7, name: 'MOREAU Julien', email: 'julien.moreau@company.fr', role: 'Analyste', initials: 'JM', color: '#8E44AD' },
+    { id: 8, name: 'GARNIER Laura', email: 'laura.garnier@company.fr', role: 'RH', initials: 'LG', color: '#FF9800' },
+    { id: 9, name: 'FAURE Nicolas', email: 'nicolas.faure@company.fr', role: 'Architecte', initials: 'NF', color: '#3F51B5' },
+    { id: 10, name: 'CHEVALIER Emma', email: 'emma.chevalier@company.fr', role: 'Testeur', initials: 'EC', color: '#9C27B0' },
+    { id: 11, name: 'RIVIERE Hugo', email: 'hugo.riviere@company.fr', role: 'Support', initials: 'HR', color: '#00BCD4' },
+    { id: 12, name: 'PEREZ Manon', email: 'manon.perez@company.fr', role: 'UI Designer', initials: 'MP', color: '#FF5722' },
+    { id: 13, name: 'BOUCHER Lucas', email: 'lucas.boucher@company.fr', role: 'Développeur', initials: 'LB', color: '#4CAF50' },
+    { id: 14, name: 'DUVAL Léa', email: 'lea.duval@company.fr', role: 'Scrum Master', initials: 'LD', color: '#607D8B' },
+    { id: 15, name: 'MARCHAND Antoine', email: 'antoine.marchand@company.fr', role: 'Manager', initials: 'AM', color: '#E91E63' },
+    { id: 16, name: 'ROUX Camille', email: 'camille.roux@company.fr', role: 'Data Scientist', initials: 'CR', color: '#795548' },
+    { id: 17, name: 'COLLET Paul', email: 'paul.collet@company.fr', role: 'Développeur', initials: 'PC', color: '#009688' },
+    { id: 18, name: 'GUYOT Alice', email: 'alice.guyot@company.fr', role: 'Consultant', initials: 'AG', color: '#CDDC39' },
+    { id: 19, name: 'BARBIER Louis', email: 'louis.barbier@company.fr', role: 'Chef de produit', initials: 'LB', color: '#673AB7' },
+    { id: 20, name: 'CARON Chloé', email: 'chloe.caron@company.fr', role: 'Stagiaire', initials: 'CC', color: '#F44336' },
+  ]);
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchSelectedTerm, setSearchSelectedTerm] = useState('');
+  const [showAddSection, setShowAddSection] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Filtrer les participants disponibles selon la recherche
+  const filteredParticipants = availableParticipants.filter(participant =>
+    participant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    participant.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Filtrer les participants sélectionnés selon la recherche
+  const filteredSelectedParticipants = selectedParticipants.filter(participant =>
+    participant.name.toLowerCase().includes(searchSelectedTerm.toLowerCase()) ||
+    participant.email.toLowerCase().includes(searchSelectedTerm.toLowerCase())
+  );
+
+  // Ajouter un participant à la liste sélectionnée
+  const addParticipant = (participant) => {
+    if (!selectedParticipants.find(p => p.id === participant.id)) {
+      setSelectedParticipants([...selectedParticipants, {
+        ...participant
+      }]);
+      setAvailableParticipants(availableParticipants.filter(p => p.id !== participant.id));
+    }
+   // setShowAddSection(false);
+    setSearchTerm('');
+  };
+
+  // Supprimer un participant de la liste sélectionnée
+  const removeParticipant = (participantId) => {
+    const participantToRemove = selectedParticipants.find(p => p.id === participantId);
+    if (participantToRemove) {
+      setSelectedParticipants(selectedParticipants.filter(p => p.id !== participantId));
+      // Remettre dans la liste disponible si ce n'était pas déjà un participant sélectionné initialement
+      if (participantId !== 1) {
+        setAvailableParticipants([...availableParticipants, participantToRemove]);
+      }
+    }
+  };
+
+  // Gérer l'upload de fichier
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log('Fichier uploadé:', file.name);
+      // Ici vous pouvez traiter le fichier (CSV, Excel, etc.)
+      alert(`Fichier "${file.name}" chargé avec succès !`);
+    }
+  };
+
+  // Fermer tous les modals
+  const closeAllModals = () => {
+    setIsMainModalOpen(false);
+    setShowAddSection(false);
+    setSearchTerm('');
+    setSearchSelectedTerm('');
+  };
+
+  return (
+    <div>
+      {/* Bouton principal pour ouvrir le modal */}
+      <button
+        onClick={() => setIsMainModalOpen(true)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '12px 20px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          fontSize: '16px',
+          fontWeight: '500',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(0,123,255,0.3)',
+          transition: 'all 0.2s ease',
+          fontFamily: 'Arial, sans-serif'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = '#0056b3';
+          e.target.style.transform = 'translateY(-1px)';
+          e.target.style.boxShadow = '0 4px 12px rgba(0,123,255,0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = '#007bff';
+          e.target.style.transform = 'translateY(0)';
+          e.target.style.boxShadow = '0 2px 8px rgba(0,123,255,0.3)';
+        }}
+      >
+        <Users size={20} />
+        Participants ({selectedParticipants.length})
+      </button>
+
+      {/* Modal principal de gestion des participants */}
+      {isMainModalOpen && (
+        <div style={{
+          position: 'fixed',
+          top: '0',
+          left: '0',
+          right: '0',
+          bottom: '0',
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '800px',
+            maxHeight: '90vh',
+            overflow: 'hidden',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+            fontFamily: 'Arial, sans-serif'
+          }}>
+            {/* Header du modal principal */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              padding: '24px 24px 20px 24px',
+              borderBottom: '1px solid #eee'
+            }}>
+              <h2 style={{ 
+                margin: '0', 
+                fontSize: '24px', 
+                fontWeight: '600', 
+                color: '#333',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <Users size={24} color="#007bff" />
+                Participants ({selectedParticipants.length})
+              </h2>
+              
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <Upload size={16} />
+                  Charger participants
+                </button>
+                
+                <button
+                  onClick={() => setShowAddSection(!showAddSection)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    backgroundColor: showAddSection ? '#6c757d' : '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <Plus size={16} />
+                  {showAddSection ? 'Annuler' : 'Ajouter'}
+                </button>
+
+                <button
+                  onClick={closeAllModals}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '28px',
+                    cursor: 'pointer',
+                    color: '#666',
+                    padding: '4px',
+                    borderRadius: '4px'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Input file caché */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
+            />
+
+            {/* Contenu principal du modal */}
+            <div style={{ 
+              display: 'flex',
+              height: 'calc(90vh - 120px)',
+              gap: '20px'
+            }}>
+              {/* Section gauche - Participants sélectionnés */}
+              <div style={{ 
+                flex: showAddSection ? '1' : '1',
+                padding: '20px 0 20px 24px',
+                
+                transition: 'all 0.3s ease'
+              }}>
+                <h3 style={{ 
+                  margin: '0 0 16px 0', 
+                  fontSize: '18px', 
+                  fontWeight: '600', 
+                  color: '#333' 
+                }}>
+                  Participants sélectionnés
+                </h3>
+
+                {/* Barre de recherche pour les participants sélectionnés */}
+                {selectedParticipants.length > 0 && (
+                  <div style={{ 
+                    position: 'relative', 
+                    marginBottom: '16px',
+                    marginRight: '20px'
+                  }}>
+                    <Search 
+                      size={16} 
+                      style={{ 
+                        position: 'absolute', 
+                        left: '10px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        color: '#666' 
+                      }} 
+                    />
+                    <input
+                      type="text"
+                      placeholder="Rechercher dans les sélectionnés..."
+                      value={searchSelectedTerm}
+                      onChange={(e) => setSearchSelectedTerm(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 8px 8px 32px',
+                        border: '1px solid #ddd',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        backgroundColor: 'white'
+                      }}
+                    />
+                  </div>
+                )}
+                
+                {filteredSelectedParticipants.length === 0 && selectedParticipants.length > 0 ? (
+                  <div style={{ 
+                    textAlign: 'center', 
+                    color: '#666', 
+                    padding: '20px',
+                    fontSize: '14px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    marginRight: '20px',
+                  }}>
+                    <Search size={32} color="#ccc" style={{ marginBottom: '12px' }} />
+                    <div>Aucun participant trouvé</div>
+                  </div>
+                ) : selectedParticipants.length === 0 ? (
+                  <div style={{ 
+                    textAlign: 'center', 
+                    color: '#666', 
+                    padding: '40px 20px',
+                    fontSize: '14px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px'
+                  }}>
+                    <Users size={48} color="#ccc" style={{ marginBottom: '16px' }} />
+                    <div>Aucun participant sélectionné</div>
+                  </div>
+                ) : (
+                  <div style={{ 
+                    backgroundColor: '#f8f9fa', 
+                    borderRadius: '8px', 
+                    padding: '16px',
+                    marginRight: '20px',
+                    overflowY: 'auto',
+                    maxHeight: '400px'
+                  }}>
+                    {filteredSelectedParticipants.map((participant, index) => (
+                      <div key={participant.id} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '12px 0',
+                        borderBottom: index < filteredSelectedParticipants.length - 1 ? '1px solid #dee2e6' : 'none'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            backgroundColor: participant.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            fontWeight: '600',
+                            fontSize: '14px',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                          }}>
+                            {participant.initials}
+                          </div>
+                          <div>
+                            <div style={{ 
+                              fontWeight: '600', 
+                              color: '#333',
+                              fontSize: '14px',
+                              marginBottom: '2px'
+                            }}>
+                              {participant.name}
+                            </div>
+                            <div style={{ 
+                              fontSize: '12px', 
+                              color: '#666' 
+                            }}>
+                              {participant.email}
+                              {participant.matricule && ` • Matricule: ${participant.matricule}`}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <button
+                          onClick={() => removeParticipant(participant.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#dc3545',
+                            cursor: 'pointer',
+                            padding: '8px',
+                            borderRadius: '50%',
+                            transition: 'background-color 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = '#f8d7da'}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Section droite - Ajouter des participants (conditionnelle) */}
+              {showAddSection && (
+                <div style={{
+                  flex: '1',
+                  borderLeft: '1px solid #eee',
+                  padding: '20px 24px 20px 20px',
+                  overflowY: 'auto',
+                  backgroundColor: '#fafbfc',
+                  animation: 'slideInRight 0.3s ease'
+                }}>
+                  <h3 style={{ 
+                    margin: '0 0 16px 0', 
+                    fontSize: '18px', 
+                    fontWeight: '600', 
+                    color: '#333',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <UserPlus size={20} color="#007bff" />
+                    Ajouter des participants
+                  </h3>
+
+                  {/* Barre de recherche */}
+                  <div style={{ 
+                    position: 'relative', 
+                    marginBottom: '20px' 
+                  }}>
+                    <Search 
+                      size={18} 
+                      style={{ 
+                        position: 'absolute', 
+                        left: '12px', 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        color: '#666' 
+                      }} 
+                    />
+                    <input
+                      type="text"
+                      placeholder="Rechercher par nom, email..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 10px 10px 40px',
+                        border: '1px solid #ddd',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        backgroundColor: 'white'
+                      }}
+                    />
+                  </div>
+
+                  {/* Liste des participants disponibles */}
+                  <div style={{ 
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    border: '1px solid #eee',
+                    maxHeight: '400px',
+                    overflowY: 'auto'
+                  }}>
+                    {filteredParticipants.length === 0 ? (
+                      <div style={{ 
+                        textAlign: 'center', 
+                        color: '#666', 
+                        padding: '30px 20px',
+                        fontSize: '14px'
+                      }}>
+                        {searchTerm ? (
+                          <>
+                            <Search size={32} color="#ccc" style={{ marginBottom: '12px' }} />
+                            <div>Aucun participant trouvé</div>
+                          </>
+                        ) : (
+                          <>
+                            <Users size={32} color="#ccc" style={{ marginBottom: '12px' }} />
+                            <div>Tous les participants ont été ajoutés</div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      filteredParticipants.map((participant, index) => (
+                        <div 
+                          key={participant.id}
+                          onClick={() => addParticipant(participant)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '12px 16px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            backgroundColor: 'white',
+                            borderBottom: index < filteredParticipants.length - 1 ? '1px solid #f0f0f0' : 'none'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f8f9fa';
+                            e.currentTarget.style.transform = 'translateX(4px)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.transform = 'translateX(0)';
+                          }}
+                        >
+                          <div style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            backgroundColor: participant.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            fontWeight: '600',
+                            fontSize: '12px',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                          }}>
+                            {participant.initials}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ 
+                              fontWeight: '600', 
+                              color: '#333',
+                              fontSize: '14px',
+                              marginBottom: '2px'
+                            }}>
+                              {participant.name}
+                            </div>
+                            <div style={{ 
+                              fontSize: '12px', 
+                              color: '#666' 
+                            }}>
+                              {participant.email} • {participant.role}
+                            </div>
+                          </div>
+                          <Plus size={16} color="#007bff" />
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+
+    </div>
+  );
+};
+
+export default ParticipantsManager;
