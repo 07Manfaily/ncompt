@@ -50,7 +50,7 @@ function App() {
       <Routes>
         {/* Routes sans la sidebar */}
         <Route path="/" element={<Login />} />
-        <Route path="/chart" element={<ParticipantList />} />
+        <Route path="/chart" element={<Chart />} />
 
         {/* Routes qui utilisent le layout principal (avec sidebar) */}
         <Route element={<AppLayout />}>

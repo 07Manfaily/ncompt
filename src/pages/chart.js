@@ -55,6 +55,9 @@ const ProfileDashboard = () => {
   });
 
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState('general'); // Nouvel état pour les onglets
+  const [presenceData, setPresenceData] = useState({}); // État pour gérer la présence
+  const [feedbackData, setFeedbackData] = useState({}); // État pour les avis des participants
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -436,6 +439,22 @@ const ProfileDashboard = () => {
     return status === null ? "En attente de validation" : status;
   };
 
+  // Fonction pour gérer la présence d'un participant
+  const handlePresenceChange = (participantId, isPresent) => {
+    setPresenceData(prev => ({
+      ...prev,
+      [participantId]: isPresent
+    }));
+  };
+
+  // Fonction pour gérer l'avis d'un participant
+  const handleFeedbackChange = (participantId, feedback) => {
+    setFeedbackData(prev => ({
+      ...prev,
+      [participantId]: feedback
+    }));
+  };
+
   // Fonction pour fermer le modal
   const closeModal = () => {
     setSelectedSession(null);
@@ -443,6 +462,23 @@ const ProfileDashboard = () => {
     setShowAddMember(false);
     setParticipantSearch('');
     setShowAllParticipants(false);
+    setActiveTab('general'); // Réinitialiser l'onglet actif
+    setPresenceData({}); // Réinitialiser les données de présence
+    setFeedbackData({}); // Réinitialiser les données de feedback
+  };
+
+  // Fonction pour sauvegarder les données de présence
+  const savePresenceData = () => {
+    // Ici vous pouvez ajouter la logique pour sauvegarder dans l'API
+    console.log('Données de présence à sauvegarder:', presenceData);
+    alert('Données de présence sauvegardées avec succès !');
+  };
+
+  // Fonction pour sauvegarder les données de feedback
+  const saveFeedbackData = () => {
+    // Ici vous pouvez ajouter la logique pour sauvegarder dans l'API
+    console.log('Données de feedback à sauvegarder:', feedbackData);
+    alert('Avis des participants sauvegardés avec succès !');
   };
 
   if (loading) {
@@ -1018,66 +1054,119 @@ const ProfileDashboard = () => {
               {/* Modal Header */}
               <div style={{
                 padding: '24px 24px 16px',
-                borderBottom: '1px solid #e5e7eb',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
+                borderBottom: '1px solid #e5e7eb'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '8px',
-                    backgroundColor: isNewSession ? '#10b981' : 
-                      getSessionColor(selectedSession) === 'yellow' ? '#fefce8' :
-                      getSessionColor(selectedSession) === 'blue' ? '#eff6ff' :
-                        getSessionColor(selectedSession) === 'pink' ? '#fdf2f8' :
-                          getSessionColor(selectedSession) === 'green' ? '#f0fdf4' : '#f9fafb',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '20px'
-                  }}>
-                    {isNewSession ? '➕' : '📚'}
-                  </div>
-                  <div>
-                    <h2 style={{
-                      fontSize: '20px',
-                      fontWeight: '600',
-                      color: '#111827',
-                      margin: '0 0 4px 0'
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '8px',
+                      backgroundColor: isNewSession ? '#10b981' : 
+                        getSessionColor(selectedSession) === 'yellow' ? '#fefce8' :
+                        getSessionColor(selectedSession) === 'blue' ? '#eff6ff' :
+                          getSessionColor(selectedSession) === 'pink' ? '#fdf2f8' :
+                            getSessionColor(selectedSession) === 'green' ? '#f0fdf4' : '#f9fafb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '20px'
                     }}>
-                      {isNewSession ? 'Créer une nouvelle session' : selectedSession.title}
-                    </h2>
-                    <p style={{
-                      fontSize: '14px',
+                      {isNewSession ? '➕' : '📚'}
+                    </div>
+                    <div>
+                      <h2 style={{
+                        fontSize: '20px',
+                        fontWeight: '600',
+                        color: '#111827',
+                        margin: '0 0 4px 0'
+                      }}>
+                        {isNewSession ? 'Créer une nouvelle session' : selectedSession.title}
+                      </h2>
+                      <p style={{
+                        fontSize: '14px',
+                        color: '#6b7280',
+                        margin: 0
+                      }}>
+                        {isNewSession ? 'Remplissez les informations ci-dessous' : selectedSession.code_session}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={closeModal}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '8px',
+                      borderRadius: '8px',
                       color: '#6b7280',
-                      margin: 0
-                    }}>
-                      {isNewSession ? 'Remplissez les informations ci-dessous' : selectedSession.code_session}
-                    </p>
-                  </div>
+                      transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#f3f4f6';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                  >
+                    <X size={20} />
+                  </button>
                 </div>
-                <button
-                  onClick={closeModal}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    color: '#6b7280',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#f3f4f6';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <X size={20} />
-                </button>
+
+                {/* Onglets */}
+                {!isNewSession && (
+                  <div style={{ display: 'flex', gap: '2px' }}>
+                    <button
+                      onClick={() => setActiveTab('general')}
+                      style={{
+                        padding: '12px 24px',
+                        backgroundColor: activeTab === 'general' ? '#3b82f6' : '#f3f4f6',
+                        color: activeTab === 'general' ? 'white' : '#6b7280',
+                        border: 'none',
+                        borderRadius: '8px 8px 0 0',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      📋 Informations générales
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('presence')}
+                      style={{
+                        padding: '12px 24px',
+                        backgroundColor: activeTab === 'presence' ? '#3b82f6' : '#f3f4f6',
+                        color: activeTab === 'presence' ? 'white' : '#6b7280',
+                        border: 'none',
+                        borderRadius: '8px 8px 0 0',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      ✅ Présence
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('feedback')}
+                      style={{
+                        padding: '12px 24px',
+                        backgroundColor: activeTab === 'feedback' ? '#3b82f6' : '#f3f4f6',
+                        color: activeTab === 'feedback' ? 'white' : '#6b7280',
+                        border: 'none',
+                        borderRadius: '8px 8px 0 0',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      💬 Formulaire à chaud
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Modal Content */}
@@ -1089,29 +1178,794 @@ const ProfileDashboard = () => {
                 flexDirection: 'column',
                 gap: '24px'
               }}>
-                {/* Session Description - seulement pour les sessions existantes */}
-                {!isNewSession && (
-                  <div>
-                    <h3 style={{
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      color: '#111827',
-                      margin: '0 0 12px 0'
-                    }}>
-                      Description
-                    </h3>
-                    <p style={{
-                      fontSize: '14px',
-                      color: '#6b7280',
-                      lineHeight: '1.6',
-                      margin: 0
-                    }}>
-                      {selectedSession.description}
-                    </p>
-                  </div>
+                {/* Contenu des onglets */}
+                {isNewSession ? (
+                  // Contenu pour nouvelle session (inchangé)
+                  <>
+                    {/* Session Description - seulement pour les sessions existantes */}
+                    {!isNewSession && (
+                      <div>
+                        <h3 style={{
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          color: '#111827',
+                          margin: '0 0 12px 0'
+                        }}>
+                          Description
+                        </h3>
+                        <p style={{
+                          fontSize: '14px',
+                          color: '#6b7280',
+                          lineHeight: '1.6',
+                          margin: 0
+                        }}>
+                          {selectedSession.description}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // Contenu pour sessions existantes avec onglets
+                  <>
+                    {/* Onglet 1: Informations générales */}
+                    {activeTab === 'general' && (
+                      <>
+                        {/* Description de la session */}
+                        <div>
+                          <h3 style={{
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            color: '#111827',
+                            margin: '0 0 12px 0'
+                          }}>
+                            Description
+                          </h3>
+                          <p style={{
+                            fontSize: '14px',
+                            color: '#6b7280',
+                            lineHeight: '1.6',
+                            margin: 0
+                          }}>
+                            {selectedSession.description}
+                          </p>
+                        </div>
+
+                        {/* Session Details Form */}
+                        <div>
+                          <h3 style={{
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            color: '#111827',
+                            margin: '0 0 16px 0'
+                          }}>
+                            Détails de la session
+                          </h3>
+
+                          <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(2, 1fr)',
+                            gap: '16px',
+                            marginBottom: '16px'
+                          }}>
+                            {/* Date de début */}
+                            <div>
+                              <label style={{
+                                display: 'block',
+                                fontSize: '12px',
+                                color: '#6b7280',
+                                marginBottom: '6px',
+                                textTransform: 'uppercase',
+                                fontWeight: '500'
+                              }}>
+                                <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                Date de début
+                              </label>
+                              <input
+                                type="datetime-local"
+                                value={sessionData.startDate}
+                                onChange={(e) => setSessionData(prev => ({ ...prev, startDate: e.target.value }))}
+                                style={{
+                                  width: '100%',
+                                  padding: '10px 12px',
+                                  border: '1px solid #d1d5db',
+                                  borderRadius: '8px',
+                                  fontSize: '14px',
+                                  backgroundColor: '#fff'
+                                }}
+                              />
+                            </div>
+
+                            {/* Date de fin */}
+                            <div>
+                              <label style={{
+                                display: 'block',
+                                fontSize: '12px',
+                                color: '#6b7280',
+                                marginBottom: '6px',
+                                textTransform: 'uppercase',
+                                fontWeight: '500'
+                              }}>
+                                <Clock size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                Date de fin
+                              </label>
+                              <input
+                                type="datetime-local"
+                                value={sessionData.endDate}
+                                onChange={(e) => setSessionData(prev => ({ ...prev, endDate: e.target.value }))}
+                                style={{
+                                  width: '100%',
+                                  padding: '10px 12px',
+                                  border: '1px solid #d1d5db',
+                                  borderRadius: '8px',
+                                  fontSize: '14px',
+                                  backgroundColor: '#fff'
+                                }}
+                              />
+                            </div>
+
+                            {/* Lieu */}
+                            <div>
+                              <label style={{
+                                display: 'block',
+                                fontSize: '12px',
+                                color: '#6b7280',
+                                marginBottom: '6px',
+                                textTransform: 'uppercase',
+                                fontWeight: '500'
+                              }}>
+                                <MapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                Lieu
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Ex: Salle de conférence A"
+                                value={sessionData.lieu}
+                                onChange={(e) => setSessionData(prev => ({ ...prev, lieu: e.target.value }))}
+                                style={{
+                                  width: '100%',
+                                  padding: '10px 12px',
+                                  border: '1px solid #d1d5db',
+                                  borderRadius: '8px',
+                                  fontSize: '14px',
+                                  backgroundColor: '#fff'
+                                }}
+                              />
+                            </div>
+
+                            {/* Ville */}
+                            <div>
+                              <label style={{
+                                display: 'block',
+                                fontSize: '12px',
+                                color: '#6b7280',
+                                marginBottom: '6px',
+                                textTransform: 'uppercase',
+                                fontWeight: '500'
+                              }}>
+                                <Building size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                Ville
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Ex: Abidjan"
+                                value={sessionData.ville}
+                                onChange={(e) => setSessionData(prev => ({ ...prev, ville: e.target.value }))}
+                                style={{
+                                  width: '100%',
+                                  padding: '10px 12px',
+                                  border: '1px solid #d1d5db',
+                                  borderRadius: '8px',
+                                  fontSize: '14px',
+                                  backgroundColor: '#fff'
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Statut - Affiché uniquement si des participants sont ajoutés et dates renseignées */}
+                          {selectedSession.participants.length > 0 && sessionData.startDate && sessionData.endDate && (
+                            <div style={{ marginBottom: '16px' }}>
+                              <label style={{
+                                display: 'block',
+                                fontSize: '12px',
+                                color: '#6b7280',
+                                marginBottom: '6px',
+                                textTransform: 'uppercase',
+                                fontWeight: '500'
+                              }}>
+                                <CheckCircle size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                Statut de la session
+                              </label>
+                              <select
+                                value={sessionData.status}
+                                onChange={(e) => setSessionData(prev => ({ ...prev, status: e.target.value }))}
+                                style={{
+                                  width: '100%',
+                                  padding: '10px 12px',
+                                  border: '1px solid #d1d5db',
+                                  borderRadius: '8px',
+                                  fontSize: '14px',
+                                  backgroundColor: '#fff'
+                                }}
+                              >
+                                <option value="">Sélectionner un statut</option>
+                                {options.map(option => (
+                                  <option key={option} value={option}>{option}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Participants Section */}
+                        <div>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '16px'
+                          }}>
+                            <h3 style={{
+                              fontSize: '16px',
+                              fontWeight: '600',
+                              color: '#111827',
+                              margin: 0
+                            }}>
+                              Participants ({selectedSession.participants.length})
+                            </h3>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              <button
+                                onClick={loadParticipants}
+                                disabled={loadingParticipants}
+                                style={{
+                                  padding: '8px 16px',
+                                  backgroundColor: '#10b981',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  cursor: loadingParticipants ? 'not-allowed' : 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px',
+                                  opacity: loadingParticipants ? 0.7 : 1
+                                }}
+                              >
+                                {loadingParticipants ? (
+                                  <>
+                                    <div style={{
+                                      width: '12px',
+                                      height: '12px',
+                                      border: '2px solid transparent',
+                                      borderTop: '2px solid white',
+                                      borderRadius: '50%',
+                                      animation: 'spin 1s linear infinite'
+                                    }}></div>
+                                    Chargement...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload size={14} />
+                                    Charger participants
+                                  </>
+                                )}
+                              </button>
+                              <button
+                                onClick={() => setShowAddMember(!showAddMember)}
+                                style={{
+                                  padding: '8px 16px',
+                                  backgroundColor: '#3b82f6',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '6px'
+                                }}
+                              >
+                                <Plus size={14} />
+                                Ajouter
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Add Participant Form */}
+                          {showAddMember && (
+                            <div style={{
+                              padding: '16px',
+                              backgroundColor: '#f0f9ff',
+                              borderRadius: '8px',
+                              marginBottom: '16px',
+                              border: '1px solid #bae6fd'
+                            }}>
+                              <h4 style={{
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                color: '#111827',
+                                margin: '0 0 12px 0'
+                              }}>
+                                Ajouter un participant
+                              </h4>
+
+                              {/* Barre de recherche pour participants */}
+                              <div style={{ marginBottom: '12px' }}>
+                                <div style={{ position: 'relative' }}>
+                                  <Search size={16} color="#6b7280" style={{
+                                    position: 'absolute',
+                                    left: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)'
+                                  }} />
+                                  <input
+                                    type="text"
+                                    placeholder="Rechercher par nom, prénom, email ou matricule..."
+                                    value={participantSearch}
+                                    onChange={(e) => setParticipantSearch(e.target.value)}
+                                    style={{
+                                      width: '100%',
+                                      padding: '8px 12px 8px 36px',
+                                      border: '1px solid #d1d5db',
+                                      borderRadius: '6px',
+                                      fontSize: '12px',
+                                      backgroundColor: 'white'
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Liste des participants disponibles */}
+                              <div style={{
+                                maxHeight: '200px',
+                                overflowY: 'auto',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '6px',
+                                backgroundColor: 'white'
+                              }}>
+                                {filteredParticipants.slice(0, showAllParticipants ? filteredParticipants.length : 10).map((participant, index) => (
+                                  <div
+                                    key={index}
+                                    onClick={() => {
+                                      addParticipantToSession(selectedSession.id, participant);
+                                      setParticipantSearch('');
+                                    }}
+                                    style={{
+                                      padding: '8px 12px',
+                                      borderBottom: index < filteredParticipants.length - 1 ? '1px solid #f3f4f6' : 'none',
+                                      cursor: 'pointer',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px',
+                                      transition: 'background-color 0.2s'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = '#f9fafb';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = 'white';
+                                    }}
+                                  >
+                                    <div style={{
+                                      width: '24px',
+                                      height: '24px',
+                                      borderRadius: '50%',
+                                      backgroundColor: '#3b82f6',
+                                      color: 'white',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      fontSize: '10px',
+                                      fontWeight: '600'
+                                    }}>
+                                      {getInitials(participant.nom, participant.prenom)}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                      <div style={{ fontSize: '12px', fontWeight: '500', color: '#111827' }}>
+                                        {participant.nom} {participant.prenom}
+                                      </div>
+                                      <div style={{ fontSize: '10px', color: '#6b7280' }}>
+                                        {participant.email} • {participant.fonction}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+
+                                {filteredParticipants.length > 10 && !showAllParticipants && (
+                                  <div
+                                    onClick={() => setShowAllParticipants(true)}
+                                    style={{
+                                      padding: '8px 12px',
+                                      textAlign: 'center',
+                                      cursor: 'pointer',
+                                      backgroundColor: '#f9fafb',
+                                      fontSize: '12px',
+                                      color: '#3b82f6',
+                                      fontWeight: '500'
+                                    }}
+                                  >
+                                    <ChevronDown size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                    Voir {filteredParticipants.length - 10} participants de plus
+                                  </div>
+                                )}
+
+                                {showAllParticipants && filteredParticipants.length > 10 && (
+                                  <div
+                                    onClick={() => setShowAllParticipants(false)}
+                                    style={{
+                                      padding: '8px 12px',
+                                      textAlign: 'center',
+                                      cursor: 'pointer',
+                                      backgroundColor: '#f9fafb',
+                                      fontSize: '12px',
+                                      color: '#3b82f6',
+                                      fontWeight: '500'
+                                    }}
+                                  >
+                                    <ChevronUp size={14} style={{ display: 'inline', marginRight: '4px' }} />
+                                    Réduire la liste
+                                  </div>
+                                )}
+
+                                {filteredParticipants.length === 0 && (
+                                  <div style={{
+                                    padding: '20px',
+                                    textAlign: 'center',
+                                    color: '#6b7280',
+                                    fontSize: '12px'
+                                  }}>
+                                    Aucun participant trouvé
+                                  </div>
+                                )}
+                              </div>
+
+                              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                                <button
+                                  onClick={() => {
+                                    setShowAddMember(false);
+                                    setParticipantSearch('');
+                                    setShowAllParticipants(false);
+                                  }}
+                                  style={{
+                                    padding: '6px 12px',
+                                    backgroundColor: '#f3f4f6',
+                                    color: '#6b7280',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    fontSize: '12px',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Fermer
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Participants List */}
+                          <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '8px',
+                            maxHeight: '300px',
+                            overflowY: 'auto'
+                          }}>
+                            {selectedSession.participants.map((participant, index) => (
+                              <div key={index} style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                padding: '12px',
+                                backgroundColor: '#f9fafb',
+                                borderRadius: '8px',
+                                border: '1px solid #e5e7eb'
+                              }}>
+                                <div style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '12px',
+                                  fontWeight: '600',
+                                  backgroundColor: index % 4 === 0 ? '#fb923c' :
+                                    index % 4 === 1 ? '#60a5fa' :
+                                      index % 4 === 2 ? '#34d399' : '#f59e0b',
+                                  color: 'white'
+                                }}>
+                                  {getInitials(participant.nom, participant.prenom)}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                  <p style={{
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    color: '#111827',
+                                    margin: '0 0 2px 0'
+                                  }}>
+                                    {participant.nom} {participant.prenom}
+                                  </p>
+                                  <p style={{
+                                    fontSize: '11px',
+                                    color: '#6b7280',
+                                    margin: '0 0 1px 0'
+                                  }}>
+                                    {participant.email}
+                                  </p>
+                                  <p style={{
+                                    fontSize: '10px',
+                                    color: '#9ca3af',
+                                    margin: 0
+                                  }}>
+                                    Matricule: {participant.matricule}
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() => removeParticipantFromSession(selectedSession.id, index)}
+                                  style={{
+                                    padding: '6px',
+                                    backgroundColor: '#fef2f2',
+                                    color: '#dc2626',
+                                    border: '1px solid #fecaca',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                  title="Supprimer ce participant"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+
+                          {selectedSession.participants.length === 0 && (
+                            <div style={{
+                              textAlign: 'center',
+                              padding: '32px 16px',
+                              color: '#6b7280'
+                            }}>
+                              <Users size={32} color="#d1d5db" style={{ marginBottom: '12px' }} />
+                              <p style={{ margin: 0, fontSize: '14px' }}>Aucun participant assigné</p>
+                              <p style={{ margin: '4px 0 0 0', fontSize: '12px' }}>
+                                Cliquez sur "Ajouter" pour assigner des participants à cette session
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Onglet 2: Présence */}
+                    {activeTab === 'presence' && (
+                      <div>
+                        <h3 style={{
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          color: '#111827',
+                          margin: '0 0 16px 0'
+                        }}>
+                          Gestion de la présence
+                        </h3>
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '12px'
+                        }}>
+                          {selectedSession.participants.map((participant, index) => (
+                            <div key={index} style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '16px',
+                              backgroundColor: '#f9fafb',
+                              borderRadius: '8px',
+                              border: '1px solid #e5e7eb'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{
+                                  width: '40px',
+                                  height: '40px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#3b82f6',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: 'white',
+                                  fontWeight: '600',
+                                  fontSize: '14px'
+                                }}>
+                                  {getInitials(participant.nom, participant.prenom)}
+                                </div>
+                                <div>
+                                  <p style={{
+                                    margin: '0 0 4px 0',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#111827'
+                                  }}>
+                                    {participant.prenom} {participant.nom}
+                                  </p>
+                                  <p style={{
+                                    margin: 0,
+                                    fontSize: '12px',
+                                    color: '#6b7280'
+                                  }}>
+                                    {participant.email}
+                                  </p>
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button
+                                  onClick={() => handlePresenceChange(participant.matricule, true)}
+                                  style={{
+                                    padding: '8px 16px',
+                                    backgroundColor: presenceData[participant.matricule] === true ? '#10b981' : '#f3f4f6',
+                                    color: presenceData[participant.matricule] === true ? 'white' : '#6b7280',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                  }}
+                                >
+                                  ✅ Présent
+                                </button>
+                                <button
+                                  onClick={() => handlePresenceChange(participant.matricule, false)}
+                                  style={{
+                                    padding: '8px 16px',
+                                    backgroundColor: presenceData[participant.matricule] === false ? '#dc2626' : '#f3f4f6',
+                                    color: presenceData[participant.matricule] === false ? 'white' : '#6b7280',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    fontSize: '12px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                  }}
+                                >
+                                  ❌ Absent
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Onglet 3: Formulaire à chaud */}
+                    {activeTab === 'feedback' && (
+                      <div>
+                        <h3 style={{
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          color: '#111827',
+                          margin: '0 0 16px 0'
+                        }}>
+                          Avis des participants
+                        </h3>
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '12px'
+                        }}>
+                          {selectedSession.participants.map((participant, index) => (
+                            <div key={index} style={{
+                              padding: '16px',
+                              backgroundColor: '#f9fafb',
+                              borderRadius: '8px',
+                              border: '1px solid #e5e7eb'
+                            }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                <div style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: '50%',
+                                  backgroundColor: '#3b82f6',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: 'white',
+                                  fontWeight: '600',
+                                  fontSize: '12px'
+                                }}>
+                                  {getInitials(participant.nom, participant.prenom)}
+                                </div>
+                                <div>
+                                  <p style={{
+                                    margin: '0 0 2px 0',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    color: '#111827'
+                                  }}>
+                                    {participant.prenom} {participant.nom}
+                                  </p>
+                                  <p style={{
+                                    margin: 0,
+                                    fontSize: '12px',
+                                    color: '#6b7280'
+                                  }}>
+                                    {participant.email}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              {/* Note globale */}
+                              <div style={{ marginBottom: '12px' }}>
+                                <label style={{
+                                  display: 'block',
+                                  fontSize: '12px',
+                                  color: '#6b7280',
+                                  marginBottom: '6px',
+                                  fontWeight: '500'
+                                }}>
+                                  Note globale (1-5)
+                                </label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                      key={star}
+                                      onClick={() => handleFeedbackChange(participant.matricule, { ...feedbackData[participant.matricule], rating: star })}
+                                      style={{
+                                        padding: '4px 8px',
+                                        backgroundColor: (feedbackData[participant.matricule]?.rating || 0) >= star ? '#fbbf24' : '#f3f4f6',
+                                        color: (feedbackData[participant.matricule]?.rating || 0) >= star ? 'white' : '#6b7280',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        fontSize: '12px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                      }}
+                                    >
+                                      ⭐
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Commentaire */}
+                              <div>
+                                <label style={{
+                                  display: 'block',
+                                  fontSize: '12px',
+                                  color: '#6b7280',
+                                  marginBottom: '6px',
+                                  fontWeight: '500'
+                                }}>
+                                  Commentaire
+                                </label>
+                                <textarea
+                                  placeholder="Avis du participant sur la formation..."
+                                  value={feedbackData[participant.matricule]?.comment || ''}
+                                  onChange={(e) => handleFeedbackChange(participant.matricule, { ...feedbackData[participant.matricule], comment: e.target.value })}
+                                  rows={3}
+                                  style={{
+                                    width: '100%',
+                                    padding: '8px 12px',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '6px',
+                                    fontSize: '12px',
+                                    backgroundColor: '#fff',
+                                    resize: 'vertical',
+                                    fontFamily: 'inherit'
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
-                {/* Champs pour nouvelle session */}
+                {/* Champs pour nouvelle session - maintenant dans l'onglet Informations générales */}
                 {isNewSession && (
                   <div>
                     <h3 style={{
@@ -1784,6 +2638,36 @@ const ProfileDashboard = () => {
                     >
                       Annuler
                     </button>
+                    
+                    {/* Bouton spécifique pour les onglets de présence et feedback */}
+                    {!isNewSession && (activeTab === 'presence' || activeTab === 'feedback') && (
+                      <button
+                        onClick={() => {
+                          if (activeTab === 'presence') {
+                            savePresenceData();
+                          } else {
+                            saveFeedbackData();
+                          }
+                        }}
+                        style={{
+                          padding: '10px 20px',
+                          backgroundColor: '#10b981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        <Save size={14} />
+                        {activeTab === 'presence' ? 'Sauvegarder présence' : 'Sauvegarder avis'}
+                      </button>
+                    )}
+                    
                     <button
                       onClick={saveSession}
                       disabled={saving}
