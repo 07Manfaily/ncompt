@@ -19,7 +19,7 @@ import BusinessCardOrange from './pages/BusinessCardOrange';
 import Plan from './pages/formationPlan';
 import Task from './pages/task';
 import Form from './pages/form'; // Utilisation du bon formulaire
-import Chart from './pages/hot';
+import Chart from './pages/stat';
 import Notif from './pages/notif';
 import ParticipantList from './pages/participant';
 
