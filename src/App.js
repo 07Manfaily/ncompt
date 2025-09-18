@@ -22,6 +22,8 @@ import Form from './pages/form'; // Utilisation du bon formulaire
 import Chart from './pages/ntest';
 import Notif from './pages/notif';
 import ParticipantList from './pages/participant';
+import Table from './pages/table';
+
 
 // Le composant de Layout principal qui inclut la Sidebar et le Header
 const AppLayout = () => {
@@ -49,6 +51,7 @@ function App() {
     <Router>
       <Routes>
         {/* Routes sans la sidebar */}
+        <Route path="/table" element={<Table />} />
         <Route path="/" element={<Login />} />
         <Route path="/chart" element={<Chart />} />
 
