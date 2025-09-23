@@ -23,6 +23,7 @@ import Chart from './pages/ntest';
 import Notif from './pages/notif';
 import ParticipantList from './pages/participant';
 import Table from './pages/table';
+import Test from './pages/head';
 
 
 // Le composant de Layout principal qui inclut la Sidebar et le Header
@@ -53,13 +54,15 @@ function App() {
         {/* Routes sans la sidebar */}
         <Route path="/table" element={<Table />} />
         <Route path="/" element={<Login />} />
+                <Route path="/" element={<Login />} />
+            <Route path="/test" element={<Test />} />
         <Route path="/chart" element={<Chart />} />
 
         {/* Routes qui utilisent le layout principal (avec sidebar) */}
         <Route element={<AppLayout />}>
           <Route path="/home" element={<Home />} />
-                    <Route path="/notif" element={<Notif />} />
-                    <Route path="/participantList" element={<ParticipantList />} />
+          <Route path="/notif" element={<Notif />} />
+          <Route path="/participantList" element={<ParticipantList />} />
 
           <Route path="/formation-plan" element={<Plan />} />
           <Route path="/sessions" element={<Task />} />

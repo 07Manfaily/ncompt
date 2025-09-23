@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const FormationWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
   const [completedSteps, setCompletedSteps] = useState([]);
+  const dialogRef = useRef(null);
   
   const [formData, setFormData] = useState({
     year: '',
@@ -13,8 +14,8 @@ const FormationWizard = () => {
     thematique: '',
     type_de_programme: '',
     origine_de_la_demande: '',
-    formation_obligatoire: false,
-    formation_diplomante: false,
+    formation_obligatoire: null,
+    formation_diplomante: null,
     priorite: '',
     mode_diffusion: '',
     type: '',
@@ -43,6 +44,14 @@ const FormationWizard = () => {
     { id: 5, title: 'Équipes & Objectifs', icon: '🎯', color: '#f59e0b' },
     { id: 6, title: 'Finalisation', icon: '✨', color: '#ef4444' }
   ];
+
+  const openModal = () => {
+    dialogRef.current?.showModal();
+  };
+
+  const closeModal = () => {
+    dialogRef.current?.close();
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -129,52 +138,90 @@ const FormationWizard = () => {
 
     console.log('🚀 Données prêtes pour l\'API:', Object.fromEntries(dataToSend));
     alert('✅ Formation créée avec succès ! Vérifiez la console pour les détails.');
+    closeModal();
   };
 
-  // Styles
+  // Styles responsive
   const containerStyle = {
-    minHeight: '100vh',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     padding: '20px',
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
   };
 
+  const triggerButtonStyle = {
+    padding: '16px 32px',
+    border: 'none',
+    borderRadius: '12px',
+    fontSize: '18px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    color: 'white',
+    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px'
+  };
+
+  const dialogStyle = {
+    margin: 'auto',
+    padding: '0',
+    border: 'none',
+    borderRadius: '16px',
+    backgroundColor: 'transparent',
+    maxWidth: '95vw',
+    maxHeight: '95vh',
+    width: '50%',
+    height: '100%',
+    overflow: 'hidden',
+    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+  };
+
+  const backdropStyle = {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backdropFilter: 'blur(8px)'
+  };
+
   const wizardContainerStyle = {
-    maxWidth: '900px',
-    margin: '0 auto',
+    height: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: '24px',
-    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+    borderRadius: '16px',
     backdropFilter: 'blur(16px)',
     border: '1px solid rgba(255, 255, 255, 0.2)',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column'
   };
 
   const headerStyle = {
     background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-    padding: '32px',
+    padding: 'clamp(16px, 4vw, 32px)',
     textAlign: 'center',
     position: 'relative',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    flexShrink: 0
   };
 
   const progressBarStyle = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '24px',
-    position: 'relative'
+    marginBottom: 'clamp(12px, 3vw, 24px)',
+    position: 'relative',
+    flexWrap: 'wrap',
+    gap: '8px'
   };
 
   const progressLineStyle = {
     position: 'absolute',
-    top: '20px',
+    top: '50%',
     left: '0',
     right: '0',
     height: '3px',
     background: 'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
     borderRadius: '2px',
-    zIndex: 1
+    zIndex: 1,
+    transform: 'translateY(-50%)'
   };
 
   const progressFillStyle = {
@@ -190,13 +237,13 @@ const FormationWizard = () => {
   };
 
   const stepIndicatorStyle = (step) => ({
-    width: '40px',
-    height: '40px',
+    width: 'clamp(32px, 8vw, 40px)',
+    height: 'clamp(32px, 8vw, 40px)',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '18px',
+    fontSize: 'clamp(14px, 3vw, 18px)',
     cursor: 'pointer',
     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
     zIndex: 3,
@@ -216,8 +263,9 @@ const FormationWizard = () => {
   });
 
   const contentStyle = {
-    padding: '48px',
-    minHeight: '500px',
+    padding: 'clamp(16px, 4vw, 48px)',
+    flex: 1,
+    overflow: 'auto',
     transform: isAnimating ? 'translateX(20px)' : 'translateX(0)',
     opacity: isAnimating ? 0 : 1,
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -225,10 +273,10 @@ const FormationWizard = () => {
 
   const inputStyle = {
     width: '100%',
-    padding: '16px 20px',
+    padding: 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)',
     border: '2px solid transparent',
     borderRadius: '12px',
-    fontSize: '16px',
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
     background: 'linear-gradient(white, white) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box',
     outline: 'none',
     transition: 'all 0.3s ease',
@@ -237,18 +285,18 @@ const FormationWizard = () => {
 
   const labelStyle = {
     display: 'block',
-    marginBottom: '12px',
+    marginBottom: 'clamp(8px, 2vw, 12px)',
     fontWeight: '600',
     color: '#1f2937',
-    fontSize: '15px',
+    fontSize: 'clamp(13px, 3vw, 15px)',
     letterSpacing: '0.025em'
   };
 
   const buttonStyle = (variant = 'primary') => ({
-    padding: '14px 28px',
+    padding: 'clamp(12px, 3vw, 14px) clamp(20px, 5vw, 28px)',
     border: 'none',
     borderRadius: '12px',
-    fontSize: '16px',
+    fontSize: 'clamp(14px, 3.5vw, 16px)',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -266,11 +314,46 @@ const FormationWizard = () => {
     backdropFilter: 'blur(10px)'
   });
 
+  const closeButtonStyle = {
+    position: 'absolute',
+    top: '16px',
+    right: '16px',
+    width: '32px',
+    height: '32px',
+    border: 'none',
+    borderRadius: '50%',
+    background: 'rgba(255, 255, 255, 0.2)',
+    color: 'white',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '18px',
+    transition: 'all 0.3s ease',
+    zIndex: 10
+  };
+
+  const gridStyle = {
+    display: 'grid',
+    gap: 'clamp(16px, 4vw, 32px)',
+    marginBottom: 'clamp(16px, 4vw, 32px)'
+  };
+
+  const twoColumnGrid = {
+    ...gridStyle,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))'
+  };
+
+  const fourColumnGrid = {
+    ...gridStyle,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))'
+  };
+
   const tagStyle = {
     background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
     padding: '8px 16px',
     borderRadius: '20px',
-    fontSize: '14px',
+    fontSize: 'clamp(12px, 2.5vw, 14px)',
     margin: '4px',
     display: 'inline-flex',
     alignItems: 'center',
@@ -286,24 +369,25 @@ const FormationWizard = () => {
           <div>
             <div style={{
               textAlign: 'center',
-              marginBottom: '40px'
+              marginBottom: 'clamp(24px, 6vw, 40px)'
             }}>
               <div style={{
-                fontSize: '48px',
+                fontSize: 'clamp(32px, 8vw, 48px)',
                 marginBottom: '16px'
               }}>📋</div>
               <h2 style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 6vw, 32px)',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                margin: '0 auto 8px auto'
               }}>
                 Informations Générales
               </h2>
               <p style={{
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 color: '#6b7280',
                 maxWidth: '500px',
                 margin: '0 auto'
@@ -312,12 +396,7 @@ const FormationWizard = () => {
               </p>
             </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '32px',
-              marginBottom: '32px'
-            }}>
+            <div style={twoColumnGrid}>
               <div>
                 <label style={labelStyle}>Année de formation *</label>
                 <input
@@ -377,7 +456,7 @@ const FormationWizard = () => {
               display: 'grid',
               gridTemplateColumns: '1fr',
               gap: '24px',
-              marginTop: '32px'
+              marginTop: 'clamp(16px, 4vw, 32px)'
             }}>
               <div>
                 <label style={labelStyle}>Objectif principal de la formation</label>
@@ -387,7 +466,7 @@ const FormationWizard = () => {
                   onChange={handleInputChange}
                   style={{
                     ...inputStyle,
-                    minHeight: '120px',
+                    minHeight: 'clamp(80px, 20vw, 120px)',
                     resize: 'vertical'
                   }}
                   placeholder="Décrivez en détail les objectifs et les compétences que cette formation vise à développer..."
@@ -402,24 +481,25 @@ const FormationWizard = () => {
           <div>
             <div style={{
               textAlign: 'center',
-              marginBottom: '40px'
+              marginBottom: 'clamp(24px, 6vw, 40px)'
             }}>
               <div style={{
-                fontSize: '48px',
+                fontSize: 'clamp(32px, 8vw, 48px)',
                 marginBottom: '16px'
               }}>⚙️</div>
               <h2 style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 6vw, 32px)',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                margin: '0 auto 8px auto'
               }}>
                 Configuration du Programme
               </h2>
               <p style={{
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 color: '#6b7280',
                 maxWidth: '500px',
                 margin: '0 auto'
@@ -428,12 +508,7 @@ const FormationWizard = () => {
               </p>
             </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '32px',
-              marginBottom: '32px'
-            }}>
+            <div style={twoColumnGrid}>
               <div>
                 <label style={labelStyle}>Type de programme</label>
                 <select
@@ -498,70 +573,163 @@ const FormationWizard = () => {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '24px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+              gap: 'clamp(16px, 4vw, 24px)',
+              marginTop: 'clamp(16px, 4vw, 32px)'
             }}>
+              {/* Formation obligatoire */}
               <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-                padding: '20px',
+                padding: 'clamp(16px, 4vw, 24px)',
                 background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                 borderRadius: '16px',
-                border: '2px solid rgba(102, 126, 234, 0.1)',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-              onClick={() => handleInputChange({target: {name: 'formation_obligatoire', type: 'checkbox', checked: !formData.formation_obligatoire}})}>
-                <input
-                  type="checkbox"
-                  name="formation_obligatoire"
-                  checked={formData.formation_obligatoire}
-                  onChange={handleInputChange}
-                  style={{ 
-                    transform: 'scale(1.3)',
-                    accentColor: '#667eea'
-                  }}
-                />
-                <div>
-                  <div style={{ fontWeight: '600', fontSize: '16px', color: '#1f2937' }}>
-                    Formation obligatoire
-                  </div>
-                  <div style={{ fontSize: '14px', color: '#6b7280' }}>
-                    Participation requise pour tous
-                  </div>
+                border: '2px solid rgba(102, 126, 234, 0.1)'
+              }}>
+                <div style={{
+                  fontWeight: '600',
+                  fontSize: 'clamp(14px, 3.5vw, 16px)',
+                  color: '#1f2937',
+                  marginBottom: '8px'
+                }}>
+                  Formation obligatoire
+                </div>
+                <div style={{
+                  fontSize: 'clamp(12px, 3vw, 14px)',
+                  color: '#6b7280',
+                  marginBottom: '16px'
+                }}>
+                  Participation requise pour tous
+                </div>
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  flexWrap: 'wrap'
+                }}>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    background: formData.formation_obligatoire === true ? '#667eea' : 'transparent',
+                    color: formData.formation_obligatoire === true ? 'white' : '#374151',
+                    transition: 'all 0.3s ease',
+                    fontWeight: '500',
+                    fontSize: 'clamp(12px, 3vw, 14px)',
+                    minWidth: 'fit-content'
+                  }}>
+                    <input
+                      type="radio"
+                      name="formation_obligatoire"
+                      value="true"
+                      checked={formData.formation_obligatoire === true}
+                      onChange={() => setFormData(prev => ({...prev, formation_obligatoire: true}))}
+                      style={{ margin: 0 }}
+                    />
+                    Oui
+                  </label>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    background: formData.formation_obligatoire === false ? '#667eea' : 'transparent',
+                    color: formData.formation_obligatoire === false ? 'white' : '#374151',
+                    transition: 'all 0.3s ease',
+                    fontWeight: '500',
+                    fontSize: 'clamp(12px, 3vw, 14px)',
+                    minWidth: 'fit-content'
+                  }}>
+                    <input
+                      type="radio"
+                      name="formation_obligatoire"
+                      value="false"
+                      checked={formData.formation_obligatoire === false}
+                      onChange={() => setFormData(prev => ({...prev, formation_obligatoire: false}))}
+                      style={{ margin: 0 }}
+                    />
+                    Non
+                  </label>
                 </div>
               </div>
               
+              {/* Formation diplomante */}
               <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-                padding: '20px',
+                padding: 'clamp(16px, 4vw, 24px)',
                 background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                 borderRadius: '16px',
-                border: '2px solid rgba(102, 126, 234, 0.1)',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-              onClick={() => handleInputChange({target: {name: 'formation_diplomante', type: 'checkbox', checked: !formData.formation_diplomante}})}>
-                <input
-                  type="checkbox"
-                  name="formation_diplomante"
-                  checked={formData.formation_diplomante}
-                  onChange={handleInputChange}
-                  style={{ 
-                    transform: 'scale(1.3)',
-                    accentColor: '#667eea'
-                  }}
-                />
-                <div>
-                  <div style={{ fontWeight: '600', fontSize: '16px', color: '#1f2937' }}>
-                    Formation diplomante
-                  </div>
-                  <div style={{ fontSize: '14px', color: '#6b7280' }}>
-                    Délivre un certificat/diplôme
-                  </div>
+                border: '2px solid rgba(102, 126, 234, 0.1)'
+              }}>
+                <div style={{
+                  fontWeight: '600',
+                  fontSize: 'clamp(14px, 3.5vw, 16px)',
+                  color: '#1f2937',
+                  marginBottom: '8px'
+                }}>
+                  Formation diplomante
+                </div>
+                <div style={{
+                  fontSize: 'clamp(12px, 3vw, 14px)',
+                  color: '#6b7280',
+                  marginBottom: '16px'
+                }}>
+                  Délivre un certificat/diplôme
+                </div>
+                <div style={{
+                  display: 'flex',
+                  gap: '12px',
+                  flexWrap: 'wrap'
+                }}>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    background: formData.formation_diplomante === true ? '#667eea' : 'transparent',
+                    color: formData.formation_diplomante === true ? 'white' : '#374151',
+                    transition: 'all 0.3s ease',
+                    fontWeight: '500',
+                    fontSize: 'clamp(12px, 3vw, 14px)',
+                    minWidth: 'fit-content'
+                  }}>
+                    <input
+                      type="radio"
+                      name="formation_diplomante"
+                      value="true"
+                      checked={formData.formation_diplomante === true}
+                      onChange={() => setFormData(prev => ({...prev, formation_diplomante: true}))}
+                      style={{ margin: 0 }}
+                    />
+                    Oui
+                  </label>
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    background: formData.formation_diplomante === false ? '#667eea' : 'transparent',
+                    color: formData.formation_diplomante === false ? 'white' : '#374151',
+                    transition: 'all 0.3s ease',
+                    fontWeight: '500',
+                    fontSize: 'clamp(12px, 3vw, 14px)',
+                    minWidth: 'fit-content'
+                  }}>
+                    <input
+                      type="radio"
+                      name="formation_diplomante"
+                      value="false"
+                      checked={formData.formation_diplomante === false}
+                      onChange={() => setFormData(prev => ({...prev, formation_diplomante: false}))}
+                      style={{ margin: 0 }}
+                    />
+                    Non
+                  </label>
                 </div>
               </div>
             </div>
@@ -573,24 +741,25 @@ const FormationWizard = () => {
           <div>
             <div style={{
               textAlign: 'center',
-              marginBottom: '40px'
+              marginBottom: 'clamp(24px, 6vw, 40px)'
             }}>
               <div style={{
-                fontSize: '48px',
+                fontSize: 'clamp(32px, 8vw, 48px)',
                 marginBottom: '16px'
               }}>📅</div>
               <h2 style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 6vw, 32px)',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                margin: '0 auto 8px auto'
               }}>
                 Planification & Détails
               </h2>
               <p style={{
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 color: '#6b7280',
                 maxWidth: '500px',
                 margin: '0 auto'
@@ -599,11 +768,7 @@ const FormationWizard = () => {
               </p>
             </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr 1fr',
-              gap: '24px'
-            }}>
+            <div style={fourColumnGrid}>
               <div>
                 <label style={labelStyle}>Type de formation</label>
                 <input
@@ -714,24 +879,25 @@ const FormationWizard = () => {
           <div>
             <div style={{
               textAlign: 'center',
-              marginBottom: '40px'
+              marginBottom: 'clamp(24px, 6vw, 40px)'
             }}>
               <div style={{
-                fontSize: '48px',
+                fontSize: 'clamp(32px, 8vw, 48px)',
                 marginBottom: '16px'
               }}>💰</div>
               <h2 style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 6vw, 32px)',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                margin: '0 auto 8px auto'
               }}>
                 Budget & Coûts
               </h2>
               <p style={{
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 color: '#6b7280',
                 maxWidth: '500px',
                 margin: '0 auto'
@@ -742,23 +908,23 @@ const FormationWizard = () => {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '32px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+              gap: 'clamp(16px, 4vw, 32px)',
               maxWidth: '800px',
               margin: '0 auto'
             }}>
               <div style={{
-                padding: '32px',
+                padding: 'clamp(20px, 5vw, 32px)',
                 background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
                 borderRadius: '20px',
                 border: '2px solid rgba(16, 185, 129, 0.2)',
                 textAlign: 'center'
               }}>
                 <div style={{
-                  fontSize: '32px',
+                  fontSize: 'clamp(24px, 6vw, 32px)',
                   marginBottom: '16px'
                 }}>🎨</div>
-                <label style={{...labelStyle, textAlign: 'center', fontSize: '16px', fontWeight: '700'}}>
+                <label style={{...labelStyle, textAlign: 'center', fontSize: 'clamp(14px, 3.5vw, 16px)', fontWeight: '700'}}>
                   Coût Conception & Animation
                 </label>
                 <input
@@ -769,7 +935,7 @@ const FormationWizard = () => {
                   style={{
                     ...inputStyle,
                     textAlign: 'center',
-                    fontSize: '18px',
+                    fontSize: 'clamp(16px, 4vw, 18px)',
                     fontWeight: '600',
                     marginTop: '8px'
                   }}
@@ -777,7 +943,7 @@ const FormationWizard = () => {
                   step="0.01"
                 />
                 <p style={{
-                  fontSize: '14px',
+                  fontSize: 'clamp(12px, 3vw, 14px)',
                   color: '#6b7280',
                   marginTop: '12px',
                   lineHeight: '1.5'
@@ -787,17 +953,17 @@ const FormationWizard = () => {
               </div>
               
               <div style={{
-                padding: '32px',
+                padding: 'clamp(20px, 5vw, 32px)',
                 background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
                 borderRadius: '20px',
                 border: '2px solid rgba(59, 130, 246, 0.2)',
                 textAlign: 'center'
               }}>
                 <div style={{
-                  fontSize: '32px',
+                  fontSize: 'clamp(24px, 6vw, 32px)',
                   marginBottom: '16px'
                 }}>🚚</div>
-                <label style={{...labelStyle, textAlign: 'center', fontSize: '16px', fontWeight: '700'}}>
+                <label style={{...labelStyle, textAlign: 'center', fontSize: 'clamp(14px, 3.5vw, 16px)', fontWeight: '700'}}>
                   Coûts Logistique
                 </label>
                 <input
@@ -808,7 +974,7 @@ const FormationWizard = () => {
                   style={{
                     ...inputStyle,
                     textAlign: 'center',
-                    fontSize: '18px',
+                    fontSize: 'clamp(16px, 4vw, 18px)',
                     fontWeight: '600',
                     marginTop: '8px'
                   }}
@@ -816,7 +982,7 @@ const FormationWizard = () => {
                   step="0.01"
                 />
                 <p style={{
-                  fontSize: '14px',
+                  fontSize: 'clamp(12px, 3vw, 14px)',
                   color: '#6b7280',
                   marginTop: '12px',
                   lineHeight: '1.5'
@@ -827,15 +993,15 @@ const FormationWizard = () => {
             </div>
 
             <div style={{
-              marginTop: '40px',
-              padding: '24px',
+              marginTop: 'clamp(24px, 6vw, 40px)',
+              padding: 'clamp(16px, 4vw, 24px)',
               background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
               borderRadius: '16px',
               border: '2px solid rgba(102, 126, 234, 0.1)',
               textAlign: 'center'
             }}>
               <h3 style={{
-                fontSize: '20px',
+                fontSize: 'clamp(16px, 4vw, 20px)',
                 fontWeight: '600',
                 color: '#1f2937',
                 marginBottom: '8px'
@@ -843,7 +1009,7 @@ const FormationWizard = () => {
                 💡 Coût Total Estimé
               </h3>
               <div style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 6vw, 32px)',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 WebkitBackgroundClip: 'text',
@@ -863,24 +1029,25 @@ const FormationWizard = () => {
           <div>
             <div style={{
               textAlign: 'center',
-              marginBottom: '40px'
+              marginBottom: 'clamp(24px, 6vw, 40px)'
             }}>
               <div style={{
-                fontSize: '48px',
+                fontSize: 'clamp(32px, 8vw, 48px)',
                 marginBottom: '16px'
               }}>🎯</div>
               <h2 style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 6vw, 32px)',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                margin: '0 auto 8px auto'
               }}>
                 Équipes & Objectifs
               </h2>
               <p style={{
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 color: '#6b7280',
                 maxWidth: '500px',
                 margin: '0 auto'
@@ -891,18 +1058,18 @@ const FormationWizard = () => {
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '40px'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(350px, 100%), 1fr))',
+              gap: 'clamp(20px, 5vw, 40px)'
             }}>
               {/* Directions */}
               <div style={{
-                padding: '32px',
+                padding: 'clamp(20px, 5vw, 32px)',
                 background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
                 borderRadius: '20px',
                 border: '2px solid rgba(245, 158, 11, 0.3)'
               }}>
                 <h3 style={{
-                  fontSize: '20px',
+                  fontSize: 'clamp(16px, 4vw, 20px)',
                   fontWeight: '700',
                   color: '#92400e',
                   marginBottom: '20px',
@@ -916,7 +1083,8 @@ const FormationWizard = () => {
                 <div style={{
                   display: 'flex',
                   gap: '12px',
-                  marginBottom: '20px'
+                  marginBottom: '20px',
+                  flexWrap: 'wrap'
                 }}>
                   <input
                     type="text"
@@ -925,7 +1093,8 @@ const FormationWizard = () => {
                     style={{
                       ...inputStyle,
                       flex: 1,
-                      background: 'white'
+                      background: 'white',
+                      minWidth: '200px'
                     }}
                     placeholder="Ex: Direction Commerciale"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addDirection())}
@@ -936,9 +1105,10 @@ const FormationWizard = () => {
                     style={{
                       ...buttonStyle('primary'),
                       minWidth: 'auto',
-                      padding: '16px 20px',
+                      padding: 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)',
                       background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                      boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)'
+                      boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)',
+                      flexShrink: 0
                     }}
                   >
                     ➕
@@ -962,7 +1132,7 @@ const FormationWizard = () => {
                       width: '100%',
                       textAlign: 'center',
                       color: '#92400e',
-                      fontSize: '14px',
+                      fontSize: 'clamp(12px, 3vw, 14px)',
                       fontStyle: 'italic',
                       padding: '20px'
                     }}>
@@ -1000,13 +1170,13 @@ const FormationWizard = () => {
 
               {/* Objectifs */}
               <div style={{
-                padding: '32px',
+                padding: 'clamp(20px, 5vw, 32px)',
                 background: 'linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%)',
                 borderRadius: '20px',
                 border: '2px solid rgba(139, 92, 246, 0.3)'
               }}>
                 <h3 style={{
-                  fontSize: '20px',
+                  fontSize: 'clamp(16px, 4vw, 20px)',
                   fontWeight: '700',
                   color: '#5b21b6',
                   marginBottom: '20px',
@@ -1020,7 +1190,8 @@ const FormationWizard = () => {
                 <div style={{
                   display: 'flex',
                   gap: '12px',
-                  marginBottom: '20px'
+                  marginBottom: '20px',
+                  flexWrap: 'wrap'
                 }}>
                   <input
                     type="text"
@@ -1029,7 +1200,8 @@ const FormationWizard = () => {
                     style={{
                       ...inputStyle,
                       flex: 1,
-                      background: 'white'
+                      background: 'white',
+                      minWidth: '200px'
                     }}
                     placeholder="Ex: Améliorer la communication"
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addObjective())}
@@ -1040,9 +1212,10 @@ const FormationWizard = () => {
                     style={{
                       ...buttonStyle('primary'),
                       minWidth: 'auto',
-                      padding: '16px 20px',
+                      padding: 'clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)',
                       background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                      boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)'
+                      boxShadow: '0 4px 15px rgba(139, 92, 246, 0.4)',
+                      flexShrink: 0
                     }}
                   >
                     ➕
@@ -1066,7 +1239,7 @@ const FormationWizard = () => {
                       width: '100%',
                       textAlign: 'center',
                       color: '#5b21b6',
-                      fontSize: '14px',
+                      fontSize: 'clamp(12px, 3vw, 14px)',
                       fontStyle: 'italic',
                       padding: '20px'
                     }}>
@@ -1110,24 +1283,25 @@ const FormationWizard = () => {
           <div>
             <div style={{
               textAlign: 'center',
-              marginBottom: '40px'
+              marginBottom: 'clamp(24px, 6vw, 40px)'
             }}>
               <div style={{
-                fontSize: '48px',
+                fontSize: 'clamp(32px, 8vw, 48px)',
                 marginBottom: '16px'
               }}>✨</div>
               <h2 style={{
-                fontSize: '32px',
+                fontSize: 'clamp(24px, 6vw, 32px)',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                marginBottom: '8px'
+                marginBottom: '8px',
+                margin: '0 auto 8px auto'
               }}>
                 Récapitulatif & Finalisation
               </h2>
               <p style={{
-                fontSize: '16px',
+                fontSize: 'clamp(14px, 3.5vw, 16px)',
                 color: '#6b7280',
                 maxWidth: '500px',
                 margin: '0 auto'
@@ -1138,17 +1312,17 @@ const FormationWizard = () => {
 
             <div style={{
               display: 'grid',
-              gap: '24px'
+              gap: 'clamp(16px, 4vw, 24px)'
             }}>
               {/* Résumé des informations */}
               <div style={{
-                padding: '24px',
+                padding: 'clamp(16px, 4vw, 24px)',
                 background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(102, 126, 234, 0.1)'
               }}>
                 <h3 style={{
-                  fontSize: '18px',
+                  fontSize: 'clamp(16px, 4vw, 18px)',
                   fontWeight: '700',
                   color: '#1f2937',
                   marginBottom: '16px'
@@ -1157,8 +1331,9 @@ const FormationWizard = () => {
                 </h3>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px'
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
+                  gap: '16px',
+                  fontSize: 'clamp(12px, 3vw, 14px)'
                 }}>
                   <div><strong>Titre:</strong> {formData.title || 'Non défini'}</div>
                   <div><strong>Année:</strong> {formData.year || 'Non définie'}</div>
@@ -1171,13 +1346,13 @@ const FormationWizard = () => {
 
               {/* Planning */}
               <div style={{
-                padding: '24px',
+                padding: 'clamp(16px, 4vw, 24px)',
                 background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(16, 185, 129, 0.2)'
               }}>
                 <h3 style={{
-                  fontSize: '18px',
+                  fontSize: 'clamp(16px, 4vw, 18px)',
                   fontWeight: '700',
                   color: '#065f46',
                   marginBottom: '16px'
@@ -1186,8 +1361,9 @@ const FormationWizard = () => {
                 </h3>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px'
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
+                  gap: '16px',
+                  fontSize: 'clamp(12px, 3vw, 14px)'
                 }}>
                   <div><strong>Formateur:</strong> {formData.formateur || 'Non défini'}</div>
                   <div><strong>Effectif:</strong> {formData.effectifTotal || 'Non défini'}</div>
@@ -1200,13 +1376,13 @@ const FormationWizard = () => {
 
               {/* Budget */}
               <div style={{
-                padding: '24px',
+                padding: 'clamp(16px, 4vw, 24px)',
                 background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
                 borderRadius: '16px',
                 border: '2px solid rgba(245, 158, 11, 0.2)'
               }}>
                 <h3 style={{
-                  fontSize: '18px',
+                  fontSize: 'clamp(16px, 4vw, 18px)',
                   fontWeight: '700',
                   color: '#92400e',
                   marginBottom: '16px'
@@ -1215,13 +1391,14 @@ const FormationWizard = () => {
                 </h3>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                  gap: '16px'
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(250px, 100%), 1fr))',
+                  gap: '16px',
+                  fontSize: 'clamp(12px, 3vw, 14px)'
                 }}>
                   <div><strong>Conception/Animation:</strong> {formData.conception_animation ? `${parseFloat(formData.conception_animation).toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}` : '0 €'}</div>
                   <div><strong>Logistique:</strong> {formData.couts_logistique ? `${parseFloat(formData.couts_logistique).toLocaleString('fr-FR', {style: 'currency', currency: 'EUR'})}` : '0 €'}</div>
                   <div style={{
-                    fontSize: '18px',
+                    fontSize: 'clamp(16px, 4vw, 18px)',
                     fontWeight: '700',
                     color: '#92400e'
                   }}>
@@ -1233,17 +1410,17 @@ const FormationWizard = () => {
               {/* Directions et Objectifs */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '24px'
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+                gap: 'clamp(16px, 4vw, 24px)'
               }}>
                 <div style={{
-                  padding: '24px',
+                  padding: 'clamp(16px, 4vw, 24px)',
                   background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
                   borderRadius: '16px',
                   border: '2px solid rgba(245, 158, 11, 0.2)'
                 }}>
                   <h3 style={{
-                    fontSize: '18px',
+                    fontSize: 'clamp(16px, 4vw, 18px)',
                     fontWeight: '700',
                     color: '#92400e',
                     marginBottom: '16px'
@@ -1256,14 +1433,14 @@ const FormationWizard = () => {
                     gap: '8px'
                   }}>
                     {formData.directions.length === 0 ? (
-                      <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Aucune direction</span>
+                      <span style={{ color: '#6b7280', fontStyle: 'italic', fontSize: 'clamp(12px, 3vw, 14px)' }}>Aucune direction</span>
                     ) : (
                       formData.directions.map((direction, index) => (
                         <span key={index} style={{
                           background: 'rgba(245, 158, 11, 0.2)',
                           padding: '4px 12px',
                           borderRadius: '12px',
-                          fontSize: '12px',
+                          fontSize: 'clamp(10px, 2.5vw, 12px)',
                           color: '#92400e',
                           fontWeight: '500'
                         }}>
@@ -1275,13 +1452,13 @@ const FormationWizard = () => {
                 </div>
 
                 <div style={{
-                  padding: '24px',
+                  padding: 'clamp(16px, 4vw, 24px)',
                   background: 'linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%)',
                   borderRadius: '16px',
                   border: '2px solid rgba(139, 92, 246, 0.2)'
                 }}>
                   <h3 style={{
-                    fontSize: '18px',
+                    fontSize: 'clamp(16px, 4vw, 18px)',
                     fontWeight: '700',
                     color: '#5b21b6',
                     marginBottom: '16px'
@@ -1294,14 +1471,14 @@ const FormationWizard = () => {
                     gap: '8px'
                   }}>
                     {formData.objectives.length === 0 ? (
-                      <span style={{ color: '#6b7280', fontStyle: 'italic' }}>Aucun objectif</span>
+                      <span style={{ color: '#6b7280', fontStyle: 'italic', fontSize: 'clamp(12px, 3vw, 14px)' }}>Aucun objectif</span>
                     ) : (
                       formData.objectives.map((objective, index) => (
                         <span key={index} style={{
                           background: 'rgba(139, 92, 246, 0.2)',
                           padding: '4px 12px',
                           borderRadius: '12px',
-                          fontSize: '12px',
+                          fontSize: 'clamp(10px, 2.5vw, 12px)',
                           color: '#5b21b6',
                           fontWeight: '500'
                         }}>
@@ -1316,15 +1493,15 @@ const FormationWizard = () => {
               {/* Bouton de finalisation */}
               <div style={{
                 textAlign: 'center',
-                marginTop: '32px'
+                marginTop: 'clamp(16px, 4vw, 32px)'
               }}>
                 <button
                   type="button"
                   onClick={handleSubmit}
                   style={{
                     ...buttonStyle('primary'),
-                    fontSize: '20px',
-                    padding: '20px 60px',
+                    fontSize: 'clamp(16px, 4vw, 20px)',
+                    padding: 'clamp(16px, 4vw, 20px) clamp(40px, 10vw, 60px)',
                     background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                     boxShadow: '0 8px 25px rgba(239, 68, 68, 0.4)',
                     transform: 'scale(1)',
@@ -1353,89 +1530,178 @@ const FormationWizard = () => {
 
   return (
     <div style={containerStyle}>
-      <div style={wizardContainerStyle}>
-        {/* Header avec progress */}
-        <div style={headerStyle}>
-          <h1 style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: 'white',
-            marginBottom: '32px',
-            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-          }}>
-            🎓 Assistant de Création de Formation
-          </h1>
-          
-          <div style={progressBarStyle}>
-            <div style={progressLineStyle}>
-              <div style={progressFillStyle}></div>
+      {/* Bouton pour ouvrir le modal */}
+      <button
+        onClick={openModal}
+        style={triggerButtonStyle}
+        onMouseOver={(e) => {
+          e.target.style.transform = 'translateY(-2px)';
+          e.target.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.6)';
+        }}
+        onMouseOut={(e) => {
+          e.target.style.transform = 'translateY(0)';
+          e.target.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+        }}
+      >
+        <span>🎓</span>
+        Créer une nouvelle formation
+      </button>
+
+      {/* Modal Dialog */}
+      <dialog
+        ref={dialogRef}
+        style={dialogStyle}
+        onClick={(e) => {
+          // Fermer le modal si on clique en dehors
+          if (e.target === dialogRef.current) {
+            closeModal();
+          }
+        }}
+      >
+        <div style={wizardContainerStyle}>
+          {/* Header avec progress */}
+          <div style={headerStyle}>
+            {/* Bouton de fermeture */}
+            <button
+              onClick={closeModal}
+              style={closeButtonStyle}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                e.target.style.transform = 'scale(1.1)';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.target.style.transform = 'scale(1)';
+              }}
+            >
+              ✕
+            </button>
+
+            <h1 style={{
+              fontSize: 'clamp(20px, 5vw, 28px)',
+              fontWeight: '700',
+              color: 'white',
+              marginBottom: 'clamp(16px, 4vw, 32px)',
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+            }}>
+              🎓 Assistant de Création de Formation
+            </h1>
+            
+            <div style={progressBarStyle}>
+              <div style={progressLineStyle}>
+                <div style={progressFillStyle}></div>
+              </div>
+              
+              {steps.map((step) => (
+                <div
+                  key={step.id}
+                  style={stepIndicatorStyle(step)}
+                  onClick={() => goToStep(step.id)}
+                  title={step.title}
+                >
+                  {completedSteps.includes(step.id) ? '✓' : step.icon}
+                </div>
+              ))}
             </div>
             
-            {steps.map((step) => (
-              <div
-                key={step.id}
-                style={stepIndicatorStyle(step)}
-                onClick={() => goToStep(step.id)}
-                title={step.title}
-              >
-                {completedSteps.includes(step.id) ? '✓' : step.icon}
-              </div>
-            ))}
+            <div style={{
+              color: 'rgba(255,255,255,0.9)',
+              fontSize: 'clamp(14px, 3.5vw, 16px)',
+              fontWeight: '500'
+            }}>
+              Étape {currentStep} sur {steps.length} • {steps[currentStep - 1].title}
+            </div>
           </div>
-          
-          <div style={{
-            color: 'rgba(255,255,255,0.9)',
-            fontSize: '16px',
-            fontWeight: '500'
-          }}>
-            Étape {currentStep} sur {steps.length} • {steps[currentStep - 1].title}
-          </div>
-        </div>
 
-        {/* Contenu */}
-        <div style={contentStyle}>
-          {renderStep()}
-        </div>
-
-        {/* Navigation */}
-        <div style={{
-          padding: '32px 48px',
-          borderTop: '1px solid rgba(0,0,0,0.1)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
-        }}>
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            style={{
-              ...buttonStyle('secondary'),
-              opacity: currentStep === 1 ? 0.5 : 1,
-              cursor: currentStep === 1 ? 'not-allowed' : 'pointer'
-            }}
-          >
-            ← Précédent
-          </button>
-          
-          <div style={{
-            fontSize: '14px',
-            color: '#6b7280',
-            fontWeight: '500'
-          }}>
-            {Math.round((currentStep / steps.length) * 100)}% terminé
+          {/* Contenu */}
+          <div style={contentStyle}>
+            {renderStep()}
           </div>
-          
-          {currentStep < steps.length && (
+
+          {/* Navigation */}
+          <div style={{
+            padding: 'clamp(16px, 4vw, 32px) clamp(16px, 4vw, 48px)',
+            borderTop: '1px solid rgba(0,0,0,0.1)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+            flexShrink: 0,
+            gap: '16px',
+            flexWrap: 'wrap'
+          }}>
             <button
-              onClick={nextStep}
-              style={buttonStyle('primary')}
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              style={{
+                ...buttonStyle('secondary'),
+                opacity: currentStep === 1 ? 0.5 : 1,
+                cursor: currentStep === 1 ? 'not-allowed' : 'pointer'
+              }}
             >
-              Suivant →
+              ← Précédent
             </button>
-          )}
+            
+            <div style={{
+              fontSize: 'clamp(12px, 3vw, 14px)',
+              color: '#6b7280',
+              fontWeight: '500',
+              textAlign: 'center'
+            }}>
+              {Math.round((currentStep / steps.length) * 100)}% terminé
+            </div>
+            
+            {currentStep < steps.length && (
+              <button
+                onClick={nextStep}
+                style={buttonStyle('primary')}
+              >
+                Suivant →
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </dialog>
+
+      {/* Styles pour le backdrop du dialog */}
+      <style jsx>{`
+        dialog::backdrop {
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(8px);
+        }
+        
+        dialog[open] {
+          animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          dialog {
+            margin: 10px !important;
+            max-width: calc(100vw - 20px) !important;
+            max-height: calc(100vh - 20px) !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          dialog {
+            margin: 5px !important;
+            max-width: calc(100vw - 10px) !important;
+            max-height: calc(100vh - 10px) !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
