@@ -1,298 +1,321 @@
 import { useState } from "react";
 
-const DGARetail = () => {
-  const [hoveredLink, setHoveredLink] = useState(null);
+const initialData = [
+  { id: "UC1", nbreAgence: 45, nbreCheque: 57, valeur: 22004800, chequeAConfirmer: 20 },
+  { id: "UC2", nbreAgence: 12, nbreCheque: 30, valeur: 17000000, chequeAConfirmer: 20 },
+  { id: "UC3", nbreAgence: 50, nbreCheque: 70, valeur: 140560000, chequeAConfirmer: 5 },
+];
 
-  const styles = {
-    wrapper: {
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #f0f2f5 0%, #e8eaf0 100%)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      padding: "24px",
-    },
-    card: {
-      background: "#ffffff",
-      borderRadius: "16px",
-      padding: "32px 36px",
-      width: "100%",
-      maxWidth: "860px",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)",
-    },
-    title: {
-      textAlign: "center",
-      fontSize: "22px",
-      fontWeight: "700",
-      color: "#1a1a2e",
-      marginBottom: "28px",
-      letterSpacing: "0.3px",
-    },
-    body: {
-      display: "flex",
-      gap: "24px",
-      alignItems: "stretch",
-    },
+const categories = ["catégorie", "ID UC", "Nbre d'Agence", "Valeur", "Chèque à confirmer"];
 
-    // LEFT PANEL
-    leftPanel: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "20px",
-      flex: "0 0 auto",
-      width: "200px",
-    },
-    metricCard: {
-      background: "#f7f8fa",
-      borderRadius: "12px",
-      padding: "18px 20px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "flex-start",
-      gap: "6px",
-    },
-    iconBox: {
-      width: "40px",
-      height: "40px",
-      borderRadius: "8px",
-      background: "#E2001A",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: "6px",
-    },
-    metricLabel: {
-      fontSize: "13px",
-      fontWeight: "600",
-      color: "#555",
-      margin: 0,
-    },
-    metricValue: {
-      fontSize: "28px",
-      fontWeight: "700",
-      color: "#1a1a2e",
-      margin: 0,
-      lineHeight: 1.1,
-    },
-    link: {
-      fontSize: "12px",
-      color: "#020235",
-      textDecoration: "underline",
-      cursor: "pointer",
-      marginTop: "2px",
-      opacity: 0.7,
-      transition: "opacity 0.2s",
-    },
-    linkHovered: {
-      opacity: 1,
-    },
+const formatValeur = (val) => val.toLocaleString("fr-FR");
 
-    // DIVIDER
-    divider: {
-      width: "1px",
-      background: "#e5e7eb",
-      margin: "0 4px",
-      borderRadius: "1px",
-    },
+export default function ListeUnitesCommerciales() {
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("catégorie");
+  const [selected, setSelected] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
-    // RIGHT PANEL
-    rightPanel: {
-      flex: 1,
-      display: "flex",
-      flexDirection: "column",
-      gap: "16px",
-    },
-    confirmHeader: {
-      textAlign: "center",
-    },
-    confirmLabel: {
-      fontSize: "16px",
-      fontWeight: "600",
-      color: "#5B4FCF",
-      margin: 0,
-    },
-    confirmValue: {
-      fontSize: "36px",
-      fontWeight: "700",
-      color: "#1a1a2e",
-      margin: "2px 0 0 0",
-      lineHeight: 1,
-    },
-    statsGrid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(4, 1fr)",
-      gap: "1px",
-      background: "#e5e7eb",
-      borderRadius: "10px",
-      overflow: "hidden",
-    },
-    statCell: {
-      background: "#f7f8fa",
-      padding: "14px 10px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "4px",
-    },
-    statLabel: {
-      fontSize: "12px",
-      fontWeight: "600",
-      color: "#444",
-      textAlign: "center",
-      margin: 0,
-    },
-    statCount: (color) => ({
-      fontSize: "26px",
-      fontWeight: "700",
-      color: color || "#1a1a2e",
-      margin: 0,
-      lineHeight: 1,
-    }),
-    statAmount: {
-      fontSize: "11px",
-      color: "#888",
-      margin: 0,
-      textAlign: "center",
-    },
-    moreDetails: {
-      textAlign: "center",
-      fontSize: "12px",
-      color: "#020235",
-      textDecoration: "underline",
-      cursor: "pointer",
-      opacity: 0.7,
-    },
+  const toggleSelect = (id) => {
+    setSelected((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
   };
 
-  const CheckIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="5" width="14" height="3" rx="1" fill="white" />
-      <rect x="3" y="11" width="14" height="3" rx="1" fill="white" />
-      <path d="M16 15l2.5 2.5L22 13" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelected([]);
+    } else {
+      setSelected(filtered.map((row) => row.id));
+    }
+    setSelectAll(!selectAll);
+  };
 
-  const MoneyIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <rect x="2" y="6" width="20" height="13" rx="2" stroke="white" strokeWidth="2" />
-      <circle cx="12" cy="12" r="3" stroke="white" strokeWidth="2" />
-      <path d="M6 9v0M18 15v0" stroke="white" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
+  const filtered = initialData
+    .filter((row) => {
+      const q = search.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        row.id.toLowerCase().includes(q) ||
+        String(row.nbreAgence).includes(q) ||
+        String(row.nbreCheque).includes(q) ||
+        String(row.valeur).includes(q) ||
+        String(row.chequeAConfirmer).includes(q)
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "ID UC") return a.id.localeCompare(b.id);
+      if (sortBy === "Nbre d'Agence") return a.nbreAgence - b.nbreAgence;
+      if (sortBy === "Valeur") return a.valeur - b.valeur;
+      if (sortBy === "Chèque à confirmer") return a.chequeAConfirmer - b.chequeAConfirmer;
+      return 0;
+    });
 
   return (
-    <div style={styles.wrapper}>
+    <div style={styles.page}>
       <div style={styles.card}>
-        {/* TITLE */}
-        <h2 style={styles.title}>DGA retail</h2>
+        {/* Titre */}
+        <h2 style={styles.title}>Liste des unité commerciales</h2>
 
-        <div style={styles.body}>
-          {/* LEFT PANEL */}
-          <div style={styles.leftPanel}>
-            {/* Nbre de chèque */}
-            <div style={styles.metricCard}>
-              <div style={styles.iconBox}>
-                <CheckIcon />
-              </div>
-              <p style={styles.metricLabel}>Nbre de chèque</p>
-              <p style={styles.metricValue}>150</p>
-              <span
-                style={{
-                  ...styles.link,
-                  ...(hoveredLink === "cheque" ? styles.linkHovered : {}),
-                }}
-                onMouseEnter={() => setHoveredLink("cheque")}
-                onMouseLeave={() => setHoveredLink(null)}
-              >
-                Détails
-              </span>
-            </div>
-
-            {/* Valeur */}
-            <div style={styles.metricCard}>
-              <div style={styles.iconBox}>
-                <MoneyIcon />
-              </div>
-              <p style={styles.metricLabel}>Valeur</p>
-              <p style={{ ...styles.metricValue, fontSize: "22px" }}>
-                132 450 000
-              </p>
-              <span
-                style={{
-                  ...styles.link,
-                  ...(hoveredLink === "valeur" ? styles.linkHovered : {}),
-                }}
-                onMouseEnter={() => setHoveredLink("valeur")}
-                onMouseLeave={() => setHoveredLink(null)}
-              >
-                Détails
-              </span>
-            </div>
+        {/* Barre recherche + tri */}
+        <div style={styles.toolbar}>
+          <div style={styles.searchWrapper}>
+            <input
+              type="text"
+              placeholder="Rechercher"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={styles.searchInput}
+            />
+            <span style={styles.searchIcon}>🔍</span>
           </div>
 
-          {/* DIVIDER */}
-          <div style={styles.divider} />
-
-          {/* RIGHT PANEL */}
-          <div style={styles.rightPanel}>
-            {/* Header chèque à confirmer */}
-            <div style={styles.confirmHeader}>
-              <p style={styles.confirmLabel}>Chèque à confirmer</p>
-              <p style={styles.confirmValue}>157</p>
-            </div>
-
-            {/* Stats grid */}
-            <div style={styles.statsGrid}>
-              {/* Validés */}
-              <div style={styles.statCell}>
-                <p style={styles.statLabel}>Validés</p>
-                <p style={styles.statCount("#2EB85C")}>45</p>
-                <p style={styles.statAmount}>1 000 004 587</p>
-              </div>
-
-              {/* Réfusés */}
-              <div style={styles.statCell}>
-                <p style={styles.statLabel}>Réfusés</p>
-                <p style={styles.statCount("#E2001A")}>5</p>
-                <p style={{ ...styles.statAmount, color: "#E2001A" }}>
-                  21 000 000
-                </p>
-              </div>
-
-              {/* Appel infructeux */}
-              <div style={styles.statCell}>
-                <p style={styles.statLabel}>Appel infructeux</p>
-                <p style={styles.statCount("#1a1a2e")}>2</p>
-                <p style={styles.statAmount}>700 000</p>
-              </div>
-
-              {/* Non traités */}
-              <div style={styles.statCell}>
-                <p style={styles.statLabel}>Non traités</p>
-                <p style={styles.statCount("#1a1a2e")}>7</p>
-                <p style={styles.statAmount}>10 000 000</p>
-              </div>
-            </div>
-
-            {/* Plus de détails */}
-            <div>
-              <span
-                style={{
-                  ...styles.moreDetails,
-                  ...(hoveredLink === "more" ? { opacity: 1 } : {}),
-                }}
-                onMouseEnter={() => setHoveredLink("more")}
-                onMouseLeave={() => setHoveredLink(null)}
+          <div style={styles.sortWrapper}>
+            <label style={styles.sortLabel}>Trier</label>
+            <div style={styles.selectWrapper}>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={styles.select}
               >
-                Plus de détails
-              </span>
+                {categories.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </select>
+              <span style={styles.chevron}>▾</span>
             </div>
           </div>
+        </div>
+
+        {/* Table */}
+        <div style={styles.tableWrapper}>
+          <table style={styles.table}>
+            <thead>
+              <tr style={styles.headerRow}>
+                <th style={{ ...styles.th, width: 40 }}>
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={toggleSelectAll}
+                    style={styles.checkbox}
+                  />
+                </th>
+                <th style={styles.th}>ID UC</th>
+                <th style={styles.th}>Nbre d'Agence</th>
+                <th style={styles.th}>Nbre de chèque</th>
+                <th style={styles.th}>Valeur</th>
+                <th style={styles.th}>Chèque à confirmer</th>
+                <th style={styles.th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((row, idx) => {
+                const isSelected = selected.includes(row.id);
+                return (
+                  <tr
+                    key={row.id}
+                    style={{
+                      ...styles.row,
+                      backgroundColor: isSelected
+                        ? "#eef3ff"
+                        : idx % 2 === 0
+                        ? "#fff"
+                        : "#fafafa",
+                    }}
+                  >
+                    <td style={styles.td}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(row.id)}
+                        style={styles.checkbox}
+                      />
+                    </td>
+                    <td style={styles.td}>{row.id}</td>
+                    <td style={styles.td}>{row.nbreAgence}</td>
+                    <td style={styles.td}>
+                      <span style={styles.chequeLink}>{row.nbreCheque}</span>
+                    </td>
+                    <td style={styles.td}>{formatValeur(row.valeur)}</td>
+                    <td style={styles.td}>{row.chequeAConfirmer}</td>
+                    <td style={styles.td}>
+                      <button
+                        style={styles.detailsBtn}
+                        onClick={() => alert(`Détails de ${row.id}`)}
+                      >
+                        Détails
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} style={styles.empty}>
+                    Aucun résultat trouvé.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default DGARetail;
+const styles = {
+  page: {
+    minHeight: "100vh",
+    backgroundColor: "#f0f2f5",
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    padding: "40px 16px",
+    fontFamily: "'Segoe UI', sans-serif",
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: "32px 28px",
+    width: "100%",
+    maxWidth: 960,
+    boxShadow: "0 2px 16px rgba(0,0,0,0.08)",
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 600,
+    color: "#1a1a2e",
+    marginBottom: 24,
+  },
+  toolbar: {
+    display: "flex",
+    alignItems: "flex-end",
+    gap: 20,
+    marginBottom: 28,
+    flexWrap: "wrap",
+  },
+  searchWrapper: {
+    position: "relative",
+    flex: 1,
+    minWidth: 200,
+  },
+  searchInput: {
+    width: "100%",
+    padding: "10px 40px 10px 16px",
+    borderRadius: 20,
+    border: "1px solid #dde1e7",
+    fontSize: 14,
+    color: "#444",
+    outline: "none",
+    backgroundColor: "#f8f9fb",
+    boxSizing: "border-box",
+  },
+  searchIcon: {
+    position: "absolute",
+    right: 14,
+    top: "50%",
+    transform: "translateY(-50%)",
+    fontSize: 14,
+    color: "#888",
+    pointerEvents: "none",
+  },
+  sortWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  },
+  sortLabel: {
+    fontSize: 12,
+    color: "#888",
+    fontWeight: 500,
+  },
+  selectWrapper: {
+    position: "relative",
+  },
+  select: {
+    appearance: "none",
+    WebkitAppearance: "none",
+    padding: "10px 36px 10px 14px",
+    borderRadius: 8,
+    border: "1px solid #dde1e7",
+    fontSize: 14,
+    color: "#333",
+    backgroundColor: "#fff",
+    cursor: "pointer",
+    outline: "none",
+    minWidth: 160,
+  },
+  chevron: {
+    position: "absolute",
+    right: 10,
+    top: "50%",
+    transform: "translateY(-50%)",
+    fontSize: 14,
+    color: "#555",
+    pointerEvents: "none",
+  },
+  tableWrapper: {
+    overflowX: "auto",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: 14,
+    border: "1px solid #e2e8f0",
+  },
+  headerRow: {
+    borderBottom: "2px solid #e2e8f0",
+    backgroundColor: "#f8f9fb",
+  },
+  th: {
+    textAlign: "left",
+    padding: "12px 16px",
+    fontSize: 13,
+    fontWeight: 600,
+    color: "#555",
+    whiteSpace: "nowrap",
+    borderRight: "1px solid #e2e8f0",
+    borderBottom: "2px solid #c8d0dc",
+  },
+  row: {
+    transition: "background 0.15s",
+    cursor: "default",
+  },
+  td: {
+    padding: "13px 16px",
+    color: "#333",
+    borderBottom: "1px solid #e2e8f0",
+    borderRight: "1px solid #e2e8f0",
+    whiteSpace: "nowrap",
+  },
+  checkbox: {
+    width: 15,
+    height: 15,
+    cursor: "pointer",
+    accentColor: "#4361ee",
+  },
+  chequeLink: {
+    color: "#4361ee",
+    fontWeight: 500,
+    cursor: "pointer",
+    textDecoration: "none",
+  },
+  detailsBtn: {
+    background: "none",
+    border: "none",
+    color: "#555",
+    fontSize: 14,
+    cursor: "pointer",
+    padding: "4px 0",
+    fontFamily: "inherit",
+    textDecoration: "underline",
+    textUnderlineOffset: 3,
+  },
+  empty: {
+    textAlign: "center",
+    padding: 32,
+    color: "#aaa",
+    fontSize: 14,
+  },
+};
