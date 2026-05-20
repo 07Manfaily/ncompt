@@ -1,3 +1,228 @@
+/* ===== PAGE ===== */
+.luc-page {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ===== CARD ===== */
+.luc-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 960px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== TITRE ===== */
+.luc-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 24px;
+}
+
+/* ===== TOOLBAR ===== */
+.luc-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+/* ===== RECHERCHE ===== */
+.luc-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.luc-search-input {
+  width: 100%;
+  padding: 10px 40px 10px 16px;
+  border-radius: 20px;
+  border: 1px solid #dde1e7;
+  font-size: 14px;
+  color: #444;
+  outline: none;
+  background-color: #f8f9fb;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.luc-search-input:focus {
+  border-color: #4361ee;
+}
+
+.luc-search-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #888;
+  pointer-events: none;
+}
+
+/* ===== TRI ===== */
+.luc-sort-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.luc-sort-label {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+
+.luc-select-wrapper {
+  position: relative;
+}
+
+.luc-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 10px 36px 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #dde1e7;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+  min-width: 160px;
+  transition: border-color 0.2s;
+}
+
+.luc-select:focus {
+  border-color: #4361ee;
+}
+
+.luc-chevron {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #555;
+  pointer-events: none;
+}
+
+/* ===== TABLE ===== */
+.luc-table-wrapper {
+  overflow-x: auto;
+}
+
+.luc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ===== HEADER ===== */
+.luc-header-row {
+  background-color: #f8f9fb;
+}
+
+.luc-th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 2px solid #c8d0dc;
+}
+
+.luc-th:last-child {
+  border-right: none;
+}
+
+/* ===== ROWS ===== */
+.luc-row {
+  transition: background 0.15s;
+  cursor: default;
+}
+
+.luc-row:hover {
+  background-color: #f4f6ff !important;
+}
+
+.luc-row-even {
+  background-color: #fff;
+}
+
+.luc-row-odd {
+  background-color: #fafafa;
+}
+
+.luc-row-selected {
+  background-color: #eef3ff !important;
+}
+
+/* ===== TD ===== */
+.luc-td {
+  padding: 13px 16px;
+  color: #333;
+  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.luc-td:last-child {
+  border-right: none;
+}
+
+/* ===== CHECKBOX ===== */
+.luc-checkbox {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: #4361ee;
+}
+
+/* ===== CHEQUE LINK ===== */
+.luc-cheque-link {
+  color: #4361ee;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ===== BOUTON DÉTAILS ===== */
+.luc-details-btn {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 0;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.luc-details-btn:hover {
+  color: #4361ee;
+}
+
+/* ===== EMPTY ===== */
+.luc-empty {
+  text-align: center;
+  padding: 32px;
+  color: #aaa;
+  font-size: 14px;
+}
 import { useState } from "react";
 
 const initialData = [
@@ -32,17 +257,9 @@ export default function ListeUnitesCommerciales() {
   };
 
   const filtered = initialData
-    .filter((row) => {
-      const q = search.toLowerCase().trim();
-      if (!q) return true;
-      return (
-        row.id.toLowerCase().includes(q) ||
-        String(row.nbreAgence).includes(q) ||
-        String(row.nbreCheque).includes(q) ||
-        String(row.valeur).includes(q) ||
-        String(row.chequeAConfirmer).includes(q)
-      );
-    })
+    .filter((row) =>
+      row.id.toLowerCase().includes(search.toLowerCase())
+    )
     .sort((a, b) => {
       if (sortBy === "ID UC") return a.id.localeCompare(b.id);
       if (sortBy === "Nbre d'Agence") return a.nbreAgence - b.nbreAgence;
@@ -262,11 +479,9 @@ const styles = {
     width: "100%",
     borderCollapse: "collapse",
     fontSize: 14,
-    border: "1px solid #e2e8f0",
   },
   headerRow: {
     borderBottom: "2px solid #e2e8f0",
-    backgroundColor: "#f8f9fb",
   },
   th: {
     textAlign: "left",
@@ -275,8 +490,6 @@ const styles = {
     fontWeight: 600,
     color: "#555",
     whiteSpace: "nowrap",
-    borderRight: "1px solid #e2e8f0",
-    borderBottom: "2px solid #c8d0dc",
   },
   row: {
     transition: "background 0.15s",
@@ -285,8 +498,7 @@ const styles = {
   td: {
     padding: "13px 16px",
     color: "#333",
-    borderBottom: "1px solid #e2e8f0",
-    borderRight: "1px solid #e2e8f0",
+    borderBottom: "1px solid #f0f0f0",
     whiteSpace: "nowrap",
   },
   checkbox: {
