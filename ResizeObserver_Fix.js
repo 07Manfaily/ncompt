@@ -1,86 +1,14 @@
-// Solution pour corriger les erreurs "ResizeObserver loop completed with undelivered notifications"
-
-// 1. Patch global du ResizeObserver
-if (typeof window !== 'undefined' && typeof window.ResizeObserver !== 'undefined') {
-  const OriginalResizeObserver = window.ResizeObserver;
-  let resizeObserverErrorCount = 0;
-  
-  window.ResizeObserver = class extends OriginalResizeObserver {
-    constructor(callback) {
-      super((entries, observer) => {
-        try {
-          // Utiliser requestAnimationFrame pour éviter les boucles infinies
-          if (resizeObserverErrorCount < 10) {
-            requestAnimationFrame(() => {
-              try {
-                callback(entries, observer);
-              } catch (e) {
-                resizeObserverErrorCount++;
-                // Ignore silencieusement après trop d'erreurs
-              }
-            });
-          }
-        } catch (e) {
-          resizeObserverErrorCount++;
-        }
-      });
-    }
-  };
-}
-
-// 2. Suppression des erreurs ResizeObserver dans la console
-if (typeof console !== 'undefined') {
-  const originalError = console.error;
-  console.error = (...args) => {
-    const message = args[0];
-    if (typeof message === 'string' && 
-        (message.includes('ResizeObserver') || 
-         message.includes('loop completed with undelivered notifications'))) {
-      return; // Ne pas afficher les erreurs ResizeObserver
-    }
-    originalError.apply(console, args);
-  };
-}
-
-// 3. Gestion des erreurs non capturées
-if (typeof window !== 'undefined') {
-  const handleError = (event) => {
-    if (event.message && event.message.includes('ResizeObserver')) {
-      event.preventDefault();
-      return false;
-    }
-  };
-
-  window.addEventListener('error', handleError);
-  
-  // Gestion des promesses rejetées
-  const handleUnhandledRejection = (event) => {
-    if (event.reason && 
-        event.reason.message && 
-        event.reason.message.includes('ResizeObserver')) {
-      event.preventDefault();
-      return;
-    }
-  };
-
-  window.addEventListener('unhandledrejection', handleUnhandledRejection);
-}
-
-// 4. Export pour utilisation dans d'autres composants
-export const ResizeObserverFix = {
-  // Méthode pour appliquer le fix
-  apply: () => {
-    // Le fix est appliqué automatiquement lors de l'import
-    console.log('ResizeObserver fix appliqué avec succès');
-  },
-  
-  // Méthode pour vérifier si le fix est actif
-  isActive: () => {
-    return typeof window !== 'undefined' && 
-           window.ResizeObserver && 
-           window.ResizeObserver.name === 'ResizeObserver';
-  }
-};
-
-// 5. Application automatique
-ResizeObserverFix.apply(); 
+Proposition de partenariat exclusif – World Football Fan Festival 2026 x CE SGCI
+​Monsieur le Directeur,
+​Je tiens tout d'abord à vous remercier chaleureusement pour l'accueil et la qualité de l'échange que vous avez eu aujourd'hui avec mon collaborateur/partenaire concernant le World Football Fan Festival. Comme convenu, je prends le relais pour vous transmettre par ce courriel les éléments clés de notre proposition afin de formaliser notre collaboration.
+​Pour rappel, le festival se tiendra du 11 juin au 19 juillet 2026 au Stade Félix Houphouët-Boigny (Le Félicia) à Abidjan. À l'occasion de la Coupe du Monde, cet événement offrira une expérience festive et sécurisée unique en plein cœur du Plateau.
+​Dans le cadre de ce partenariat avec le Comité d'Entreprise de la SGCI, nous avons le plaisir de vous proposer les modalités suivantes :
+​Pour les Collaborateurs de la SGCI (Avantage CE) :
+​Mise en place d'une réduction exclusive de [Indiquer le pourcentage, ex: 15%] sur les tickets d'accès au festival, disponible via un code promo dédié (ex: SGCI2026) sur la billetterie officielle wanaut.com.
+​Alternative : Un tarif préférentiel sur l'achat d'un lot de tickets physiques par le CE pour vos collaborateurs.
+​Pour les Clients de la SGCI (Activation Commerciale) :
+​Possibilité de réserver des packages ou des accès privilégiés pour vos clients VIP/Premium.
+​Opportunité d'associer l'image de la banque à l'événement (via vos canaux de communication ou des vagues de dotations de tickets en agence pour stimuler la fidélisation).
+​L'événement débutant dans un peu plus d'une semaine, nous sommes à votre entière disposition pour caler les derniers détails logistiques dès réception de votre projet de contrat.
+​Vous trouverez en pièce jointe l'affiche officielle de l'événement (pense à lui dire de joindre l'image 441537.jpg) ainsi qu'une présentation plus détaillée du festival.
+​Dans l'attente de votre retour pour la finalisation de notre accord, je vous prie d'agréer, Monsieur le Directeur, l'expression de mes salutations distinguées.
